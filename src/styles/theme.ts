@@ -35,6 +35,8 @@ export type ThemeColors = {
   placeholder: string;
   /** Fundo do bottom sheet */
   overlay: string;
+  /** Linhas do quadriculado do cartão de progresso */
+  grid: string;
   /** Gradiente de 180deg: início e fim */
   gradient: readonly [string, string];
   /** Rampa de intensidade, do nível 1 ao 4 */
@@ -54,6 +56,7 @@ export const THEMES: Record<ColorScheme, ThemeColors> = {
     accentText: BRAND.indigo,
     placeholder: "#5E5E5E",
     overlay: "rgba(0,0,0,0.50)",
+    grid: "rgba(0,0,0,0.06)",
     gradient: [BRAND.indigo, BRAND.orange],
     ramp: [BRAND.indigo, "#841E89", "#C13444", BRAND.orange],
   },
@@ -69,6 +72,7 @@ export const THEMES: Record<ColorScheme, ThemeColors> = {
     accentText: BRAND.orange,
     placeholder: "#8F8F8F",
     overlay: "rgba(0,0,0,0.62)",
+    grid: "rgba(221,221,221,0.06)",
     gradient: ["#7A4DFF", BRAND.orange],
     ramp: ["#7A4DFF", "#A64CAA", "#D34C55", BRAND.orange],
   },

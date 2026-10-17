@@ -93,7 +93,6 @@ export default function BotaoOpcao({
 
 const styles = StyleSheet.create({
   cartao: {
-    flex: 1,
     height: SIZES.categoryCard,
     padding: 14,
     borderRadius: RADIUS.category,
