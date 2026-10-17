@@ -10,7 +10,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import GaleriaScreen from "./src/screens/GaleriaScreen";
+import HomeScreen from "./src/screens/HomeScreen";
 import { ThemeProvider, useTheme } from "./src/theme/ThemeProvider";
 
 SplashScreen.preventAutoHideAsync().catch(() => {
@@ -21,7 +21,7 @@ function Root() {
   const { scheme } = useTheme();
   return (
     <>
-      <GaleriaScreen />
+      <HomeScreen />
       <StatusBar style={scheme === "dark" ? "light" : "dark"} />
     </>
   );

@@ -188,20 +188,3 @@ export const MOTION = {
   toast: { duration: 550, delay: 300 },
   press: { duration: 220, offset: 2, scale: 0.99 },
 } as const;
-
-/**
- * Aliases da v1 usados pelas telas ainda não migradas (Home, BotaoAcao e BotaoOpcao).
- * Apontam para os tokens do tema claro e saem quando a Home for reescrita na Etapa 2.
- * @deprecated use useTheme().colors
- */
-export const COLORS = {
-  primaryNavy: THEMES.light.ink,
-  blueprintBlue: THEMES.light.ink,
-  specialPurple: THEMES.light.accentText,
-  backgroundSlate: THEMES.light.bg,
-  surfaceWhite: THEMES.light.card,
-  buttonDefault: THEMES.light.sunk,
-  textPrimary: THEMES.light.ink,
-  textSecondary: THEMES.light.mute,
-  textOnPrimary: THEMES.light.onInk,
-} as const;
