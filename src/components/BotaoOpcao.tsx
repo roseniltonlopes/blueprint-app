@@ -11,12 +11,19 @@ import { COLORS } from "../styles/theme";
  * - selecionado: booleano que indica se esta categoria é a escolha atual no useState
  * - corSelecionado: (Opcional) permite personalizar a cor de destaque quando selecionado
  */
+type BotaoOpcaoProps = {
+  titulo: string;
+  aoPressionar: () => void;
+  selecionado?: boolean;
+  corSelecionado?: string;
+};
+
 export default function BotaoOpcao({
   titulo,
   aoPressionar,
   selecionado,
   corSelecionado,
-}) {
+}: BotaoOpcaoProps) {
   return (
     <Pressable
       style={[
@@ -26,14 +33,7 @@ export default function BotaoOpcao({
       ]}
       onPress={aoPressionar}
     >
-      <Text
-        style={[
-          styles.textoBotao,
-          selecionado && styles.textoBotaoSelecionado,
-        ]}
-      >
-        {titulo}
-      </Text>
+      <Text style={[styles.textoBotao, selecionado && styles.textoBotaoSelecionado]}>{titulo}</Text>
     </Pressable>
   );
 }

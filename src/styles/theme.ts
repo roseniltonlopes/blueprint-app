@@ -5,12 +5,12 @@
 
 export const COLORS = {
   // Paleta Principal (Light Mode — Base Creme #FFFDF2)
-  creamBackground: "#FFFDF2",   // Fundo principal claro (Creme oficial)
-  creamSurface: "#F4F1E1",      // Superfície de cards e inputs no modo claro
-  creamBorder: "#D8D5C5",       // Bordas sutis no modo claro
-  pureBlack: "#000000",         // Cor primária de contraste, botões ativos e fundo Dark Mode
-  charcoalSpecial: "#2D2A24",   // Destaque especial diferenciado para a opção "Outro"
-  textMuted: "#52514C",         // Textos secundários e legendas
+  creamBackground: "#FFFDF2", // Fundo principal claro (Creme oficial)
+  creamSurface: "#F4F1E1", // Superfície de cards e inputs no modo claro
+  creamBorder: "#D8D5C5", // Bordas sutis no modo claro
+  pureBlack: "#000000", // Cor primária de contraste, botões ativos e fundo Dark Mode
+  charcoalSpecial: "#2D2A24", // Destaque especial diferenciado para a opção "Outro"
+  textMuted: "#52514C", // Textos secundários e legendas
 
   // Aliases semânticos usados nos componentes
   primaryNavy: "#000000",
