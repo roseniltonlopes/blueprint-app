@@ -1,0 +1,390 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2180 960" width="2180" height="960" fill="none">
+  <defs>
+    <style>
+      .font-title { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 800; }
+      .font-semi { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600; }
+      .font-reg { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 400; }
+    </style>
+  </defs>
+
+  <!-- Canvas Background -->
+  <rect width="2180" height="960" fill="#EBE9DF"/>
+
+  <!-- ===================================================================== -->
+  <!-- TELA 1: CADASTRO & LOGIN GLOBAL (Google / Apple / Campos Obrigatórios)-->
+  <!-- ===================================================================== -->
+  <g id="Screen_01_Auth_Global" transform="translate(40, 60)">
+    <text x="195" y="-20" text-anchor="middle" fill="#000000" font-size="16" class="font-semi">01. Cadastro &amp; Login Global</text>
+    <!-- Phone Frame -->
+    <rect width="390" height="844" rx="44" fill="#FFFDF2" stroke="#000000" stroke-width="6"/>
+    <!-- Dynamic Island -->
+    <rect x="145" y="16" width="100" height="26" rx="13" fill="#000000"/>
+
+    <!-- Brand Header -->
+    <text x="195" y="105" text-anchor="middle" fill="#000000" font-size="34" class="font-title">Blueprint</text>
+    <text x="195" y="132" text-anchor="middle" fill="#52514C" font-size="14" class="font-reg">Plano de Ação Claro e Estruturado</text>
+
+    <!-- Social Auth Buttons (Google & Apple/iOS) -->
+    <g id="Btn_Google" transform="translate(28, 165)">
+      <rect width="334" height="50" rx="25" fill="#FFFDF2" stroke="#000000" stroke-width="1.5"/>
+      <circle cx="84" cy="25" r="9" fill="#000000"/>
+      <text x="84" y="29" text-anchor="middle" fill="#FFFDF2" font-size="11" class="font-title">G</text>
+      <text x="180" y="30" text-anchor="middle" fill="#000000" font-size="15" class="font-semi">Continuar com Google</text>
+    </g>
+
+    <g id="Btn_Apple_iOS" transform="translate(28, 227)">
+      <rect width="334" height="50" rx="25" fill="#000000"/>
+      <circle cx="84" cy="25" r="9" fill="#FFFDF2"/>
+      <text x="180" y="30" text-anchor="middle" fill="#FFFDF2" font-size="15" class="font-semi">Continuar com Apple (iOS)</text>
+    </g>
+
+    <!-- Divider -->
+    <line x1="28" y1="302" x2="145" y2="302" stroke="#D8D5C5" stroke-width="1.5"/>
+    <text x="195" y="307" text-anchor="middle" fill="#52514C" font-size="12" class="font-semi">OU CADASTRE-SE</text>
+    <line x1="245" y1="302" x2="362" y2="302" stroke="#D8D5C5" stroke-width="1.5"/>
+
+    <!-- Mandatory Global Fields -->
+    <g id="Input_Nome" transform="translate(28, 326)">
+      <text x="4" y="16" fill="#000000" font-size="13" class="font-semi">Nome completo *</text>
+      <rect y="24" width="334" height="48" rx="14" fill="#F4F1E1" stroke="#000000" stroke-width="1.2"/>
+      <text x="16" y="53" fill="#52514C" font-size="14" class="font-reg">Ex: Nilton Lopes</text>
+    </g>
+
+    <g id="Input_Email" transform="translate(28, 412)">
+      <text x="4" y="16" fill="#000000" font-size="13" class="font-semi">E-mail *</text>
+      <rect y="24" width="334" height="48" rx="14" fill="#F4F1E1" stroke="#000000" stroke-width="1.2"/>
+      <text x="16" y="53" fill="#52514C" font-size="14" class="font-reg">seuemail@dominio.com</text>
+    </g>
+
+    <g id="Input_Pais_Fuso" transform="translate(28, 498)">
+      <text x="4" y="16" fill="#000000" font-size="13" class="font-semi">País / Idioma Global *</text>
+      <rect y="24" width="334" height="48" rx="14" fill="#F4F1E1" stroke="#000000" stroke-width="1.2"/>
+      <text x="16" y="53" fill="#000000" font-size="14" class="font-reg">Brasil (PT-BR) • UTC-3</text>
+    </g>
+
+    <g id="Input_Senha" transform="translate(28, 584)">
+      <text x="4" y="16" fill="#000000" font-size="13" class="font-semi">Senha (mín. 8 caracteres) *</text>
+      <rect y="24" width="334" height="48" rx="14" fill="#F4F1E1" stroke="#000000" stroke-width="1.2"/>
+      <text x="16" y="53" fill="#000000" font-size="14" class="font-semi">••••••••••••</text>
+    </g>
+
+    <!-- Primary Submit CTA -->
+    <g id="Btn_Criar_Conta" transform="translate(28, 686)">
+      <rect width="334" height="54" rx="27" fill="#000000"/>
+      <text x="167" y="33" text-anchor="middle" fill="#FFFDF2" font-size="16" class="font-title">Criar Conta no Blueprint</text>
+    </g>
+
+    <text x="195" y="772" text-anchor="middle" fill="#52514C" font-size="13" class="font-semi">Já possui conta? Entrar</text>
+    <rect x="125" y="824" width="140" height="5" rx="2.5" fill="#000000"/>
+  </g>
+
+  <!-- ===================================================================== -->
+  <!-- TELA 2: HOME - ESTADO INICIAL (EMPTY STATE) - MODO CLARO (#FFFDF2)    -->
+  <!-- ===================================================================== -->
+  <g id="Screen_02_Home_Empty" transform="translate(468, 60)">
+    <text x="195" y="-20" text-anchor="middle" fill="#000000" font-size="16" class="font-semi">02. Home — Estado Inicial (Light #FFFDF2)</text>
+    <rect width="390" height="844" rx="44" fill="#FFFDF2" stroke="#000000" stroke-width="6"/>
+    <rect x="145" y="16" width="100" height="26" rx="13" fill="#000000"/>
+
+    <!-- Top Bar + Light/Dark Switch -->
+    <text x="28" y="88" fill="#000000" font-size="24" class="font-title">Blueprint</text>
+    <text x="28" y="108" fill="#52514C" font-size="13" class="font-reg">Plano de Ação Diário</text>
+    <g id="Theme_Toggle_Light" transform="translate(300, 68)">
+      <rect width="62" height="32" rx="16" fill="#000000"/>
+      <circle cx="16" cy="16" r="12" fill="#FFFDF2"/>
+      <text x="16" y="20" text-anchor="middle" fill="#000000" font-size="11" class="font-title">☀</text>
+      <text x="45" y="20" text-anchor="middle" fill="#FFFDF2" font-size="11" class="font-title">☾</text>
+    </g>
+
+    <!-- Hero Counter Card -->
+    <g id="Card_Contador_Zero" transform="translate(28, 128)">
+      <rect width="334" height="104" rx="22" fill="#F4F1E1" stroke="#000000" stroke-width="1.5"/>
+      <text x="167" y="54" text-anchor="middle" fill="#000000" font-size="40" class="font-title">0</text>
+      <text x="167" y="80" text-anchor="middle" fill="#52514C" font-size="14" class="font-semi">ações concluídas hoje</text>
+    </g>
+
+    <!-- Section Label -->
+    <text x="28" y="264" fill="#000000" font-size="15" class="font-title">Selecione seu foco agora</text>
+
+    <!-- Category Grid (52px+ Touch Targets) -->
+    <g id="Cat_Hidratacao" transform="translate(28, 280)">
+      <rect width="160" height="92" rx="20" fill="#F4F1E1" stroke="#D8D5C5" stroke-width="1.5"/>
+      <text x="80" y="42" text-anchor="middle" fill="#000000" font-size="22" class="font-title">💧</text>
+      <text x="80" y="70" text-anchor="middle" fill="#000000" font-size="15" class="font-semi">Hidratação</text>
+    </g>
+
+    <g id="Cat_Exercicio" transform="translate(202, 280)">
+      <rect width="160" height="92" rx="20" fill="#F4F1E1" stroke="#D8D5C5" stroke-width="1.5"/>
+      <text x="80" y="42" text-anchor="middle" fill="#000000" font-size="22" class="font-title">🏋️</text>
+      <text x="80" y="70" text-anchor="middle" fill="#000000" font-size="15" class="font-semi">Exercício</text>
+    </g>
+
+    <g id="Cat_Descanso" transform="translate(28, 386)">
+      <rect width="160" height="92" rx="20" fill="#F4F1E1" stroke="#D8D5C5" stroke-width="1.5"/>
+      <text x="80" y="42" text-anchor="middle" fill="#000000" font-size="22" class="font-title">🌙</text>
+      <text x="80" y="70" text-anchor="middle" fill="#000000" font-size="15" class="font-semi">Descanso</text>
+    </g>
+
+    <g id="Cat_Estudo" transform="translate(202, 386)">
+      <rect width="160" height="92" rx="20" fill="#F4F1E1" stroke="#D8D5C5" stroke-width="1.5"/>
+      <text x="80" y="42" text-anchor="middle" fill="#000000" font-size="22" class="font-title">📖</text>
+      <text x="80" y="70" text-anchor="middle" fill="#000000" font-size="15" class="font-semi">Estudo</text>
+    </g>
+
+    <g id="Cat_Outro" transform="translate(28, 492)">
+      <rect width="334" height="64" rx="20" fill="#F4F1E1" stroke="#D8D5C5" stroke-width="1.5"/>
+      <text x="167" y="38" text-anchor="middle" fill="#000000" font-size="15" class="font-semi">✦  Outro (Demanda personalizada)</text>
+    </g>
+
+    <!-- Status Pill -->
+    <g id="Status_Empty" transform="translate(28, 580)">
+      <rect width="334" height="48" rx="16" fill="#F4F1E1"/>
+      <text x="167" y="29" text-anchor="middle" fill="#52514C" font-size="14" class="font-semi">Nenhuma categoria selecionada</text>
+    </g>
+
+    <!-- Primary CTA Button -->
+    <g id="Btn_Confirm_Disabled" transform="translate(28, 644)">
+      <rect width="334" height="54" rx="27" fill="#D8D5C5"/>
+      <text x="167" y="33" text-anchor="middle" fill="#52514C" font-size="15" class="font-title">Toque em uma opção acima</text>
+    </g>
+
+    <!-- Bottom Navigation Bar (Thumb Zone) -->
+    <g id="Bottom_Nav_1" transform="translate(6, 742)">
+      <line x1="0" y1="0" x2="378" y2="0" stroke="#D8D5C5" stroke-width="1.5"/>
+      <text x="65" y="34" text-anchor="middle" fill="#000000" font-size="18" class="font-title">●</text>
+      <text x="65" y="54" text-anchor="middle" fill="#000000" font-size="12" class="font-title">Hoje</text>
+      <text x="189" y="34" text-anchor="middle" fill="#52514C" font-size="18" class="font-reg">○</text>
+      <text x="189" y="54" text-anchor="middle" fill="#52514C" font-size="12" class="font-semi">Histórico</text>
+      <text x="313" y="34" text-anchor="middle" fill="#52514C" font-size="18" class="font-reg">○</text>
+      <text x="313" y="54" text-anchor="middle" fill="#52514C" font-size="12" class="font-semi">Perfil</text>
+    </g>
+    <rect x="125" y="824" width="140" height="5" rx="2.5" fill="#000000"/>
+  </g>
+
+  <!-- ===================================================================== -->
+  <!-- TELA 3: HOME - CATEGORIA SELECIONADA (ACTIVE STATE)                   -->
+  <!-- ===================================================================== -->
+  <g id="Screen_03_Home_Active" transform="translate(896, 60)">
+    <text x="195" y="-20" text-anchor="middle" fill="#000000" font-size="16" class="font-semi">03. Home — Categoria Selecionada</text>
+    <rect width="390" height="844" rx="44" fill="#FFFDF2" stroke="#000000" stroke-width="6"/>
+    <rect x="145" y="16" width="100" height="26" rx="13" fill="#000000"/>
+
+    <text x="28" y="88" fill="#000000" font-size="24" class="font-title">Blueprint</text>
+    <text x="28" y="108" fill="#52514C" font-size="13" class="font-reg">Plano de Ação Diário</text>
+    <g transform="translate(300, 68)">
+      <rect width="62" height="32" rx="16" fill="#000000"/>
+      <circle cx="16" cy="16" r="12" fill="#FFFDF2"/>
+      <text x="16" y="20" text-anchor="middle" fill="#000000" font-size="11" class="font-title">☀</text>
+      <text x="45" y="20" text-anchor="middle" fill="#FFFDF2" font-size="11" class="font-title">☾</text>
+    </g>
+
+    <!-- Hero Counter Updated -->
+    <g transform="translate(28, 128)">
+      <rect width="334" height="104" rx="22" fill="#F4F1E1" stroke="#000000" stroke-width="2"/>
+      <text x="167" y="54" text-anchor="middle" fill="#000000" font-size="40" class="font-title">3</text>
+      <text x="167" y="80" text-anchor="middle" fill="#000000" font-size="14" class="font-semi">ações registradas hoje</text>
+    </g>
+
+    <text x="28" y="264" fill="#000000" font-size="15" class="font-title">Selecione seu foco agora</text>
+
+    <g transform="translate(28, 280)">
+      <rect width="160" height="92" rx="20" fill="#F4F1E1" stroke="#D8D5C5" stroke-width="1.5"/>
+      <text x="80" y="42" text-anchor="middle" fill="#000000" font-size="22" class="font-title">💧</text>
+      <text x="80" y="70" text-anchor="middle" fill="#000000" font-size="15" class="font-semi">Hidratação</text>
+    </g>
+
+    <g transform="translate(202, 280)">
+      <rect width="160" height="92" rx="20" fill="#F4F1E1" stroke="#D8D5C5" stroke-width="1.5"/>
+      <text x="80" y="42" text-anchor="middle" fill="#000000" font-size="22" class="font-title">🏋️</text>
+      <text x="80" y="70" text-anchor="middle" fill="#000000" font-size="15" class="font-semi">Exercício</text>
+    </g>
+
+    <g transform="translate(28, 386)">
+      <rect width="160" height="92" rx="20" fill="#F4F1E1" stroke="#D8D5C5" stroke-width="1.5"/>
+      <text x="80" y="42" text-anchor="middle" fill="#000000" font-size="22" class="font-title">🌙</text>
+      <text x="80" y="70" text-anchor="middle" fill="#000000" font-size="15" class="font-semi">Descanso</text>
+    </g>
+
+    <!-- ACTIVE CARD: ESTUDO (Pure Black #000000 with Cream #FFFDF2 text) -->
+    <g id="Cat_Estudo_Selected" transform="translate(202, 386)">
+      <rect width="160" height="92" rx="20" fill="#000000"/>
+      <circle cx="136" cy="22" r="10" fill="#FFFDF2"/>
+      <text x="136" y="26" text-anchor="middle" fill="#000000" font-size="12" class="font-title">✓</text>
+      <text x="80" y="42" text-anchor="middle" fill="#FFFDF2" font-size="22" class="font-title">📖</text>
+      <text x="80" y="70" text-anchor="middle" fill="#FFFDF2" font-size="15" class="font-title">Estudo</text>
+    </g>
+
+    <g transform="translate(28, 492)">
+      <rect width="334" height="64" rx="20" fill="#F4F1E1" stroke="#D8D5C5" stroke-width="1.5"/>
+      <text x="167" y="38" text-anchor="middle" fill="#000000" font-size="15" class="font-semi">✦  Outro (Demanda personalizada)</text>
+    </g>
+
+    <!-- Active Status Pill -->
+    <g transform="translate(28, 580)">
+      <rect width="334" height="48" rx="16" fill="#F4F1E1" stroke="#000000" stroke-width="1.5"/>
+      <text x="167" y="29" text-anchor="middle" fill="#000000" font-size="14" class="font-title">Foco atual: Estudo</text>
+    </g>
+
+    <!-- Primary CTA Active -->
+    <g transform="translate(28, 644)">
+      <rect width="334" height="54" rx="27" fill="#000000"/>
+      <text x="167" y="33" text-anchor="middle" fill="#FFFDF2" font-size="16" class="font-title">Registrar no Blueprint</text>
+    </g>
+
+    <!-- Bottom Navigation Bar -->
+    <g transform="translate(6, 742)">
+      <line x1="0" y1="0" x2="378" y2="0" stroke="#D8D5C5" stroke-width="1.5"/>
+      <text x="65" y="34" text-anchor="middle" fill="#000000" font-size="18" class="font-title">●</text>
+      <text x="65" y="54" text-anchor="middle" fill="#000000" font-size="12" class="font-title">Hoje</text>
+      <text x="189" y="34" text-anchor="middle" fill="#52514C" font-size="18" class="font-reg">○</text>
+      <text x="189" y="54" text-anchor="middle" fill="#52514C" font-size="12" class="font-semi">Histórico</text>
+      <text x="313" y="34" text-anchor="middle" fill="#52514C" font-size="18" class="font-reg">○</text>
+      <text x="313" y="54" text-anchor="middle" fill="#52514C" font-size="12" class="font-semi">Perfil</text>
+    </g>
+    <rect x="125" y="824" width="140" height="5" rx="2.5" fill="#000000"/>
+  </g>
+
+  <!-- ===================================================================== -->
+  <!-- TELA 4: HOME - OPÇÃO ESPECIAL "OUTRO" ATIVA (COR DIFERENCIADA)        -->
+  <!-- ===================================================================== -->
+  <g id="Screen_04_Home_Outro" transform="translate(1324, 60)">
+    <text x="195" y="-20" text-anchor="middle" fill="#000000" font-size="16" class="font-semi">04. Home — Opção "Outro" Ativa</text>
+    <rect width="390" height="844" rx="44" fill="#FFFDF2" stroke="#000000" stroke-width="6"/>
+    <rect x="145" y="16" width="100" height="26" rx="13" fill="#000000"/>
+
+    <text x="28" y="88" fill="#000000" font-size="24" class="font-title">Blueprint</text>
+    <text x="28" y="108" fill="#52514C" font-size="13" class="font-reg">Plano de Ação Diário</text>
+    <g transform="translate(300, 68)">
+      <rect width="62" height="32" rx="16" fill="#000000"/>
+      <circle cx="16" cy="16" r="12" fill="#FFFDF2"/>
+      <text x="16" y="20" text-anchor="middle" fill="#000000" font-size="11" class="font-title">☀</text>
+      <text x="45" y="20" text-anchor="middle" fill="#FFFDF2" font-size="11" class="font-title">☾</text>
+    </g>
+
+    <g transform="translate(28, 128)">
+      <rect width="334" height="104" rx="22" fill="#F4F1E1" stroke="#000000" stroke-width="2"/>
+      <text x="167" y="54" text-anchor="middle" fill="#000000" font-size="40" class="font-title">4</text>
+      <text x="167" y="80" text-anchor="middle" fill="#000000" font-size="14" class="font-semi">ações registradas hoje</text>
+    </g>
+
+    <text x="28" y="264" fill="#000000" font-size="15" class="font-title">Selecione seu foco agora</text>
+
+    <g transform="translate(28, 280)">
+      <rect width="160" height="92" rx="20" fill="#F4F1E1" stroke="#D8D5C5" stroke-width="1.5"/>
+      <text x="80" y="42" text-anchor="middle" fill="#000000" font-size="22" class="font-title">💧</text>
+      <text x="80" y="70" text-anchor="middle" fill="#000000" font-size="15" class="font-semi">Hidratação</text>
+    </g>
+
+    <g transform="translate(202, 280)">
+      <rect width="160" height="92" rx="20" fill="#F4F1E1" stroke="#D8D5C5" stroke-width="1.5"/>
+      <text x="80" y="42" text-anchor="middle" fill="#000000" font-size="22" class="font-title">🏋️</text>
+      <text x="80" y="70" text-anchor="middle" fill="#000000" font-size="15" class="font-semi">Exercício</text>
+    </g>
+
+    <g transform="translate(28, 386)">
+      <rect width="160" height="92" rx="20" fill="#F4F1E1" stroke="#D8D5C5" stroke-width="1.5"/>
+      <text x="80" y="42" text-anchor="middle" fill="#000000" font-size="22" class="font-title">🌙</text>
+      <text x="80" y="70" text-anchor="middle" fill="#000000" font-size="15" class="font-semi">Descanso</text>
+    </g>
+
+    <g transform="translate(202, 386)">
+      <rect width="160" height="92" rx="20" fill="#F4F1E1" stroke="#D8D5C5" stroke-width="1.5"/>
+      <text x="80" y="42" text-anchor="middle" fill="#000000" font-size="22" class="font-title">📖</text>
+      <text x="80" y="70" text-anchor="middle" fill="#000000" font-size="15" class="font-semi">Estudo</text>
+    </g>
+
+    <!-- SPECIAL CUSTOM PROP: OUTRO SELECTED (Charcoal #2D2A24 + Dashed Cream Border) -->
+    <g id="Cat_Outro_Selected" transform="translate(28, 492)">
+      <rect width="334" height="64" rx="20" fill="#2D2A24" stroke="#000000" stroke-width="2" stroke-dasharray="6 4"/>
+      <text x="167" y="38" text-anchor="middle" fill="#FFFDF2" font-size="15" class="font-title">✦  Outro (Selecionado — Cor Especial)</text>
+    </g>
+
+    <g transform="translate(28, 580)">
+      <rect width="334" height="48" rx="16" fill="#2D2A24"/>
+      <text x="167" y="29" text-anchor="middle" fill="#FFFDF2" font-size="14" class="font-title">Foco atual: Outro</text>
+    </g>
+
+    <g transform="translate(28, 644)">
+      <rect width="334" height="54" rx="27" fill="#000000"/>
+      <text x="167" y="33" text-anchor="middle" fill="#FFFDF2" font-size="16" class="font-title">Registrar no Blueprint</text>
+    </g>
+
+    <g transform="translate(6, 742)">
+      <line x1="0" y1="0" x2="378" y2="0" stroke="#D8D5C5" stroke-width="1.5"/>
+      <text x="65" y="34" text-anchor="middle" fill="#000000" font-size="18" class="font-title">●</text>
+      <text x="65" y="54" text-anchor="middle" fill="#000000" font-size="12" class="font-title">Hoje</text>
+      <text x="189" y="34" text-anchor="middle" fill="#52514C" font-size="18" class="font-reg">○</text>
+      <text x="189" y="54" text-anchor="middle" fill="#52514C" font-size="12" class="font-semi">Histórico</text>
+      <text x="313" y="34" text-anchor="middle" fill="#52514C" font-size="18" class="font-reg">○</text>
+      <text x="313" y="54" text-anchor="middle" fill="#52514C" font-size="12" class="font-semi">Perfil</text>
+    </g>
+    <rect x="125" y="824" width="140" height="5" rx="2.5" fill="#000000"/>
+  </g>
+
+  <!-- ===================================================================== -->
+  <!-- TELA 5: HISTÓRICO & DARK MODE ATIVO (#000000 + #FFFDF2)               -->
+  <!-- ===================================================================== -->
+  <g id="Screen_05_History_Dark_Mode" transform="translate(1752, 60)">
+    <text x="195" y="-20" text-anchor="middle" fill="#000000" font-size="16" class="font-semi">05. Histórico — Dark Mode (#000000)</text>
+    <rect width="390" height="844" rx="44" fill="#000000" stroke="#2D2A24" stroke-width="6"/>
+    <rect x="145" y="16" width="100" height="26" rx="13" fill="#1A1916"/>
+
+    <!-- Header in Dark Mode -->
+    <text x="28" y="88" fill="#FFFDF2" font-size="24" class="font-title">Histórico</text>
+    <text x="28" y="108" fill="#A8A496" font-size="13" class="font-reg">Sincronizado na nuvem • Hoje</text>
+
+    <!-- Dark Mode Toggle Active -->
+    <g id="Theme_Toggle_Dark" transform="translate(300, 68)">
+      <rect width="62" height="32" rx="16" fill="#FFFDF2"/>
+      <text x="18" y="20" text-anchor="middle" fill="#000000" font-size="11" class="font-title">☀</text>
+      <circle cx="46" cy="16" r="12" fill="#000000"/>
+      <text x="46" y="20" text-anchor="middle" fill="#FFFDF2" font-size="11" class="font-title">☾</text>
+    </g>
+
+    <!-- Activity Cards List in Cream (#FFFDF2) on Pure Black (#000000) -->
+    <g id="Hist_Card_1" transform="translate(28, 138)">
+      <rect width="334" height="84" rx="20" fill="#FFFDF2"/>
+      <text x="22" y="36" fill="#000000" font-size="16" class="font-title">📖  Estudo — Arquitetura Mobile</text>
+      <text x="22" y="60" fill="#52514C" font-size="13" class="font-semi">Concluído hoje às 19:10 • Sincronizado</text>
+    </g>
+
+    <g id="Hist_Card_2" transform="translate(28, 236)">
+      <rect width="334" height="84" rx="20" fill="#FFFDF2"/>
+      <text x="22" y="36" fill="#000000" font-size="16" class="font-title">🏋️  Exercício — Treino Diário</text>
+      <text x="22" y="60" fill="#52514C" font-size="13" class="font-semi">Concluído hoje às 17:45 • Sincronizado</text>
+    </g>
+
+    <g id="Hist_Card_3" transform="translate(28, 334)">
+      <rect width="334" height="84" rx="20" fill="#FFFDF2"/>
+      <text x="22" y="36" fill="#000000" font-size="16" class="font-title">💧  Hidratação — Meta 2L</text>
+      <text x="22" y="60" fill="#52514C" font-size="13" class="font-semi">Concluído hoje às 14:20 • Sincronizado</text>
+    </g>
+
+    <g id="Hist_Card_4" transform="translate(28, 432)">
+      <rect width="334" height="84" rx="20" fill="#1C1B18" stroke="#FFFDF2" stroke-width="1.2" stroke-dasharray="5 4"/>
+      <text x="22" y="36" fill="#FFFDF2" font-size="16" class="font-title">✦  Outro — Revisão de Projeto</text>
+      <text x="22" y="60" fill="#A8A496" font-size="13" class="font-semi">Concluído hoje às 11:00 • Categoria Especial</text>
+    </g>
+
+    <!-- Weekly Summary Card -->
+    <g id="Card_Weekly_Summary" transform="translate(28, 540)">
+      <rect width="334" height="140" rx="22" fill="#1C1B18" stroke="#383630" stroke-width="1.5"/>
+      <text x="22" y="36" fill="#FFFDF2" font-size="15" class="font-title">Consistência da Semana</text>
+      <text x="22" y="62" fill="#A8A496" font-size="13" class="font-reg">Você manteve o plano ativo por 5 dias seguidos.</text>
+      <rect x="22" y="88" width="290" height="28" rx="14" fill="#FFFDF2"/>
+      <text x="167" y="107" text-anchor="middle" fill="#000000" font-size="13" class="font-title">100% Sincronizado na Nuvem</text>
+    </g>
+
+    <!-- Bottom Navigation Bar (Dark Mode) -->
+    <g id="Bottom_Nav_Dark" transform="translate(6, 742)">
+      <line x1="0" y1="0" x2="378" y2="0" stroke="#2D2A24" stroke-width="1.5"/>
+      <text x="65" y="34" text-anchor="middle" fill="#A8A496" font-size="18" class="font-reg">○</text>
+      <text x="65" y="54" text-anchor="middle" fill="#A8A496" font-size="12" class="font-semi">Hoje</text>
+      <text x="189" y="34" text-anchor="middle" fill="#FFFDF2" font-size="18" class="font-title">●</text>
+      <text x="189" y="54" text-anchor="middle" fill="#FFFDF2" font-size="12" class="font-title">Histórico</text>
+      <text x="313" y="34" text-anchor="middle" fill="#A8A496" font-size="18" class="font-reg">○</text>
+      <text x="313" y="54" text-anchor="middle" fill="#A8A496" font-size="12" class="font-semi">Perfil</text>
+    </g>
+    <rect x="125" y="824" width="140" height="5" rx="2.5" fill="#FFFDF2"/>
+  </g>
+</svg>

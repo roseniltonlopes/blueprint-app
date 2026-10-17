@@ -1,0 +1,32 @@
+# Dependências
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Arquivos nativos temporários e builds
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.apk
+*.aab
+
+# Variáveis de ambiente e segredos (Supabase)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs e Sistema Operacional
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+.DS_Store
+Thumbs.db
