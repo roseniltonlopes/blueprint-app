@@ -1,37 +1,58 @@
-import React from "react";
-import { Pressable, StyleSheet, Text } from "react-native";
-import { COLORS } from "../styles/theme";
+import { Pressable, StyleSheet } from "react-native";
+import { useTheme } from "../theme/ThemeProvider";
+import { RADIUS, SIZES } from "../styles/theme";
+import { Icon } from "../ui/Icon";
+import { Text } from "../ui/Text";
 
-/**
- * Componente Reutilizável: BotaoAcao
- *
- * Usado para confirmar o registro da ação selecionada no plano diário (Blueprint).
- */
 type BotaoAcaoProps = {
   titulo: string;
   aoPressionar: () => void;
+  desabilitado?: boolean;
 };
 
-export default function BotaoAcao({ titulo, aoPressionar }: BotaoAcaoProps) {
+/** Botão principal (docs/03, telas 2 e 3): preto com brilho laranja; desabilitado em tom afundado. */
+export default function BotaoAcao({ titulo, aoPressionar, desabilitado = false }: BotaoAcaoProps) {
+  const { colors, shadows } = useTheme();
+
   return (
-    <Pressable style={styles.botao} onPress={aoPressionar}>
-      <Text style={styles.textoBotao}>{titulo}</Text>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ disabled: desabilitado }}
+      disabled={desabilitado}
+      onPress={aoPressionar}
+      style={({ pressed }) => [
+        styles.botao,
+        desabilitado
+          ? { backgroundColor: colors.sunk }
+          : { backgroundColor: colors.ink, boxShadow: shadows.glow },
+        pressed && !desabilitado && styles.pressionado,
+      ]}
+    >
+      {desabilitado ? (
+        <Text variant="support" weight={500} color="mute" style={styles.textoDesabilitado}>
+          {titulo}
+        </Text>
+      ) : (
+        <>
+          <Icon name="mais" color={colors.onInk} size={20} strokeWidth={2.4} />
+          <Text variant="body" weight={600} color="onInk">
+            {titulo}
+          </Text>
+        </>
+      )}
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   botao: {
-    backgroundColor: COLORS.primaryNavy,
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    marginTop: 8,
+    height: SIZES.button,
+    borderRadius: RADIUS.button,
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
   },
-  textoBotao: {
-    color: COLORS.textOnPrimary,
-    fontSize: 16,
-    fontWeight: "700",
-  },
+  textoDesabilitado: { fontSize: 15 },
+  pressionado: { transform: [{ translateY: 2 }, { scale: 0.99 }] },
 });
