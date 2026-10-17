@@ -7,6 +7,16 @@ O link é privado até o dono do canvas compartilhar pelo botão *Share*. O cód
 
 ---
 
+## 📱 Telas do MVP
+
+| | | |
+|---|---|---|
+| ![Cadastro e login](docs/assets/telas/cadastro-login.png) | ![Home estado inicial](docs/assets/telas/home-estado-inicial.png) | ![Home categoria ativa](docs/assets/telas/home-categoria-ativa.png) |
+| ![Home opção Outro](docs/assets/telas/home-opcao-outro.png) | ![Home modo escuro](docs/assets/telas/home-escuro.png) | ![Calendário modo escuro](docs/assets/telas/calendario-escuro.png) |
+| ![Histórico](docs/assets/telas/historico.png) | ![Perfil modo escuro](docs/assets/telas/perfil-escuro.png) | |
+
+---
+
 ## 📌 Estado atual do projeto
 
 | Camada | Situação |
