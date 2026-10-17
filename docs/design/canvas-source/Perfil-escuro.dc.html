@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Perfil, modo escuro</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+input::placeholder{color:#8F8F8F}
+button{font-family:inherit}
+.tap{transition:transform .22s cubic-bezier(.2,.8,.2,1),box-shadow .22s ease,background-color .3s ease,color .3s ease,border-color .3s ease}
+.tap:hover{transform:translateY(-1px)}
+.tap:active{transform:translate(2px,2px) scale(.99)}
+.tap:focus-visible,input:focus-visible{outline:2px solid #FF4B00;outline-offset:3px}
+.fu{animation:fu .6s cubic-bezier(.2,.8,.2,1) backwards}
+@keyframes fu{from{opacity:0;transform:translateY(10px)}}
+.fade{animation:fade .6s ease .25s backwards}
+@keyframes fade{from{opacity:0}}
+.seg{animation:draw .8s cubic-bezier(.2,.8,.2,1) backwards}
+@keyframes draw{from{stroke-dasharray:0 400}}
+.grow{transform-origin:bottom;animation:grow .85s cubic-bezier(.2,.8,.2,1) backwards}
+@keyframes grow{from{transform:scaleY(0)}}
+.pop{animation:pop .5s cubic-bezier(.2,.8,.2,1) backwards}
+@keyframes pop{from{opacity:0;transform:scale(.6)}}
+.up{animation:up .55s cubic-bezier(.2,.8,.2,1) .3s backwards}
+@keyframes up{from{opacity:0;transform:translateY(24px)}}
+.sheet{animation:sheet .6s cubic-bezier(.2,.8,.2,1) backwards}
+@keyframes sheet{from{transform:translateY(100%)}}
+.veil{animation:fade .4s ease backwards}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div style="position:relative;width:390px;height:844px;box-sizing:border-box;overflow:hidden;display:flex;flex-direction:column;background:#000000;color:#DDDDDD;font-family:'Nohemi','Sora',system-ui,sans-serif;"><div style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;padding:24px 16px 0">
+<h1 class="fu" style="margin:0;font-family:'Nohemi','Sora',system-ui,sans-serif;font-weight:400;letter-spacing:-0.02em;font-size:30px;line-height:36px">Perfil</h1>
+<div class="fu" style="margin-top:16px;display:flex;align-items:center;gap:14px;animation-delay:.05s">
+<div style="width:64px;height:64px;flex:none;border-radius:50%;background:linear-gradient(180deg,#7A4DFF,#FF4B00);color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-family:'Nohemi','Sora',system-ui,sans-serif;font-weight:600;font-size:22px">AS</div>
+<div style="flex:1;min-width:0"><div style="font-size:19px;line-height:26px;font-weight:600">Ana Souza</div><div style="font-size:14px;line-height:20px;color:#9C9C9C">ana@exemplo.com</div></div>
+<button type="button" class="tap" style="height:44px;padding:0 16px;border-radius:999px;background:#222222;color:#DDDDDD;cursor:pointer;font-family:'Nohemi','Sora',system-ui,sans-serif;font-size:14px;font-weight:500">Editar</button>
+</div>
+<div class="fu" style="margin-top:16px;display:flex;gap:12px;animation-delay:.1s"><div style="flex:1;padding:14px 16px;border-radius:22px;background:#141414;box-shadow:none"><div style="font-family:'Nohemi','Sora',system-ui,sans-serif;font-weight:300;letter-spacing:-0.03em;font-size:36px;line-height:40px">128</div><div style="font-size:14px;line-height:20px;color:#9C9C9C">ações registradas</div></div><div style="flex:1;padding:14px 16px;border-radius:22px;background:#141414;box-shadow:none"><div style="font-family:'Nohemi','Sora',system-ui,sans-serif;font-weight:300;letter-spacing:-0.03em;font-size:36px;line-height:40px">7 dias</div><div style="font-size:14px;line-height:20px;color:#9C9C9C">sequência atual</div></div></div>
+<div class="fu" style="margin-top:12px;padding:16px 20px 14px;border-radius:24px;background:#141414;box-shadow:none;animation-delay:.15s">
+<div style="display:flex;align-items:baseline;justify-content:space-between"><h2 style="margin:0;font-size:17px;line-height:24px;font-weight:600">Mapa de calor</h2><div style="font-size:13px;line-height:18px;color:#9C9C9C">últimas 12 semanas</div></div>
+<div style="margin-top:12px;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:repeat(7,18px);grid-auto-flow:column;gap:4px">
+<sc-for list="{{heat}}" as="c" hint-placeholder-count="84"><div class="pop" style="border-radius:5px;background:{{c.bg}};animation-delay:{{c.d}}"></div></sc-for>
+</div>
+<div style="margin-top:12px;display:flex;align-items:center;justify-content:flex-end;gap:5px;font-size:13px;line-height:18px;color:#9C9C9C">menos<div style="display:flex;gap:4px;margin:0 4px"><div style="width:14px;height:14px;border-radius:4px;background:rgba(221,221,221,0.2)"></div><div style="width:14px;height:14px;border-radius:4px;background:#7A4DFF"></div><div style="width:14px;height:14px;border-radius:4px;background:#A64CAA"></div><div style="width:14px;height:14px;border-radius:4px;background:#D34C55"></div><div style="width:14px;height:14px;border-radius:4px;background:#FF4B00"></div></div>mais</div>
+</div>
+<h2 class="fu" style="margin:20px 0 12px;font-size:17px;line-height:24px;font-weight:600;animation-delay:.2s">Aparência</h2>
+<div class="fu" style="animation-delay:.22s"><div style="display:flex;padding:3px;border-radius:999px;background:#222222"><button type="button" class="tap" aria-pressed="false" style="flex:1;height:44px;border:none;border-radius:999px;background:transparent;color:#DDDDDD;cursor:pointer;font-family:'Nohemi','Sora',system-ui,sans-serif;font-size:14px;font-weight:500">Claro</button><button type="button" class="tap" aria-pressed="true" style="flex:1;height:44px;border:none;border-radius:999px;background:#DDDDDD;color:#000000;cursor:pointer;font-family:'Nohemi','Sora',system-ui,sans-serif;font-size:14px;font-weight:500">Escuro</button><button type="button" class="tap" aria-pressed="false" style="flex:1;height:44px;border:none;border-radius:999px;background:transparent;color:#DDDDDD;cursor:pointer;font-family:'Nohemi','Sora',system-ui,sans-serif;font-size:14px;font-weight:500">Automático</button></div></div>
+<div class="fu" style="margin-top:16px;display:flex;align-items:center;justify-content:space-between;animation-delay:.26s"><div style="font-size:16px;line-height:22px;font-weight:500">Cor de destaque</div><div style="display:flex;gap:12px;padding-right:5px"><button type="button" class="tap" aria-label="Cor de destaque Gradiente" aria-pressed="true" style="width:44px;height:44px;padding:0;border:none;border-radius:50%;background:linear-gradient(180deg,#7A4DFF,#FF4B00);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 0 0 3px #000000,0 0 0 5px #DDDDDD;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button><button type="button" class="tap" aria-label="Cor de destaque Laranja" aria-pressed="false" style="width:44px;height:44px;padding:0;border:none;border-radius:50%;background:#FF4B00;display:flex;align-items:center;justify-content:center;cursor:pointer;"></button><button type="button" class="tap" aria-label="Cor de destaque Índigo" aria-pressed="false" style="width:44px;height:44px;padding:0;border:none;border-radius:50%;background:#4607CD;display:flex;align-items:center;justify-content:center;cursor:pointer;"></button></div></div>
+<div style="margin-top:12px"><div style="display:flex;align-items:center;justify-content:space-between;height:56px"><div style="font-size:16px;line-height:22px;font-weight:500">Fuso horário</div><div style="font-size:15px;line-height:20px;color:#9C9C9C">América/São Paulo</div></div><div style="display:flex;align-items:center;justify-content:space-between;height:56px"><div style="font-size:16px;line-height:22px;font-weight:500">Conta</div><div style="font-size:15px;line-height:20px;color:#9C9C9C">Google</div></div></div>
+</div>
+<nav aria-label="Navegação principal" style="display:flex;gap:6px;padding:10px 12px 22px;background:#141414;box-shadow:none"><button type="button" class="tap" style="flex:1;min-width:0;height:56px;border:none;border-radius:18px;background:transparent;color:#9C9C9C;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;font-size:12px;line-height:14px;font-weight:500;padding:0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9C9C9C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg><span>Hoje</span></button><button type="button" class="tap" style="flex:1;min-width:0;height:56px;border:none;border-radius:18px;background:transparent;color:#9C9C9C;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;font-size:12px;line-height:14px;font-weight:500;padding:0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9C9C9C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>Calendário</span></button><button type="button" class="tap" style="flex:1;min-width:0;height:56px;border:none;border-radius:18px;background:transparent;color:#9C9C9C;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;font-size:12px;line-height:14px;font-weight:500;padding:0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9C9C9C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span>Histórico</span></button><button type="button" class="tap" aria-current="page" style="flex:1;min-width:0;height:56px;border:none;border-radius:18px;background:#DDDDDD;color:#000000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;font-size:12px;line-height:14px;font-weight:500;padding:0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Perfil</span></button></nav></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return { heat: [{"bg": "rgba(221,221,221,0.2)", "d": "0.30s"}, {"bg": "#D34C55", "d": "0.30s"}, {"bg": "#7A4DFF", "d": "0.30s"}, {"bg": "#FF4B00", "d": "0.30s"}, {"bg": "#A64CAA", "d": "0.30s"}, {"bg": "rgba(221,221,221,0.2)", "d": "0.30s"}, {"bg": "#D34C55", "d": "0.30s"}, {"bg": "#A64CAA", "d": "0.34s"}, {"bg": "#7A4DFF", "d": "0.34s"}, {"bg": "rgba(221,221,221,0.2)", "d": "0.34s"}, {"bg": "#FF4B00", "d": "0.34s"}, {"bg": "#D34C55", "d": "0.34s"}, {"bg": "#A64CAA", "d": "0.34s"}, {"bg": "#7A4DFF", "d": "0.34s"}, {"bg": "#FF4B00", "d": "0.39s"}, {"bg": "#FF4B00", "d": "0.39s"}, {"bg": "#FF4B00", "d": "0.39s"}, {"bg": "#FF4B00", "d": "0.39s"}, {"bg": "#FF4B00", "d": "0.39s"}, {"bg": "#FF4B00", "d": "0.39s"}, {"bg": "#FF4B00", "d": "0.39s"}, {"bg": "#7A4DFF", "d": "0.43s"}, {"bg": "#A64CAA", "d": "0.43s"}, {"bg": "#D34C55", "d": "0.43s"}, {"bg": "#FF4B00", "d": "0.43s"}, {"bg": "rgba(221,221,221,0.2)", "d": "0.43s"}, {"bg": "#7A4DFF", "d": "0.43s"}, {"bg": "#A64CAA", "d": "0.43s"}, {"bg": "#D34C55", "d": "0.48s"}, {"bg": "rgba(221,221,221,0.2)", "d": "0.48s"}, {"bg": "#A64CAA", "d": "0.48s"}, {"bg": "#FF4B00", "d": "0.48s"}, {"bg": "#7A4DFF", "d": "0.48s"}, {"bg": "#D34C55", "d": "0.48s"}, {"bg": "rgba(221,221,221,0.2)", "d": "0.48s"}, {"bg": "rgba(221,221,221,0.2)", "d": "0.52s"}, {"bg": "#D34C55", "d": "0.52s"}, {"bg": "#7A4DFF", "d": "0.52s"}, {"bg": "#FF4B00", "d": "0.52s"}, {"bg": "#A64CAA", "d": "0.52s"}, {"bg": "rgba(221,221,221,0.2)", "d": "0.52s"}, {"bg": "#D34C55", "d": "0.52s"}, {"bg": "#A64CAA", "d": "0.57s"}, {"bg": "#7A4DFF", "d": "0.57s"}, {"bg": "rgba(221,221,221,0.2)", "d": "0.57s"}, {"bg": "#FF4B00", "d": "0.57s"}, {"bg": "#D34C55", "d": "0.57s"}, {"bg": "#A64CAA", "d": "0.57s"}, {"bg": "#7A4DFF", "d": "0.57s"}, {"bg": "#FF4B00", "d": "0.61s"}, {"bg": "#FF4B00", "d": "0.61s"}, {"bg": "#FF4B00", "d": "0.61s"}, {"bg": "#FF4B00", "d": "0.61s"}, {"bg": "#FF4B00", "d": "0.61s"}, {"bg": "#FF4B00", "d": "0.61s"}, {"bg": "#FF4B00", "d": "0.61s"}, {"bg": "#7A4DFF", "d": "0.66s"}, {"bg": "#A64CAA", "d": "0.66s"}, {"bg": "#D34C55", "d": "0.66s"}, {"bg": "#FF4B00", "d": "0.66s"}, {"bg": "rgba(221,221,221,0.2)", "d": "0.66s"}, {"bg": "#7A4DFF", "d": "0.66s"}, {"bg": "#A64CAA", "d": "0.66s"}, {"bg": "#D34C55", "d": "0.70s"}, {"bg": "rgba(221,221,221,0.2)", "d": "0.70s"}, {"bg": "#A64CAA", "d": "0.70s"}, {"bg": "#FF4B00", "d": "0.70s"}, {"bg": "#7A4DFF", "d": "0.70s"}, {"bg": "#D34C55", "d": "0.70s"}, {"bg": "rgba(221,221,221,0.2)", "d": "0.70s"}, {"bg": "rgba(221,221,221,0.2)", "d": "0.75s"}, {"bg": "#D34C55", "d": "0.75s"}, {"bg": "#7A4DFF", "d": "0.75s"}, {"bg": "#FF4B00", "d": "0.75s"}, {"bg": "#A64CAA", "d": "0.75s"}, {"bg": "rgba(221,221,221,0.2)", "d": "0.75s"}, {"bg": "#D34C55", "d": "0.75s"}, {"bg": "#A64CAA", "d": "0.79s"}, {"bg": "#7A4DFF", "d": "0.79s"}, {"bg": "rgba(221,221,221,0.2)", "d": "0.79s"}, {"bg": "#FF4B00", "d": "0.79s"}, {"bg": "#D34C55", "d": "0.79s"}, {"bg": "#A64CAA", "d": "0.79s"}, {"bg": "#D34C55", "d": "0.79s"}] };
+}
+}
+</script>
+</body>
+</html>

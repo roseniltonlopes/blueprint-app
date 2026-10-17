@@ -1,69 +1,94 @@
-# 🎨 03. Guia de Telas do MVP e Kit Editável para o Figma — **Blueprint**
+# 🎨 03. Guia das 8 Telas da v2 do Blueprint
 
-Este documento apresenta as **5 telas em alta definição do MVP** do aplicativo **Blueprint**, construídas com base nas boas práticas modernas de UI/UX Mobile (*One Screen One Job*, *Touch Targets* amplos, *Empty/Active States*, *Bottom Navigation Bar* na zona do polegar e alternância **Light / Dark Mode**) utilizando a identidade visual **Creme (`#FFFDF2`)** e **Preto Puro (`#000000`)**.
+Este documento descreve as telas da **versão 2** do design, com a paleta da marca (Preto, Off White, Laranja, Roxo índigo e gradiente), tipografia Nohemi, cartões suaves sem bordas escuras e movimento sutil.
 
----
+- **Canvas editável:** https://claude.ai/artifact/Cae8a8KKv5bRKpx234Zh3h (privado até o dono compartilhar pelo botão *Share*)
+- **Código-fonte das pranchas:** [`docs/design/canvas-source/`](design/canvas-source/)
+- **Tokens, motion e acessibilidade:** [`04-design-tokens-e-motion.md`](04-design-tokens-e-motion.md)
+- **Funções e critérios de aceite:** [`05-funcionalidades-e-fluxos.md`](05-funcionalidades-e-fluxos.md)
 
-## 1. Apresentação das 5 Telas do MVP (Alta Definição)
-
-![Painel das 5 Telas do MVP - Blueprint](assets/blueprint_mvp_screens.jpg)
-
----
-
-## 2. Arquivo Vetorial Editável no Figma (`.SVG` 100% Editável)
-
-Para facilitar a edição imediata de qualquer texto, botão, cor ou ícone no **Figma**:
-
-- 📂 **Arquivo Vetorial Oficial no Repositório:** [`docs/figma/blueprint_ui_kit.svg`](figma/blueprint_ui_kit.svg)
-
-### Como abrir e editar no seu Figma em 5 segundos:
-1. Abra o [Figma](https://www.figma.com) no navegador ou aplicativo Desktop e crie um novo *Design File*;
-2. Arraste o arquivo [`docs/figma/blueprint_ui_kit.svg`](figma/blueprint_ui_kit.svg) diretamente para dentro da tela do Figma;
-3. **Pronto!** Os 5 quadros (`390 x 844` — proporção moderna mobile) aparecerão separados por camadas (*Frames/Groups*: `Screen_01_Auth_Global`, `Screen_02_Home_Empty`, `Screen_03_Home_Active`, `Screen_04_Home_Outro`, `Screen_05_History_Dark_Mode`) prontos para editar e gerar seu link público de compartilhamento.
+Todas as pranchas têm `390 x 844` px. Nomes, datas e números são dados de exemplo.
 
 ---
 
-## 3. Detalhamento de Cada Tela e Boas Práticas Aplicadas
+## 1. Mudanças em relação à v1
 
-### 📱 Tela 1 — Cadastro & Login Global (`Screen_01_Auth_Global`)
-- **Objetivo (*One Screen, One Job*):** Permitir autenticação rápida ou criação de conta global sem fricção.
-- **Login Social Integrado (1 Toque):**
-  - Botão **Continuar com Google** (fundo Creme `#FFFDF2`, borda `#000000`);
-  - Botão **Continuar com Apple / iOS** (fundo Preto `#000000`, texto `#FFFDF2`).
-- **Campos Obrigatórios e de Uso Global:**
-  - `Nome completo *`
-  - `E-mail *`
-  - `País / Idioma Global *` (Ex: *Brasil (PT-BR) • UTC-3* para sincronização correta de fuso horário no banco em nuvem)
-  - `Senha (mín. 8 caracteres) *`
-- **Ação Primária:** Botão arredondado `Criar Conta no Blueprint` na zona do polegar.
+| Tema | v1 | v2 |
+| :--- | :--- | :--- |
+| Paleta | Creme `#FFFDF2` e Preto | Preto, Off White `#DDDDDD`, Laranja `#FF4B00`, Roxo `#4607CD` e gradiente |
+| Tipografia | Sistema | Nohemi (mockup com Sora como substituta) |
+| Cartões | Bordas escuras de 1,5px e sombras duras | Sem bordas, tom de superfície e sombra difusa |
+| Navegação | 3 abas: Hoje, Histórico, Perfil | 4 abas: Hoje, Calendário, Histórico, Perfil |
+| Progresso | Número grande em cartão | Anel segmentado de 5 partes com gradiente |
+| Categoria "Outro" | Cartão com cor própria | Linha larga com bottom sheet para nome livre |
+| Grid de categorias | "Descanso" aparecia separado do ícone da lua em duas células | 4 cartões completos (ícone, nome, contador) mais a linha "Outro" |
+| Feedback | Texto "Foco atual" | Cartão invertido com selo, toast com Desfazer |
+| Movimento | Nenhum | Entradas em cascata, anel, barras, sheet e toast |
 
-### 📱 Tela 2 — Home: Estado Inicial / *Empty State* (`Screen_02_Home_Empty`)
-- **Tema Claro (`#FFFDF2`):** Visual limpo, editorial e acolhedor para uso diurno.
-- **Seletor de Tema (Light/Dark Toggle):** Chave seletora (`☀ / ☾`) no canto superior direito permitindo alternar instantaneamente para o modo escuro.
-- **Hero Card de Progresso:** Exibe `0 ações concluídas hoje` em tipografia de alto impacto (`40px ExtraBold`).
-- **Grid de Categorias (`BotaoOpcao`):** Botões amplos com ícones intuitivos (`Hidratação`, `Exercício`, `Descanso`, `Estudo` e `Outro`).
-- **Menu Inferior (*Bottom Navigation Bar*):** Posicionado na base da tela com 3 abas claras: **Hoje**, **Histórico** e **Perfil**.
-
-### 📱 Tela 3 — Home: Categoria Selecionada / *Active State* (`Screen_03_Home_Active`)
-- **Feedback Visual Imediato:** Ao tocar em **`Estudo`**, o card inverte seu contraste para **Preto Puro (`#000000`)** com texto e ícone em **Creme (`#FFFDF2`)** e selo de confirmação (`✓`).
-- **Atualização de Estado (`useState`):** O indicador inferior confirma `"Foco atual: Estudo"` e habilita o botão principal `"Registrar no Blueprint"`, atualizando o contador superior (`3 ações registradas`).
-
-### 📱 Tela 4 — Home: Opção `"Outro"` Selecionada (`Screen_04_Home_Outro`)
-- **Versatilidade de Componente:** Demonstra a seleção da categoria `"Outro"` com estilo diferenciado (fundo Charcoal `#2D2A24` e borda tracejada arquitetônica), utilizando o mesmo componente `BotaoOpcao` através da propriedade `corSelecionado`.
-
-### 📱 Tela 5 — Histórico & *Dark Mode* Ativo (`Screen_05_History_Dark_Mode`)
-- **Tema Escuro (`#000000`):** Quando o usuário aciona o botão `☾` no topo, o fundo da tela assume o **Preto Puro (`#000000`)** (ideal para economia de bateria em telas OLED e conforto visual à noite), enquanto os cartões de atividades concluídas ganham destaque em **Creme (`#FFFDF2`)**.
-- **Lista de Ações Sincronizadas:** Exibe o histórico cronológico salvo na nuvem e a aba **Histórico** ativa no menu inferior.
+Os arquivos `docs/assets/blueprint_mvp_screens.jpg` e `docs/figma/blueprint_ui_kit.svg` são da **v1** e foram mantidos como histórico. Eles não refletem a v2.
 
 ---
 
-## 4. Especificação da Paleta de Cores Oficial (`Creme & Preto`)
+## 2. Telas
 
-| Token | Código Hex | Aplicação no Modo Claro (Light) | Aplicação no Modo Escuro (Dark) |
-| :--- | :--- | :--- | :--- |
-| **Warm Cream** | `#FFFDF2` | Fundo principal da tela (`SafeAreaView`) | Texto principal, cartões em destaque e botões primários |
-| **Pure Black** | `#000000` | Textos, bordas fortes e botão selecionado | Fundo principal da tela (`SafeAreaView`) |
-| **Soft Cream Card** | `#F4F1E1` | Superfície dos cartões e botões em repouso | — |
-| **Dark Surface** | `#1C1B18` | — | Superfície secundária de cartões no modo escuro |
-| **Charcoal Special** | `#2D2A24` | Cor diferenciada da opção `"Outro"` selecionada | Bordas sutis e opção `"Outro"` |
-| **Warm Muted** | `#52514C` | Subtítulos, placeholders e ícones inativos | `#A8A496` (Subtítulos no modo escuro) |
+### 📱 Tela 1: Cadastro e login (`Main.dc.html`, modo claro)
+- **Marca:** anel mini 3 de 5 e wordmark com "Blue" em Light e "print" em Bold. Frase: "Seu dia, um toque por vez."
+- **Seletor** `Criar conta | Entrar`.
+- **Login social:** "Continuar com Google" (superfície clara) e "Continuar com Apple" (preto).
+- **Divisor** "ou use seu e-mail" e campos `Nome completo`, `E-mail` e `Senha` (com botão de mostrar senha).
+- **Fuso horário:** texto informativo "Fuso horário detectado: São Paulo (GMT-3)", editável depois no Perfil.
+- **Ação primária:** "Criar conta", com brilho laranja difuso.
+- **Rodapé:** aceite de Termos e Política de Privacidade.
+
+### 📱 Tela 2: Home, estado inicial (`Home-vazio.dc.html`, modo claro)
+- **Cabeçalho:** data, saudação e chave de tema (sol e lua).
+- **Cartão de progresso:** anel de 5 segmentos vazios, `0 de 5` e a mensagem "Toque em uma categoria para começar o plano."
+- **Seção** "O que você fez agora?" com 4 cartões (Hidratação, Exercício, Descanso, Estudo) e a linha larga "Outro".
+- **Botão principal desabilitado:** "Escolha uma categoria para registrar".
+- **Barra inferior** com 4 abas e **Hoje** ativa.
+
+### 📱 Tela 3: Home, categoria ativa (`Home-ativa.dc.html`, modo claro)
+- **Estudo selecionado:** o cartão inverte para preto, com texto Off White, selo de confirmação laranja e brilho laranja.
+- **Contadores por categoria:** "2 hoje" em Hidratação e "1 hoje" em Exercício.
+- **Anel:** 3 de 5 segmentos preenchidos com o gradiente. Mensagem "Faltam 2 para fechar o dia."
+- **Botão principal habilitado:** "Registrar Estudo".
+
+### 📱 Tela 4: Home, opção Outro (`Home-outro.dc.html`, modo claro)
+- **Bottom sheet** "Outra ação" sobre fundo escurecido.
+- **Campo** "O que você fez?" com exemplo "meditação de 10 minutos".
+- **Sugestões rápidas:** Meditação, Alongamento, Organização.
+- **Ações:** "Registrar ação" e "Cancelar".
+
+### 📱 Tela 5: Home, após registrar (`Home-escuro.dc.html`, modo escuro)
+- **Fundo preto** e texto Off White. A chave de tema mostra a lua ativa.
+- **Anel:** 4 de 5 segmentos. Mensagem "Falta 1 para fechar o dia."
+- **Toast:** "Estudo registrado às 15:58" com ação **Desfazer**.
+- **Botão principal** volta ao estado desabilitado.
+
+### 📱 Tela 6: Calendário (`Calendario-escuro.dc.html`, modo escuro)
+- **Navegação de mês** ("outubro de 2026") e cabeçalho de dias da semana.
+- **Dias:** cada dia mostra o número e uma barra cuja cor indica a intensidade (nenhuma, 1 a 2, 3 a 4, 5, 6 ou mais). O dia atual é preenchido e destacado. Dias do mês anterior e futuros ficam em tom secundário.
+- **Resumo do dia selecionado:** "Hoje, 17 de outubro", 3 ações e chips por categoria.
+- **Resumo do mês:** ações no mês e dias com registro.
+
+### 📱 Tela 7: Histórico (`Historico.dc.html`, modo claro)
+- **Seletor** `Semana | Mês`.
+- **Gráfico semanal:** 7 colunas (dom a sáb) com valor sobre cada uma. A barra do dia atual usa o gradiente.
+- **Resumo:** ações na semana, dias seguidos e melhor dia.
+- **Lista cronológica** agrupada por dia ("Hoje", "Ontem"), com horário, ícone e categoria.
+
+### 📱 Tela 8: Perfil (`Perfil-escuro.dc.html`, modo escuro)
+- **Identidade:** avatar com iniciais sobre o gradiente, nome, e-mail e botão **Editar**.
+- **Estatísticas:** ações registradas e sequência atual.
+- **Mapa de calor** das últimas 12 semanas, com legenda "menos a mais".
+- **Aparência:** `Claro | Escuro | Automático` e cor de destaque (Gradiente, Laranja, Índigo).
+- **Conta:** fuso horário e provedor de login.
+
+---
+
+## 3. Como exportar imagens das telas para este repositório
+
+O repositório ainda não contém imagens da v2. Para gerar:
+1. Abra o canvas pelo link acima.
+2. Use o menu **Share > Export** do canvas (o nome exato pode variar conforme a conta) e exporte as pranchas como PNG.
+3. Salve em `docs/assets/v2/` com nomes como `01-login.png` e referencie neste documento.

@@ -1,0 +1,97 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-10-17T19:30:00Z"
+ },
+ "title": "Blueprint: novas telas do MVP",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "Cadastro e login"
+  },
+  "Home-vazio.dc.html": {
+   "x": 470,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "Home: estado inicial"
+  },
+  "Home-ativa.dc.html": {
+   "x": 940,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "Home: categoria ativa"
+  },
+  "Home-outro.dc.html": {
+   "x": 1410,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "Home: opção Outro"
+  },
+  "Home-escuro.dc.html": {
+   "x": 0,
+   "y": 1214,
+   "w": 390,
+   "h": 844,
+   "title": "Home: modo escuro"
+  },
+  "Historico.dc.html": {
+   "x": 940,
+   "y": 1214,
+   "w": 390,
+   "h": 844,
+   "title": "Histórico"
+  },
+  "Perfil-escuro.dc.html": {
+   "x": 1410,
+   "y": 1214,
+   "w": 390,
+   "h": 844,
+   "title": "Perfil: modo escuro"
+  },
+  "Calendario-escuro.dc.html": {
+   "x": 470,
+   "y": 1214,
+   "w": 390,
+   "h": 844,
+   "title": "Calendário: modo escuro"
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "Home-vazio.dc.html",
+  "Home-ativa.dc.html",
+  "Home-outro.dc.html",
+  "Home-escuro.dc.html",
+  "Calendario-escuro.dc.html",
+  "Historico.dc.html",
+  "Perfil-escuro.dc.html"
+ ],
+ "notes": {
+  "row1": {
+   "x": 0,
+   "y": -300,
+   "text": "Blueprint: fluxo claro, do cadastro ao registro",
+   "kind": "title1",
+   "maxW": 1800
+  },
+  "row2": {
+   "x": 0,
+   "y": 914,
+   "text": "Modo escuro, calendário, histórico e perfil",
+   "kind": "title1",
+   "maxW": 1800
+  }
+ },
+ "designSystems": []
+}

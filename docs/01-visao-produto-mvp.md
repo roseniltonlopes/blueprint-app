@@ -34,7 +34,7 @@ O **Blueprint** nasce com a proposta oposta: oferecer um **plano de ação claro
 | **Alta fricção de entrada** (muitos campos de texto e telas para registrar um hábito). | O usuário procrastina o registro e abandona o aplicativo na primeira semana. | **Seletor de Categoria por Toque (`BotaoOpcao`):** zero digitação obrigatória no MVP; basta 1 toque para classificar a ação. |
 | **Falta de clareza visual sobre a prioridade do momento.** | Sensação de desorganização mental ("o que estou fazendo agora?"). | **Destaque de Estado Ativo (`useState`):** a categoria selecionada muda de cor instantaneamente e atualiza o painel de foco atual. |
 | **Percepção de baixo progresso diário.** | Desmotivação ao longo do dia por não enxergar pequenas vitórias. | **Contador Diário de Ações (`quantidade`):** cada confirmação incrementa o placar diário em destaque no topo da tela. |
-| **Exceções da rotina que não cabem em categorias fixas.** | Frustração quando surge uma tarefa imprevista. | **Categoria Especial `"Outro"`:** botão dedicado com destaque visual próprio (cor roxa `#7C3AED`) para demandas extras. |
+| **Exceções da rotina que não cabem em categorias fixas.** | Frustração quando surge uma tarefa imprevista. | **Categoria Especial `"Outro"`:** linha dedicada que abre um *bottom sheet* para o usuário dar um nome livre à ação (v2, veja [`03-guia-telas-figma.md`](03-guia-telas-figma.md)). |
 
 ---
 
@@ -50,7 +50,7 @@ O **Blueprint** nasce com a proposta oposta: oferecer um **plano de ação claro
 
 ### ✅ Fase 1 — Arquitetura, UI/UX e Componentes Base
 - Estruturação completa da arquitetura no GitHub e documentação de produto;
-- Especificação visual das 3 telas/estados iniciais no Figma;
+- Especificação visual das telas: 3 estados iniciais na v1 e **8 telas na v2** (paleta da marca, calendário, histórico e perfil);
 - Tela principal de Check-in contendo:
   - Cartão de progresso diário (`quantidade` de ações registradas no dia);
   - Seletor interativo com 4 categorias principais + 1 categoria `"Outro"` com cor diferenciada;
@@ -59,4 +59,22 @@ O **Blueprint** nasce com a proposta oposta: oferecer um **plano de ação claro
 ### 🔜 Próximas Fases de Evolução
 - **Listas e Coleções:** Exibição da lista cronológica de ações registradas no dia usando `FlatList`;
 - **Navegação:** Transição entre a tela de *Check-in Diário* e a tela de *Histórico / Estatísticas*;
-- **Integração Cloud & APK:** Conexão ativa das funções com a tabela `blueprint_actions` no **Supabase** e geração do `.apk` via **Expo EAS**.
+- **Calendário e Perfil:** Calendário mensal com intensidade por dia, mapa de calor e preferências do usuário (tema, fuso, cor de destaque);
+- **Integração Cloud & APK:** Conexão ativa das funções com a tabela `blueprint_actions` no **Supabase**, login (Google, Apple e e-mail) e geração do `.apk` via **Expo EAS**.
+
+---
+
+## 6. Evolução da v2: itens fora do escopo original
+
+Estes itens aparecem nas telas da v2 e **precisam de validação de produto** antes de entrar no desenvolvimento:
+
+| Item | Motivo | Risco se ficar de fora |
+| :--- | :--- | :--- |
+| Meta diária (padrão 5) e anel de progresso | Dá sentido ao contador e cria um objetivo de fechamento do dia | Baixo: o contador simples continua funcionando |
+| Desfazer o último registro | Corrige toque errado sem precisar de tela de edição | Médio: sem isso, registros errados poluem o histórico |
+| Mapa de calor de 12 semanas | Mostra constância sem exigir configuração | Baixo |
+| Cor de destaque (Gradiente, Laranja, Índigo) | Personalização leve | Baixo |
+| Aba Calendário | Visão mensal separada do histórico | Baixo: o histórico cobre a semana |
+
+Os detalhes de cada função e os critérios de aceite estão em [`05-funcionalidades-e-fluxos.md`](05-funcionalidades-e-fluxos.md).
+

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Cadastro e login</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+input::placeholder{color:#5E5E5E}
+button{font-family:inherit}
+.tap{transition:transform .22s cubic-bezier(.2,.8,.2,1),box-shadow .22s ease,background-color .3s ease,color .3s ease,border-color .3s ease}
+.tap:hover{transform:translateY(-1px)}
+.tap:active{transform:translate(2px,2px) scale(.99)}
+.tap:focus-visible,input:focus-visible{outline:2px solid #4607CD;outline-offset:3px}
+.fu{animation:fu .6s cubic-bezier(.2,.8,.2,1) backwards}
+@keyframes fu{from{opacity:0;transform:translateY(10px)}}
+.fade{animation:fade .6s ease .25s backwards}
+@keyframes fade{from{opacity:0}}
+.seg{animation:draw .8s cubic-bezier(.2,.8,.2,1) backwards}
+@keyframes draw{from{stroke-dasharray:0 400}}
+.grow{transform-origin:bottom;animation:grow .85s cubic-bezier(.2,.8,.2,1) backwards}
+@keyframes grow{from{transform:scaleY(0)}}
+.pop{animation:pop .5s cubic-bezier(.2,.8,.2,1) backwards}
+@keyframes pop{from{opacity:0;transform:scale(.6)}}
+.up{animation:up .55s cubic-bezier(.2,.8,.2,1) .3s backwards}
+@keyframes up{from{opacity:0;transform:translateY(24px)}}
+.sheet{animation:sheet .6s cubic-bezier(.2,.8,.2,1) backwards}
+@keyframes sheet{from{transform:translateY(100%)}}
+.veil{animation:fade .4s ease backwards}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div style="position:relative;width:390px;height:844px;box-sizing:border-box;overflow:hidden;display:flex;flex-direction:column;background:#DDDDDD;color:#000000;font-family:'Nohemi','Sora',system-ui,sans-serif;"><div style="flex:1;min-height:0;display:flex;flex-direction:column;padding:28px 20px 24px">
+<div class="fu" style="display:flex;align-items:center;gap:12px">
+<svg width="48" height="48" viewBox="0 0 124 124" aria-hidden="true"><circle class="seg" style="animation-delay:0.20s" cx="62" cy="62" r="52" fill="none" stroke="#4607CD" stroke-width="12" stroke-dasharray="56.35 270.38" transform="rotate(-85.04 62 62)"/><circle class="seg" style="animation-delay:0.30s" cx="62" cy="62" r="52" fill="none" stroke="#74189A" stroke-width="12" stroke-dasharray="56.35 270.38" transform="rotate(-13.04 62 62)"/><circle class="seg" style="animation-delay:0.40s" cx="62" cy="62" r="52" fill="none" stroke="#A22966" stroke-width="12" stroke-dasharray="56.35 270.38" transform="rotate(58.96 62 62)"/><circle class="seg" style="animation-delay:0.50s" cx="62" cy="62" r="52" fill="none" stroke="rgba(0,0,0,0.16)" stroke-width="12" stroke-dasharray="56.35 270.38" transform="rotate(130.96 62 62)"/><circle class="seg" style="animation-delay:0.60s" cx="62" cy="62" r="52" fill="none" stroke="rgba(0,0,0,0.16)" stroke-width="12" stroke-dasharray="56.35 270.38" transform="rotate(202.96 62 62)"/></svg>
+<div style="font-size:40px;line-height:44px;letter-spacing:-0.04em;font-family:'Nohemi','Sora',system-ui,sans-serif;"><span style="font-weight:300">Blue</span><span style="font-weight:700">print</span></div>
+</div>
+<p class="fu" style="margin:10px 0 0;font-size:17px;line-height:26px;color:#474747;animation-delay:.06s">Seu dia, um toque por vez.</p>
+<div class="fu" style="margin-top:22px;animation-delay:.1s"><div style="display:flex;padding:3px;border-radius:999px;background:#D0D0D0"><button type="button" class="tap" aria-pressed="true" style="flex:1;height:44px;border:none;border-radius:999px;background:#000000;color:#DDDDDD;cursor:pointer;font-family:'Nohemi','Sora',system-ui,sans-serif;font-size:14px;font-weight:500">Criar conta</button><button type="button" class="tap" aria-pressed="false" style="flex:1;height:44px;border:none;border-radius:999px;background:transparent;color:#000000;cursor:pointer;font-family:'Nohemi','Sora',system-ui,sans-serif;font-size:14px;font-weight:500">Entrar</button></div></div>
+<div class="fu" style="margin-top:18px;display:flex;flex-direction:column;gap:10px;animation-delay:.15s"><button type="button" class="tap" style="height:52px;border:1px solid rgba(0,0,0,0.16);border-radius:16px;background:#F2F2F2;color:#000000;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;font-family:'Nohemi','Sora',system-ui,sans-serif;font-size:15px;font-weight:500"><span style="font-family:'Nohemi','Sora',system-ui,sans-serif;font-weight:700;font-size:18px;line-height:20px">G</span>Continuar com Google</button><button type="button" class="tap" style="height:52px;border-radius:16px;background:#000000;color:#DDDDDD;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;font-family:'Nohemi','Sora',system-ui,sans-serif;font-size:15px;font-weight:500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DDDDDD" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path fill="#DDDDDD" stroke="none" d="M16.4 12.6c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.15-2.8.85-3.5.85s-1.8-.8-3-.8c-1.5 0-3 .9-3.8 2.3-1.6 2.8-.4 6.9 1.2 9.2.8 1.1 1.7 2.3 2.9 2.3 1.2 0 1.6-.75 3-.75s1.8.75 3 .73c1.2 0 2-1.1 2.8-2.2.9-1.3 1.2-2.5 1.3-2.6-.03 0-2.5-.95-2.5-3.7zM14.2 5.9c.6-.8 1.1-1.9.95-3-.95.04-2.1.64-2.8 1.4-.6.7-1.15 1.8-1 2.9 1.05.08 2.1-.5 2.85-1.3z"/></svg>Continuar com Apple</button></div>
+<div class="fu" style="margin:16px 0;display:flex;align-items:center;gap:12px;font-size:14px;line-height:20px;color:#474747;animation-delay:.2s">
+<div style="flex:1;height:1px;background:rgba(0,0,0,0.16)"></div>ou use seu e-mail<div style="flex:1;height:1px;background:rgba(0,0,0,0.16)"></div>
+</div>
+<div class="fu" style="display:flex;flex-direction:column;gap:14px;animation-delay:.25s">
+<div style="display:flex;flex-direction:column;gap:6px"><label for="nome" style="font-size:14px;line-height:20px;font-weight:600">Nome completo</label><div style="position:relative"><input id="nome" type="text" placeholder="Como devemos te chamar" style="width:100%;height:52px;box-sizing:border-box;padding:0 16px 0 16px;border:1px solid rgba(0,0,0,0.16);border-radius:16px;background:#F2F2F2;color:#000000;font-family:'Nohemi','Sora',system-ui,sans-serif;font-size:16px"></div></div>
+<div style="display:flex;flex-direction:column;gap:6px"><label for="email" style="font-size:14px;line-height:20px;font-weight:600">E-mail</label><div style="position:relative"><input id="email" type="email" placeholder="voce@exemplo.com" style="width:100%;height:52px;box-sizing:border-box;padding:0 16px 0 16px;border:1px solid rgba(0,0,0,0.16);border-radius:16px;background:#F2F2F2;color:#000000;font-family:'Nohemi','Sora',system-ui,sans-serif;font-size:16px"></div></div>
+<div style="display:flex;flex-direction:column;gap:6px"><label for="senha" style="font-size:14px;line-height:20px;font-weight:600">Senha</label><div style="position:relative"><input id="senha" type="password" placeholder="Mínimo de 8 caracteres" style="width:100%;height:52px;box-sizing:border-box;padding:0 56px 0 16px;border:1px solid rgba(0,0,0,0.16);border-radius:16px;background:#F2F2F2;color:#000000;font-family:'Nohemi','Sora',system-ui,sans-serif;font-size:16px"><button type="button" class="tap" aria-label="Mostrar senha" style="position:absolute;right:4px;top:4px;width:44px;height:44px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#474747" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+</div>
+<p class="fu" style="margin:12px 0 0;font-size:13px;line-height:18px;color:#474747;animation-delay:.3s">Fuso horário detectado: São Paulo (GMT-3). Você pode mudar depois no perfil.</p>
+<div class="fu" style="margin-top:auto;animation-delay:.35s">
+<button type="button" class="tap" style="height:56px;width:100%;border-radius:18px;background:#000000;color:#DDDDDD;box-shadow:0 10px 26px rgba(255,75,0,0.30);cursor:pointer;font-family:'Nohemi','Sora',system-ui,sans-serif;font-size:16px;font-weight:600">Criar conta</button>
+<p style="margin:14px 0 0;text-align:center;font-size:13px;line-height:18px;color:#474747">Ao continuar, você aceita os Termos de uso e a Política de Privacidade.</p>
+</div>
+</div></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>
