@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import BotaoAcao from "../components/BotaoAcao";
 import BotaoOpcao from "../components/BotaoOpcao";
 import { COLORS } from "../styles/theme";
@@ -22,9 +23,7 @@ export default function BlueprintHomeScreen() {
     <SafeAreaView style={styles.tela}>
       <View style={styles.cartao}>
         <Text style={styles.titulo}>Blueprint</Text>
-        <Text style={styles.subtitulo}>
-          Plano de Ação Diário — Selecione seu foco agora:
-        </Text>
+        <Text style={styles.subtitulo}>Plano de Ação Diário — Selecione seu foco agora:</Text>
 
         <View style={styles.placarContainer}>
           <Text style={styles.numero}>{quantidade}</Text>
@@ -64,10 +63,7 @@ export default function BlueprintHomeScreen() {
 
         <Text style={styles.resultado}>Foco atual: {categoria}</Text>
 
-        <BotaoAcao
-          titulo="Registrar ação no Blueprint"
-          aoPressionar={registrarAcaoNoPlano}
-        />
+        <BotaoAcao titulo="Registrar ação no Blueprint" aoPressionar={registrarAcaoNoPlano} />
       </View>
     </SafeAreaView>
   );

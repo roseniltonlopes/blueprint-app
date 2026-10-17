@@ -37,3 +37,6 @@ supabase/.temp/
 # Pacote de docs v2 (já mesclado em docs/)
 blueprint-docs-v2/
 blueprint-docs-v2.zip
+
+# Arquivos locais
+*.zip
