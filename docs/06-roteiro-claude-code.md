@@ -55,7 +55,7 @@ Você é meu parceiro de desenvolvimento do app Blueprint (React Native + Expo +
 
 Antes de qualquer coisa:
 1. Leia CLAUDE.md, README.md e todos os arquivos em docs/ (principalmente 03, 04, 05 e 06).
-2. Veja as imagens das telas em docs/assets/v2/, se existirem.
+2. Veja as imagens das telas em docs/assets/telas/, se existirem.
 3. Me diga em até 10 linhas o que entendeu, o estado real do código e o que está faltando.
 
 Regras de trabalho, valem para toda a sessão:
@@ -113,7 +113,7 @@ Siga docs/04-design-tokens-e-motion.md.
 5. Crie uma tela temporária de "Galeria de componentes" para eu ver tudo no celular nos dois temas.
 6. Testes unitários dos tokens e do ThemeProvider.
 
-Teste no celular: alternar claro/escuro/automático e comparar com docs/assets/v2/.
+Teste no celular: alternar claro/escuro/automático e comparar com docs/assets/telas/.
 Critério: F08 (tema persiste só na etapa 6, aqui basta alternar).
 ```
 
@@ -214,7 +214,7 @@ ETAPA 8: Build do APK e checklist de release.
 ## 5. Dicas para o dia a dia
 
 - **Um assunto por vez.** Se ele começar a mexer em coisas fora da etapa, diga: "volte ao escopo da etapa N".
-- **Mande prints** do celular quando algo estiver diferente do design e cite a tela de `docs/assets/v2/`.
+- **Mande prints** do celular quando algo estiver diferente do design e cite a tela de `docs/assets/telas/`.
 - **Peça o plano antes do código** em qualquer mudança grande.
 - **Se uma etapa ficar grande demais**, peça para dividir em subetapas, cada uma terminando com algo testável.
 - **Mudou o design?** Atualize o canvas no claude.ai, exporte os PNGs de novo e peça ao Claude Code para reconciliar o código com `docs/`.
