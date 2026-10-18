@@ -15,7 +15,9 @@ export type IconName =
   | "hoje"
   | "calendario"
   | "historico"
-  | "perfil";
+  | "perfil"
+  | "anterior"
+  | "proximo";
 
 type IconProps = {
   name: IconName;
@@ -95,6 +97,10 @@ function desenho(name: IconName, color: string): ReactNode {
           <Path d="M12 6v6l4 2" />
         </>
       );
+    case "anterior":
+      return <Path d="m15 18-6-6 6-6" />;
+    case "proximo":
+      return <Path d="m9 18 6-6-6-6" />;
     case "perfil":
       return (
         <>

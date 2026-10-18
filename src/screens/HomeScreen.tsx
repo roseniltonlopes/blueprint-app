@@ -15,16 +15,11 @@ import {
   type CategoriaId,
 } from "../domain/categorias";
 import { formatarDataCabecalho, formatarHora } from "../domain/datas";
-import { useAcoes, type Relogio } from "../hooks/useAcoes";
+import { useAcoes } from "../hooks/useAcoes";
 import { SPACING } from "../styles/theme";
 import { cascata, entrada } from "../ui/motion";
 import { Screen } from "../ui/Screen";
 import { Text } from "../ui/Text";
-
-type HomeScreenProps = {
-  /** Fixa o "agora" em testes */
-  relogio?: Relogio;
-};
 
 type Confirmacao = {
   acaoId: string;
@@ -37,8 +32,8 @@ function mensagemDeConfirmacao(acao: Acao): string {
 }
 
 /** Home (docs/03, telas 2 a 5; docs/05, F01 a F07 e F09). */
-export default function HomeScreen({ relogio }: HomeScreenProps) {
-  const { totalHoje, porCategoriaHoje, registrar, remover } = useAcoes(relogio);
+export default function HomeScreen() {
+  const { totalHoje, porCategoriaHoje, registrar, remover, relogio } = useAcoes();
   const [selecionada, setSelecionada] = useState<CategoriaId | null>(null);
   const [sheetAberto, setSheetAberto] = useState(false);
   const [confirmacao, setConfirmacao] = useState<Confirmacao | null>(null);
@@ -81,7 +76,7 @@ export default function HomeScreen({ relogio }: HomeScreenProps) {
 
   const fecharToast = useCallback(() => setConfirmacao(null), []);
 
-  const hoje = relogio ? relogio() : new Date();
+  const hoje = relogio();
   const tituloBotao = selecionada
     ? `Registrar ${nomeDaCategoria(selecionada)}`
     : "Escolha uma categoria para registrar";

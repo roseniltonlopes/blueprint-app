@@ -1,10 +1,10 @@
 import { act, fireEvent, screen } from "@testing-library/react-native";
 import { DURACAO_TOAST_MS } from "../components/Toast";
 import HomeScreen from "../screens/HomeScreen";
-import { relogioFixo, renderComTema } from "./utils";
+import { renderComTema } from "./utils";
 
 async function abrirHome() {
-  await renderComTema(<HomeScreen relogio={relogioFixo()} />);
+  await renderComTema(<HomeScreen />);
 }
 
 function total() {

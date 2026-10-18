@@ -1,13 +1,13 @@
 import { fireEvent, screen } from "@testing-library/react-native";
 import HomeScreen from "../screens/HomeScreen";
-import { relogioFixo, renderComTema } from "./utils";
+import { renderComTema } from "./utils";
 
 function botaoPrincipal() {
   return screen.getByRole("button", { name: /Registrar|Escolha uma categoria/ });
 }
 
 async function abrirHome() {
-  await renderComTema(<HomeScreen relogio={relogioFixo()} />);
+  await renderComTema(<HomeScreen />);
 }
 
 describe("HomeScreen (F01, F02, F03, F05)", () => {
