@@ -1,4 +1,12 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { useColorScheme } from "react-native";
 import {
   BRAND,
@@ -48,16 +56,33 @@ type ThemeProviderProps = {
   children: ReactNode;
   initialMode?: ThemeMode;
   initialDestaque?: Destaque;
+  /** Chamado quando a pessoa muda tema ou destaque, para persistir a escolha */
+  aoMudar?: (preferencias: { modo: ThemeMode; destaque: Destaque }) => void;
 };
 
 export function ThemeProvider({
   children,
   initialMode = "system",
   initialDestaque = "gradiente",
+  aoMudar,
 }: ThemeProviderProps) {
   const [mode, setMode] = useState<ThemeMode>(initialMode);
   const [destaque, setDestaque] = useState<Destaque>(initialDestaque);
   const systemScheme = useColorScheme();
+  const aoMudarRef = useRef(aoMudar);
+  const primeiraRenderizacao = useRef(true);
+
+  useEffect(() => {
+    aoMudarRef.current = aoMudar;
+  }, [aoMudar]);
+
+  useEffect(() => {
+    if (primeiraRenderizacao.current) {
+      primeiraRenderizacao.current = false;
+      return;
+    }
+    aoMudarRef.current?.({ modo: mode, destaque });
+  }, [mode, destaque]);
 
   const value = useMemo<ThemeContextValue>(() => {
     const scheme: ColorScheme =
