@@ -7,7 +7,7 @@ import CartaoProgresso from "../components/CartaoProgresso";
 import ChaveDeTema from "../components/ChaveDeTema";
 import OutraAcaoSheet from "../components/OutraAcaoSheet";
 import Toast from "../components/Toast";
-import { META_DIARIA_PADRAO, type Acao } from "../domain/acoes";
+import type { Acao } from "../domain/acoes";
 import {
   CATEGORIAS_FIXAS,
   CATEGORIA_OUTRO,
@@ -33,7 +33,7 @@ function mensagemDeConfirmacao(acao: Acao): string {
 
 /** Home (docs/03, telas 2 a 5; docs/05, F01 a F07 e F09). */
 export default function HomeScreen() {
-  const { totalHoje, porCategoriaHoje, registrar, remover, relogio } = useAcoes();
+  const { totalHoje, porCategoriaHoje, meta, registrar, remover, relogio } = useAcoes();
   const [selecionada, setSelecionada] = useState<CategoriaId | null>(null);
   const [sheetAberto, setSheetAberto] = useState(false);
   const [confirmacao, setConfirmacao] = useState<Confirmacao | null>(null);
@@ -117,7 +117,7 @@ export default function HomeScreen() {
       </Animated.View>
 
       <Animated.View entering={entrada(80)} style={styles.progresso}>
-        <CartaoProgresso total={totalHoje} meta={META_DIARIA_PADRAO} />
+        <CartaoProgresso total={totalHoje} meta={meta} />
       </Animated.View>
 
       <Animated.View entering={entrada(160)}>
