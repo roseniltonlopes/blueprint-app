@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Pressable, SectionList, StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
 import GraficoSemanal from "../components/GraficoSemanal";
+import Resumo from "../components/Resumo";
 import { gerarDadosDeExemplo } from "../dev/dadosDeExemplo";
 import type { Acao } from "../domain/acoes";
 import { nomeDaCategoria } from "../domain/categorias";
@@ -20,6 +21,7 @@ import {
   sequenciaAtual,
   type GrupoDoDia,
 } from "../domain/estatisticas";
+import { plural } from "../domain/texto";
 import { useAcoes } from "../hooks/useAcoes";
 import { useTheme } from "../theme/ThemeProvider";
 import { RADIUS, SIZES, SPACING } from "../styles/theme";
@@ -31,10 +33,6 @@ import { SegmentedControl } from "../ui/SegmentedControl";
 import { Text } from "../ui/Text";
 
 type Visao = "semana" | "mes";
-
-function plural(n: number, singular: string, pluralTexto: string) {
-  return `${n} ${n === 1 ? singular : pluralTexto}`;
-}
 
 function ItemDaLista({ acao }: { acao: Acao }) {
   const { colors } = useTheme();
@@ -52,28 +50,6 @@ function ItemDaLista({ acao }: { acao: Acao }) {
         {nome}
       </Text>
     </View>
-  );
-}
-
-function Resumo({ itens }: { itens: readonly { valor: string; rotulo: string }[] }) {
-  return (
-    <Card radius="category" style={styles.resumo}>
-      {itens.map((item) => (
-        <View
-          key={item.rotulo}
-          style={styles.resumoItem}
-          accessible
-          accessibilityLabel={`${item.valor} ${item.rotulo}`}
-        >
-          <Text variant="ring" style={styles.resumoValor} numberOfLines={1}>
-            {item.valor}
-          </Text>
-          <Text variant="caption" color="mute">
-            {item.rotulo}
-          </Text>
-        </View>
-      ))}
-    </Card>
   );
 }
 
@@ -242,9 +218,6 @@ const styles = StyleSheet.create({
   },
   desabilitado: { opacity: 0.3 },
   intervalo: { fontSize: 15 },
-  resumo: { flexDirection: "row", padding: 0, borderRadius: 20 },
-  resumoItem: { flex: 1, paddingVertical: SPACING.md, paddingHorizontal: 14, gap: 2 },
-  resumoValor: { fontSize: 28, lineHeight: 32, letterSpacing: -0.84 },
   secao: {
     flexDirection: "row",
     alignItems: "baseline",

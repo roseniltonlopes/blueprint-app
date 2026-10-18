@@ -14,7 +14,7 @@ const DIAS_DA_SEMANA = [
   "Sábado",
 ] as const;
 
-const MESES = [
+export const MESES = [
   "janeiro",
   "fevereiro",
   "março",
@@ -84,6 +84,38 @@ export function formatarIntervalo(inicio: Date, fim: Date): string {
     `${inicio.getDate()} de ${MESES[inicio.getMonth()]}${sufixoInicio} a ` +
     `${fim.getDate()} de ${MESES[fim.getMonth()]}${sufixoFim}`
   );
+}
+
+/** "outubro de 2026" */
+export function formatarMesAno(ano: number, mes: number): string {
+  return `${MESES[mes]} de ${ano}`;
+}
+
+/** "17 de outubro" */
+export function formatarDiaMes(data: Date): string {
+  return `${data.getDate()} de ${MESES[data.getMonth()]}`;
+}
+
+export type CelulaDoMes = {
+  data: Date;
+  /** false para os dias do mês anterior ou seguinte que completam as semanas */
+  doMes: boolean;
+};
+
+/**
+ * Semanas (domingo a sábado) que cobrem o mês, sempre com 5 ou 6 linhas (docs/05 F11).
+ * Um fevereiro de 28 dias que começa no domingo ganha uma semana do mês seguinte.
+ */
+export function gradeDoMes(ano: number, mes: number): CelulaDoMes[][] {
+  const primeiro = new Date(ano, mes, 1);
+  const ultimo = new Date(ano, mes + 1, 0);
+  const semanas: CelulaDoMes[][] = [];
+  let dia = inicioDaSemana(primeiro);
+  while (dia.getTime() <= ultimo.getTime() || semanas.length < 5) {
+    semanas.push(diasDaSemana(dia).map((data) => ({ data, doMes: data.getMonth() === mes })));
+    dia = somarDias(dia, 7);
+  }
+  return semanas;
 }
 
 /** Título de grupo na lista do histórico: "Hoje", "Ontem" ou "Quinta-feira, 15 de outubro". */

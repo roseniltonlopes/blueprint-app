@@ -7,7 +7,7 @@ import Animated, {
   withDelay,
   withTiming,
 } from "react-native-reanimated";
-import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
+import { Gradiente } from "../ui/Gradiente";
 import { DIAS_ABREVIADOS } from "../domain/datas";
 import type { DiaDoGrafico } from "../domain/estatisticas";
 import { useTheme } from "../theme/ThemeProvider";
@@ -64,17 +64,7 @@ function Barra({ dia, maximo, indice }: BarraProps) {
       </Text>
       <View style={[styles.trilho, { backgroundColor: colors.sunk }]}>
         <Animated.View style={[styles.barra, { backgroundColor: colors.ink }, estilo]}>
-          {dia.ehHoje ? (
-            <Svg width="100%" height="100%">
-              <Defs>
-                <LinearGradient id="barraHoje" x1="0" y1="0" x2="0" y2="1">
-                  <Stop offset="0" stopColor={colors.gradient[0]} />
-                  <Stop offset="1" stopColor={colors.gradient[1]} />
-                </LinearGradient>
-              </Defs>
-              <Rect width="100%" height="100%" fill="url(#barraHoje)" />
-            </Svg>
-          ) : null}
+          {dia.ehHoje ? <Gradiente cores={colors.gradient} /> : null}
         </Animated.View>
       </View>
       <Text

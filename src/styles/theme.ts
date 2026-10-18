@@ -5,6 +5,8 @@
  */
 
 export const BRAND = {
+  /** Só para as iniciais sobre o gradiente do avatar (texto grande, docs/04 seção 8) */
+  white: "#FFFFFF",
   black: "#000000",
   offWhite: "#DDDDDD",
   orange: "#FF4B00",

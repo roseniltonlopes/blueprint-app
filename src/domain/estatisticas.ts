@@ -66,6 +66,73 @@ export function indiceDoMelhorDia(dias: readonly Pick<DiaDoGrafico, "total">[]):
   return melhor;
 }
 
+export type NivelDeIntensidade = 0 | 1 | 2 | 3 | 4;
+
+/** 0 ações → 0; 1 a 2 → 1; 3 a 4 → 2; 5 → 3; 6 ou mais → 4 (docs/04, rampa). */
+export function nivelDeIntensidade(total: number): NivelDeIntensidade {
+  if (total <= 0) return 0;
+  if (total <= 2) return 1;
+  if (total <= 4) return 2;
+  if (total === 5) return 3;
+  return 4;
+}
+
+/** Soma de todas as ações. É o "ações registradas" do Perfil. */
+export function totalGeral(porDia: ReadonlyMap<string, number>): number {
+  let total = 0;
+  for (const quantidade of porDia.values()) {
+    total += quantidade;
+  }
+  return total;
+}
+
+export type ResumoDoMes = { total: number; diasComRegistro: number };
+
+/** Total do mês e dias com pelo menos 1 ação. `mes` vai de 0 a 11. */
+export function resumoDoMes(
+  porDia: ReadonlyMap<string, number>,
+  ano: number,
+  mes: number,
+): ResumoDoMes {
+  const prefixo = `${ano}-${String(mes + 1).padStart(2, "0")}-`;
+  let total = 0;
+  let diasComRegistro = 0;
+  for (const [chave, quantidade] of porDia) {
+    if (chave.startsWith(prefixo) && quantidade > 0) {
+      total += quantidade;
+      diasComRegistro += 1;
+    }
+  }
+  return { total, diasComRegistro };
+}
+
+export type CelulaDoMapa = {
+  data: Date;
+  total: number;
+  nivel: NivelDeIntensidade;
+  futuro: boolean;
+};
+
+/**
+ * Mapa de calor: `semanas` colunas (domingo a sábado), a última é a semana atual.
+ * Retorna as colunas da mais antiga para a mais recente.
+ */
+export function mapaDeCalor(
+  porDia: ReadonlyMap<string, number>,
+  hoje: Date,
+  semanas = 12,
+): CelulaDoMapa[][] {
+  const inicioHoje = inicioDoDia(hoje).getTime();
+  const domingoAtual = somarDias(inicioDoDia(hoje), -hoje.getDay());
+  return Array.from({ length: semanas }, (_, coluna) => {
+    const domingo = somarDias(domingoAtual, -7 * (semanas - 1 - coluna));
+    return diasDaSemana(domingo).map((data) => {
+      const total = porDia.get(chaveDoDia(data)) ?? 0;
+      return { data, total, nivel: nivelDeIntensidade(total), futuro: data.getTime() > inicioHoje };
+    });
+  });
+}
+
 export type GrupoDoDia = {
   chave: string;
   titulo: string;
