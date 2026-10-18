@@ -1,8 +1,9 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import BarraDeAbas from "../components/BarraDeAbas";
-import EmBreveScreen from "../screens/EmBreveScreen";
+import CalendarioScreen from "../screens/CalendarioScreen";
 import HistoricoScreen from "../screens/HistoricoScreen";
 import HomeScreen from "../screens/HomeScreen";
+import PerfilScreen from "../screens/PerfilScreen";
 
 export type AbasParamList = {
   Hoje: undefined;
@@ -13,14 +14,6 @@ export type AbasParamList = {
 
 const Tab = createBottomTabNavigator<AbasParamList>();
 
-function CalendarioProvisorio() {
-  return <EmBreveScreen titulo="Calendário" descricao="O calendário mensal chega na Etapa 5." />;
-}
-
-function PerfilProvisorio() {
-  return <EmBreveScreen titulo="Perfil" descricao="O perfil e a aparência chegam na Etapa 5." />;
-}
-
 /** Navegação principal por 4 abas (docs/05 F10). */
 export default function Abas() {
   return (
@@ -29,9 +22,9 @@ export default function Abas() {
       screenOptions={{ headerShown: false }}
     >
       <Tab.Screen name="Hoje" component={HomeScreen} />
-      <Tab.Screen name="Calendario" component={CalendarioProvisorio} />
+      <Tab.Screen name="Calendario" component={CalendarioScreen} />
       <Tab.Screen name="Historico" component={HistoricoScreen} />
-      <Tab.Screen name="Perfil" component={PerfilProvisorio} />
+      <Tab.Screen name="Perfil" component={PerfilScreen} />
     </Tab.Navigator>
   );
 }
