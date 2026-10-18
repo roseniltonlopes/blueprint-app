@@ -1,0 +1,5 @@
+node_modules/
+docs/
+blueprint-docs-v2/
+supabase/
+*.md

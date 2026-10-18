@@ -2,7 +2,7 @@
 
 Referência única de cores, tipografia, formas, sombras, movimento e acessibilidade da v2. Os valores vêm do canvas editável: https://claude.ai/artifact/Cae8a8KKv5bRKpx234Zh3h
 
-> **Atenção:** o arquivo [`src/styles/theme.js`](../src/styles/theme.js) ainda contém os tokens da v1 (Creme e Preto) e **não foi alterado**. A seção 7 traz a proposta de atualização para a Fase 2.
+> **Implementação:** os tokens desta página estão em [`src/styles/theme.ts`](../src/styles/theme.ts) desde a Etapa 1. A seção 7 guarda a proposta original como referência.
 
 ---
 
