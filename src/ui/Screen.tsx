@@ -17,8 +17,9 @@ export function Screen({ children, scroll = false, footer, contentStyle }: Scree
   const { colors } = useTheme();
 
   return (
+    // A borda inferior fica com a barra de abas, que já aplica a área segura.
     <SafeAreaView
-      edges={["top", "left", "right", "bottom"]}
+      edges={["top", "left", "right"]}
       style={[styles.root, { backgroundColor: colors.bg }]}
     >
       {scroll ? (

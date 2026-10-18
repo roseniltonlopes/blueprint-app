@@ -56,7 +56,10 @@ export type EstadoAcoes = {
   acoes: Acao[];
 };
 
-export type EventoAcoes = { tipo: "registrar"; acao: Acao } | { tipo: "remover"; id: string };
+export type EventoAcoes =
+  | { tipo: "registrar"; acao: Acao }
+  | { tipo: "remover"; id: string }
+  | { tipo: "substituir"; acoes: Acao[] };
 
 export const ESTADO_INICIAL: EstadoAcoes = { acoes: [] };
 
@@ -69,6 +72,8 @@ export function acoesReducer(estado: EstadoAcoes, evento: EventoAcoes): EstadoAc
       return { acoes: [...estado.acoes, evento.acao] };
     case "remover":
       return { acoes: estado.acoes.filter((acao) => acao.id !== evento.id) };
+    case "substituir":
+      return { acoes: [...evento.acoes] };
   }
 }
 

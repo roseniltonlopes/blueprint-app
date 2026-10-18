@@ -6,11 +6,13 @@ import {
   Sora_700Bold,
   useFonts,
 } from "@expo-google-fonts/sora";
+import { DarkTheme, DefaultTheme, NavigationContainer, type Theme } from "@react-navigation/native";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import HomeScreen from "./src/screens/HomeScreen";
+import { AcoesProvider } from "./src/hooks/useAcoes";
+import Abas from "./src/navigation/Abas";
 import { ThemeProvider, useTheme } from "./src/theme/ThemeProvider";
 
 SplashScreen.preventAutoHideAsync().catch(() => {
@@ -18,12 +20,22 @@ SplashScreen.preventAutoHideAsync().catch(() => {
 });
 
 function Root() {
-  const { scheme } = useTheme();
+  const { scheme, colors } = useTheme();
+
+  // Fundo da navegação igual ao do tema evita piscar branco na troca de aba.
+  const temaNavegacao = useMemo<Theme>(() => {
+    const base = scheme === "dark" ? DarkTheme : DefaultTheme;
+    return {
+      ...base,
+      colors: { ...base.colors, background: colors.bg, card: colors.card, text: colors.ink },
+    };
+  }, [scheme, colors]);
+
   return (
-    <>
-      <HomeScreen />
+    <NavigationContainer theme={temaNavegacao}>
+      <Abas />
       <StatusBar style={scheme === "dark" ? "light" : "dark"} />
-    </>
+    </NavigationContainer>
   );
 }
 
@@ -53,7 +65,9 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <Root />
+        <AcoesProvider>
+          <Root />
+        </AcoesProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );
