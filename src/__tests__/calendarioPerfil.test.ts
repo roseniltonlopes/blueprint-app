@@ -1,4 +1,5 @@
-import { criarAcao } from "../domain/acoes";
+import { nova } from "./utils";
+
 import { gradeDoMes, somarDias } from "../domain/datas";
 import {
   contarPorDia,
@@ -52,10 +53,10 @@ describe("intensidade (docs/04)", () => {
 
 describe("resumos", () => {
   const acoes = [
-    criarAcao("estudo", new Date(2026, 9, 1, 9)),
-    criarAcao("estudo", new Date(2026, 9, 1, 10)),
-    criarAcao("estudo", new Date(2026, 9, 17, 10)),
-    criarAcao("estudo", new Date(2026, 8, 30, 10)),
+    nova("estudo", new Date(2026, 9, 1, 9)),
+    nova("estudo", new Date(2026, 9, 1, 10)),
+    nova("estudo", new Date(2026, 9, 17, 10)),
+    nova("estudo", new Date(2026, 8, 30, 10)),
   ];
   const porDia = contarPorDia(acoes);
 

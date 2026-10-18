@@ -1,12 +1,12 @@
 import { fireEvent, screen } from "@testing-library/react-native";
-import { criarAcao, type Acao } from "../domain/acoes";
+import type { Acao } from "../domain/acoes";
 import CalendarioScreen from "../screens/CalendarioScreen";
 import HistoricoScreen from "../screens/HistoricoScreen";
 import PerfilScreen from "../screens/PerfilScreen";
-import { renderComTema } from "./utils";
+import { renderComTema, nova } from "./utils";
 
 function em(dia: number, hora: number, categoria: Acao["categoria"] = "estudo", mes = 9) {
-  return criarAcao(categoria, new Date(2026, mes, dia, hora, 0));
+  return nova(categoria, new Date(2026, mes, dia, hora, 0));
 }
 
 describe("CalendarioScreen (F11, F12)", () => {

@@ -1,4 +1,5 @@
-import { criarAcao, type Acao } from "../domain/acoes";
+import { nova } from "./utils";
+import type { Acao } from "../domain/acoes";
 import type { CategoriaId } from "../domain/categorias";
 import { formatarIntervalo, inicioDaSemana, rotuloDoDia, somarDias } from "../domain/datas";
 import {
@@ -14,7 +15,7 @@ const HOJE = new Date(2026, 9, 17, 15, 58); // sábado
 function em(diasAtras: number, hora = 10, categoria: CategoriaId = "estudo"): Acao {
   const quando = somarDias(HOJE, -diasAtras);
   quando.setHours(hora, 0);
-  return criarAcao(categoria, quando);
+  return nova(categoria, quando);
 }
 
 describe("semana", () => {

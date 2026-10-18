@@ -77,11 +77,11 @@ create policy "Permitir leitura de acoes no Blueprint"
 As duas policies acima usam `with check (true)` e `using (true)`. Isso significa que **qualquer pessoa com a chave `anon` pode ler todas as ações de todos os usuários e inserir linhas com qualquer valor de `usuario`**. A chave `anon` é pública por desenho (ela vai embutida no `.apk` e pode ser extraída dele), então a proteção real depende das policies, não do sigilo da chave.
 
 Isso é aceitável apenas enquanto o banco guardar dados de teste. **Antes de publicar o `.apk` ou de ativar o login (Fase 4):**
-1. Aplicar a migração proposta em [`src/services/migrations/002_auth_e_rls_PROPOSTA.sql`](../src/services/migrations/002_auth_e_rls_PROPOSTA.sql), que associa cada ação a `auth.uid()` e restringe leitura, inserção e exclusão ao dono;
+1. Aplicar a migração [`src/services/migrations/002_auth_e_rls.sql`](../src/services/migrations/002_auth_e_rls.sql) (revisada na Etapa 7), que associa cada ação a `auth.uid()` e restringe leitura, inserção e exclusão ao dono;
 2. Decidir o destino das linhas antigas (sem `user_id`, ficam invisíveis após a migração);
 3. Remover o valor padrão `'Nilton'` da coluna `usuario`, que passa a ser redundante.
 
-A migração **não foi aplicada nem testada** no projeto Supabase. Revise e teste em um projeto de desenvolvimento antes.
+A migração foi **revisada na Etapa 7**, mas **não foi aplicada** pelo app nem pelo assistente: rode-a primeiro em um projeto de desenvolvimento. O app usa a chave **publicável** (`EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`); a chave `anon` é legada e será desativada pelo Supabase até o fim de 2026.
 
 ---
 

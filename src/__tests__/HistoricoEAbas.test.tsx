@@ -1,15 +1,15 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { fireEvent, screen } from "@testing-library/react-native";
-import { criarAcao } from "../domain/acoes";
+
 import { somarDias } from "../domain/datas";
 import Abas from "../navigation/Abas";
 import HistoricoScreen from "../screens/HistoricoScreen";
-import { AGORA, renderComTema } from "./utils";
+import { AGORA, renderComTema, nova } from "./utils";
 
 function acaoEm(diasAtras: number, hora: number, categoria: "estudo" | "hidratacao" = "estudo") {
   const quando = somarDias(AGORA, -diasAtras);
   quando.setHours(hora, 5);
-  return criarAcao(categoria, quando);
+  return nova(categoria, quando);
 }
 
 describe("HistoricoScreen", () => {

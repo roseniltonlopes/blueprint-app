@@ -22,6 +22,21 @@ export function fusoDoAparelho(): string | null {
   }
 }
 
+/** Deslocamento do relógio do aparelho em relação a GMT: "GMT-3", "GMT+5:30". */
+export function deslocamentoGmt(data: Date): string {
+  const minutos = -data.getTimezoneOffset();
+  const sinal = minutos < 0 ? "-" : "+";
+  const horas = Math.floor(Math.abs(minutos) / 60);
+  const resto = Math.abs(minutos) % 60;
+  return `GMT${sinal}${horas}${resto ? `:${String(resto).padStart(2, "0")}` : ""}`;
+}
+
+/** "São Paulo (GMT-3)" para o texto do cadastro. */
+export function descreverFuso(fuso: string | null, data: Date): string {
+  const cidade = fuso ? (nomeDoFuso(fuso).split("/").pop() ?? fuso) : "Horário do aparelho";
+  return `${cidade} (${deslocamentoGmt(data)})`;
+}
+
 /** "America/Sao_Paulo" → "América/São Paulo" */
 export function nomeDoFuso(fuso: string | null): string {
   if (!fuso) {

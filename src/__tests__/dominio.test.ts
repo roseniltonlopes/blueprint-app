@@ -1,3 +1,4 @@
+import { gerarIdDeTeste, nova } from "./utils";
 import {
   ESTADO_INICIAL,
   acoesDoDia,
@@ -16,7 +17,7 @@ const ONTEM_23H59 = new Date(2026, 9, 16, 23, 59);
 const HOJE_00H00 = new Date(2026, 9, 17, 0, 0);
 
 function acao(categoria: Acao["categoria"], quando: Date): Acao {
-  return criarAcao(categoria, quando);
+  return nova(categoria, quando);
 }
 
 describe("datas", () => {
@@ -95,8 +96,8 @@ describe("rótulo do Outro", () => {
   });
 
   it("recusa criar Outro com rótulo inválido", () => {
-    expect(() => criarAcao("outro", HOJE, " ")).toThrow("1 a 40 caracteres");
-    expect(criarAcao("outro", HOJE, " Alongamento ").rotulo).toBe("Alongamento");
+    expect(() => criarAcao("outro", HOJE, " ", gerarIdDeTeste)).toThrow("1 a 40 caracteres");
+    expect(criarAcao("outro", HOJE, " Alongamento ", gerarIdDeTeste).rotulo).toBe("Alongamento");
   });
 });
 

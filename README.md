@@ -102,7 +102,7 @@ blueprint-app/
     ├── services/
     │   ├── supabaseSchema.sql
     │   └── migrations/
-    │       └── 002_auth_e_rls_PROPOSTA.sql   # Proposta, ainda não aplicada
+    │       └── 002_auth_e_rls.sql            # Revisada, aplicar em dev primeiro
     └── styles/
         └── theme.js                           # Tokens da v1 (a atualizar na Fase 2)
 ```

@@ -4,6 +4,7 @@ import Animated from "react-native-reanimated";
 import GraficoSemanal from "../components/GraficoSemanal";
 import Resumo from "../components/Resumo";
 import { gerarDadosDeExemplo } from "../dev/dadosDeExemplo";
+import { gerarUuid } from "../domain/ids";
 import type { Acao } from "../domain/acoes";
 import { nomeDaCategoria } from "../domain/categorias";
 import {
@@ -65,7 +66,7 @@ function FerramentasDeDesenvolvimento() {
       </Text>
       <Pressable
         accessibilityRole="button"
-        onPress={() => substituir(gerarDadosDeExemplo(relogio()))}
+        onPress={() => substituir(gerarDadosDeExemplo(relogio(), gerarUuid))}
         style={styles.devBotao}
       >
         <Text variant="caption" color="accentText" weight={600}>

@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet } from "react-native";
 import { useTheme } from "../theme/ThemeProvider";
 import { RADIUS, SIZES } from "../styles/theme";
 import { Icon } from "../ui/Icon";
@@ -8,24 +8,36 @@ type BotaoAcaoProps = {
   titulo: string;
   aoPressionar: () => void;
   desabilitado?: boolean;
+  /** Mostra o "+" antes do título (registros); falso em ações como "Criar conta" */
+  comIcone?: boolean;
+  /** Mostra indicador de progresso e bloqueia novos toques */
+  carregando?: boolean;
 };
 
-/** Botão principal (docs/03, telas 2 e 3): preto com brilho laranja; desabilitado em tom afundado. */
-export default function BotaoAcao({ titulo, aoPressionar, desabilitado = false }: BotaoAcaoProps) {
+/** Botão principal (docs/03, telas 1 a 3): preto com brilho laranja; desabilitado em tom afundado. */
+export default function BotaoAcao({
+  titulo,
+  aoPressionar,
+  desabilitado = false,
+  comIcone = true,
+  carregando = false,
+}: BotaoAcaoProps) {
   const { colors, shadows } = useTheme();
+  const bloqueado = desabilitado || carregando;
 
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityState={{ disabled: desabilitado }}
-      disabled={desabilitado}
+      accessibilityLabel={titulo}
+      accessibilityState={{ disabled: bloqueado, busy: carregando }}
+      disabled={bloqueado}
       onPress={aoPressionar}
       style={({ pressed }) => [
         styles.botao,
         desabilitado
           ? { backgroundColor: colors.sunk }
           : { backgroundColor: colors.ink, boxShadow: shadows.glow },
-        pressed && !desabilitado && styles.pressionado,
+        pressed && !bloqueado && styles.pressionado,
       ]}
     >
       {desabilitado ? (
@@ -34,7 +46,11 @@ export default function BotaoAcao({ titulo, aoPressionar, desabilitado = false }
         </Text>
       ) : (
         <>
-          <Icon name="mais" color={colors.onInk} size={20} strokeWidth={2.4} />
+          {carregando ? (
+            <ActivityIndicator color={colors.onInk} />
+          ) : comIcone ? (
+            <Icon name="mais" color={colors.onInk} size={20} strokeWidth={2.4} />
+          ) : null}
           <Text variant="body" weight={600} color="onInk">
             {titulo}
           </Text>

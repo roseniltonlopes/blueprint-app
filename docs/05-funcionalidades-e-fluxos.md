@@ -153,4 +153,4 @@ group by 1
 order by 1;
 ```
 
-A migração que cria `perfis`, adiciona `user_id` e `rotulo` e troca as policies abertas por policies por usuário está em [`src/services/migrations/002_auth_e_rls_PROPOSTA.sql`](../src/services/migrations/002_auth_e_rls_PROPOSTA.sql).
+A migração que cria `perfis`, adiciona `user_id` e `rotulo` e troca as policies abertas por policies por usuário está em [`src/services/migrations/002_auth_e_rls.sql`](../src/services/migrations/002_auth_e_rls.sql).

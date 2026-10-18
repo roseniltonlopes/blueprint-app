@@ -17,7 +17,11 @@ export type IconName =
   | "historico"
   | "perfil"
   | "anterior"
-  | "proximo";
+  | "proximo"
+  | "olho"
+  | "olhoFechado"
+  | "nuvem"
+  | "alerta";
 
 type IconProps = {
   name: IconName;
@@ -95,6 +99,31 @@ function desenho(name: IconName, color: string): ReactNode {
         <>
           <Circle cx="12" cy="12" r="10" />
           <Path d="M12 6v6l4 2" />
+        </>
+      );
+    case "olho":
+      return (
+        <>
+          <Path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+          <Circle cx="12" cy="12" r="3" />
+        </>
+      );
+    case "olhoFechado":
+      return (
+        <>
+          <Path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+          <Path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+          <Path d="M6.61 6.61A13.53 13.53 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+          <Path d="M2 2l20 20" />
+        </>
+      );
+    case "nuvem":
+      return <Path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />;
+    case "alerta":
+      return (
+        <>
+          <Circle cx="12" cy="12" r="10" />
+          <Path d="M12 8v4M12 16h.01" />
         </>
       );
     case "anterior":
