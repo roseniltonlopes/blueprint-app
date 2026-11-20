@@ -30,9 +30,17 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "O Blueprint usa as suas fotos só para você escolher a foto do seu perfil."
+          "photosPermission": "O Blueprint usa as suas fotos só para você escolher a foto do seu perfil.",
+          "cameraPermission": false,
+          "microphonePermission": false
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "ce936785-2b61-476e-ad51-51a02a625776"
+      }
+    },
+    "owner": "roseniltonlopes"
   }
 }
