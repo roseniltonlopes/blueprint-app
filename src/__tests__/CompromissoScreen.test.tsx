@@ -385,3 +385,26 @@ describe("CompromissoScreen: remover", () => {
     expect(api.dados.avulsos).toEqual([]);
   });
 });
+
+describe("CompromissoScreen: vindo da semana modelo", () => {
+  it("abre sem nenhum dia marcado e os atalhos preenchem a semana de uma vez", async () => {
+    await abrir({ data: "2026-11-02", modelo: true });
+
+    const dias = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira"];
+    for (const dia of dias) {
+      expect(screen.getByRole("checkbox", { name: dia }).props.accessibilityState).toMatchObject({
+        checked: false,
+      });
+    }
+
+    await tocar("Seg a sex");
+    for (const dia of dias.slice(1)) {
+      expect(screen.getByRole("checkbox", { name: dia }).props.accessibilityState).toMatchObject({
+        checked: true,
+      });
+    }
+    expect(
+      screen.getByRole("checkbox", { name: "Domingo" }).props.accessibilityState,
+    ).toMatchObject({ checked: false });
+  });
+});

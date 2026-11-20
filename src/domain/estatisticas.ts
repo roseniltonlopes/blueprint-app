@@ -1,4 +1,5 @@
 import type { Acao } from "./acoes";
+import { CATEGORIAS, type CategoriaId } from "./categorias";
 import { chaveDoDia, diasDaSemana, inicioDoDia, rotuloDoDia, somarDias } from "./datas";
 
 /**
@@ -156,4 +157,27 @@ export function agruparPorDia(acoes: readonly Acao[], hoje: Date): GrupoDoDia[] 
     grupo.total += 1;
   }
   return grupos;
+}
+
+export type ContagemDeCategoria = { categoria: CategoriaId; total: number };
+
+/**
+ * Ações do mês (`mes` de 0 a 11) por categoria, da que mais aparece para a que menos.
+ * Só entram categorias com pelo menos 1 ação; empate segue a ordem da Home.
+ */
+export function contagemPorCategoria(
+  acoes: readonly Acao[],
+  ano: number,
+  mes: number,
+): ContagemDeCategoria[] {
+  const prefixo = `${ano}-${String(mes + 1).padStart(2, "0")}-`;
+  const totais = new Map<CategoriaId, number>();
+  for (const acao of acoes) {
+    if (chaveDoDia(new Date(acao.criadoEm)).startsWith(prefixo)) {
+      totais.set(acao.categoria, (totais.get(acao.categoria) ?? 0) + 1);
+    }
+  }
+  return CATEGORIAS.filter((categoria) => totais.has(categoria.id))
+    .map((categoria) => ({ categoria: categoria.id, total: totais.get(categoria.id) ?? 0 }))
+    .sort((a, b) => b.total - a.total);
 }

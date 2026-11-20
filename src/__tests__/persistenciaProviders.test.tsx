@@ -3,6 +3,7 @@ import { criarAcoesRepositoryLocal } from "../data/AcoesRepository";
 import { criarArmazenamentoEmMemoria } from "../data/armazenamento";
 import { criarAcao } from "../domain/acoes";
 import { AcoesProvider } from "../hooks/useAcoes";
+import { PerfilProvider } from "../hooks/usePerfil";
 import HomeScreen from "../screens/HomeScreen";
 import PerfilScreen from "../screens/PerfilScreen";
 import { ThemeProvider } from "../theme/ThemeProvider";
@@ -63,7 +64,9 @@ describe("ThemeProvider com persistência", () => {
       <SafeAreaProvider initialMetrics={METRICAS}>
         <ThemeProvider initialMode="dark" initialDestaque="indigo" aoMudar={aoMudar}>
           <AcoesProvider relogio={relogioFixo()}>
-            <PerfilScreen />
+            <PerfilProvider>
+              <PerfilScreen />
+            </PerfilProvider>
           </AcoesProvider>
         </ThemeProvider>
       </SafeAreaProvider>,

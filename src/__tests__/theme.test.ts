@@ -7,10 +7,10 @@ describe("tokens do tema", () => {
   });
 
   it("segue os valores de docs/04", () => {
-    expect(THEMES.light.bg).toBe("#DDDDDD");
-    expect(THEMES.dark.bg).toBe("#000000");
+    expect(THEMES.light.bg).toBe("#F6F4F0");
+    expect(THEMES.dark.bg).toBe("#0F0E0C");
     expect(THEMES.light.accentText).toBe("#4607CD");
-    expect(THEMES.dark.accentText).toBe("#FF4B00");
+    expect(THEMES.dark.accentText).toBe("#FF6A2B");
     expect(THEMES.dark.gradient[0]).toBe("#7A4DFF");
   });
 

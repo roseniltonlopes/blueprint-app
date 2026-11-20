@@ -1,9 +1,10 @@
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { Pressable, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../theme/ThemeProvider";
-import { RADIUS, SIZES, SPACING } from "../styles/theme";
+import { RADIUS, SPACING } from "../styles/theme";
 import { Icon, type IconName } from "../ui/Icon";
+import { PressableEscala } from "../ui/PressableEscala";
 import { Text } from "../ui/Text";
 
 export type RotaDaAba = "Hoje" | "Agenda" | "Calendario" | "Historico" | "Perfil";
@@ -16,7 +17,10 @@ const ABAS: Record<RotaDaAba, { rotulo: string; icone: IconName }> = {
   Perfil: { rotulo: "Perfil", icone: "perfil" },
 };
 
-/** Barra inferior de 5 abas (docs/03; aba ativa invertida, 56 de altura). */
+/**
+ * Barra inferior de 5 abas. A aba ativa fica em tinta cheia com um marcador laranja
+ * no topo; as outras ficam em cinza. Sem pílula, para não competir com o conteúdo.
+ */
 export default function BarraDeAbas({ state, navigation }: BottomTabBarProps) {
   const { colors, shadows } = useTheme();
   const insets = useSafeAreaInsets();
@@ -28,15 +32,16 @@ export default function BarraDeAbas({ state, navigation }: BottomTabBarProps) {
         styles.barra,
         {
           backgroundColor: colors.card,
+          borderTopColor: colors.hair,
           boxShadow: shadows.tabBar,
-          paddingBottom: Math.max(insets.bottom, SPACING.md) + 10,
+          paddingBottom: Math.max(insets.bottom, SPACING.sm) + 6,
         },
       ]}
     >
       {state.routes.map((rota, indice) => {
         const aba = ABAS[rota.name as RotaDaAba];
         const ativa = state.index === indice;
-        const cor = ativa ? colors.onInk : colors.mute;
+        const cor = ativa ? colors.ink : colors.mute;
 
         function aoPressionar() {
           const evento = navigation.emit({
@@ -50,19 +55,28 @@ export default function BarraDeAbas({ state, navigation }: BottomTabBarProps) {
         }
 
         return (
-          <Pressable
+          <PressableEscala
             key={rota.key}
             accessibilityRole="tab"
             accessibilityLabel={aba.rotulo}
             accessibilityState={{ selected: ativa }}
             onPress={aoPressionar}
-            style={[styles.aba, ativa && { backgroundColor: colors.ink }]}
+            escala={0.94}
+            style={styles.aba}
           >
-            <Icon name={aba.icone} color={cor} />
-            <Text variant="caption" weight={500} style={[styles.rotulo, { color: cor }]}>
+            <View
+              style={[styles.marcador, { backgroundColor: ativa ? colors.accent : "transparent" }]}
+            />
+            <Icon name={aba.icone} color={cor} strokeWidth={ativa ? 2.2 : 1.8} />
+            <Text
+              variant="caption"
+              weight={ativa ? 600 : 500}
+              numberOfLines={1}
+              style={[styles.rotulo, { color: cor }]}
+            >
               {aba.rotulo}
             </Text>
-          </Pressable>
+          </PressableEscala>
         );
       })}
     </View>
@@ -72,18 +86,23 @@ export default function BarraDeAbas({ state, navigation }: BottomTabBarProps) {
 const styles = StyleSheet.create({
   barra: {
     flexDirection: "row",
-    gap: 6,
-    paddingTop: 10,
-    paddingHorizontal: SPACING.md,
+    borderTopWidth: 1,
+    paddingHorizontal: SPACING.sm,
   },
   aba: {
     flex: 1,
     minWidth: 0,
-    height: SIZES.button,
-    borderRadius: RADIUS.button,
+    minHeight: 56,
     alignItems: "center",
-    justifyContent: "center",
-    gap: 3,
+    justifyContent: "flex-end",
+    gap: 4,
+    paddingBottom: 2,
+  },
+  marcador: {
+    width: 20,
+    height: 3,
+    borderRadius: RADIUS.pill,
+    marginBottom: 4,
   },
   rotulo: { fontSize: 12, lineHeight: 14 },
 });

@@ -1,7 +1,8 @@
-import { Pressable, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { useTheme } from "../theme/ThemeProvider";
-import { RADIUS, SIZES } from "../styles/theme";
+import { BRAND, RADIUS, SIZES } from "../styles/theme";
 import { Icon } from "../ui/Icon";
+import { PressableEscala } from "../ui/PressableEscala";
 import { Text } from "../ui/Text";
 
 type BotaoAcaoProps = {
@@ -10,23 +11,20 @@ type BotaoAcaoProps = {
   desabilitado?: boolean;
 };
 
-/** Botão principal (docs/03, telas 2 e 3): preto com brilho laranja; desabilitado em tom afundado. */
+/**
+ * Botão principal: laranja da marca com texto preto (contraste 6,3:1 nos dois temas).
+ * Desabilitado em tom afundado, com o texto ainda legível.
+ */
 export default function BotaoAcao({ titulo, aoPressionar, desabilitado = false }: BotaoAcaoProps) {
-  const { colors, shadows } = useTheme();
+  const { colors } = useTheme();
 
   return (
-    <Pressable
+    <PressableEscala
       accessibilityRole="button"
       accessibilityState={{ disabled: desabilitado }}
       disabled={desabilitado}
       onPress={aoPressionar}
-      style={({ pressed }) => [
-        styles.botao,
-        desabilitado
-          ? { backgroundColor: colors.sunk }
-          : { backgroundColor: colors.ink, boxShadow: shadows.glow },
-        pressed && !desabilitado && styles.pressionado,
-      ]}
+      style={[styles.botao, { backgroundColor: desabilitado ? colors.sunk : colors.accent }]}
     >
       {desabilitado ? (
         <Text variant="support" weight={500} color="mute" style={styles.textoDesabilitado}>
@@ -34,13 +32,13 @@ export default function BotaoAcao({ titulo, aoPressionar, desabilitado = false }
         </Text>
       ) : (
         <>
-          <Icon name="mais" color={colors.onInk} size={20} strokeWidth={2.4} />
-          <Text variant="body" weight={600} color="onInk">
+          <Icon name="mais" color={BRAND.black} size={20} strokeWidth={2.4} />
+          <Text variant="body" weight={600} style={{ color: BRAND.black }}>
             {titulo}
           </Text>
         </>
       )}
-    </Pressable>
+    </PressableEscala>
   );
 }
 
@@ -54,5 +52,4 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   textoDesabilitado: { fontSize: 15 },
-  pressionado: { transform: [{ translateY: 2 }, { scale: 0.99 }] },
 });

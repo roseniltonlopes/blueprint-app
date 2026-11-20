@@ -1,7 +1,8 @@
-import { Pressable, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useTheme } from "../theme/ThemeProvider";
 import { BRAND, RADIUS, SIZES, SPACING } from "../styles/theme";
 import { Icon, type IconName } from "../ui/Icon";
+import { PressableEscala } from "../ui/PressableEscala";
 import { Text } from "../ui/Text";
 
 type BotaoOpcaoProps = {
@@ -15,8 +16,8 @@ type BotaoOpcaoProps = {
 };
 
 /**
- * Cartão de categoria da Home (docs/03, telas 2 e 3).
- * Selecionado: cartão invertido, selo laranja e brilho.
+ * Cartão de categoria da Home.
+ * Selecionado: contorno laranja, ícone sobre laranja e selo de confirmação.
  */
 export default function BotaoOpcao({
   titulo,
@@ -30,22 +31,17 @@ export default function BotaoOpcao({
   const linha = formato === "linha";
 
   const circulo = (
-    <View style={[styles.circulo, { backgroundColor: selecionado ? colors.onInk : colors.sunk }]}>
-      <Icon name={icone} color={colors.ink} />
+    <View style={[styles.circulo, { backgroundColor: selecionado ? colors.accent : colors.sunk }]}>
+      <Icon name={icone} color={selecionado ? BRAND.black : colors.ink} />
     </View>
   );
 
   const textos = (
     <View style={linha && styles.textosLinha}>
-      <Text variant="body" color={selecionado ? "onInk" : "ink"} numberOfLines={1}>
+      <Text variant="body" numberOfLines={1}>
         {titulo}
       </Text>
-      <Text
-        variant="caption"
-        color={selecionado ? "onInk" : "mute"}
-        style={selecionado && styles.subtituloSelecionado}
-        numberOfLines={1}
-      >
+      <Text variant="caption" color="mute" numberOfLines={1}>
         {subtitulo}
       </Text>
     </View>
@@ -58,18 +54,19 @@ export default function BotaoOpcao({
   ) : null;
 
   return (
-    <Pressable
+    <PressableEscala
       accessibilityRole="button"
       accessibilityLabel={`${titulo}, ${subtitulo}`}
       accessibilityState={{ selected: selecionado }}
       onPress={aoPressionar}
-      style={({ pressed }) => [
+      style={[
         linha ? styles.linha : styles.cartao,
         {
-          backgroundColor: selecionado ? colors.ink : colors.card,
-          boxShadow: selecionado ? shadows.glow : shadows.card,
+          backgroundColor: colors.card,
+          borderColor: selecionado ? colors.accent : colors.hair,
+          borderWidth: selecionado ? 1.5 : 1,
+          boxShadow: shadows.card,
         },
-        pressed && styles.pressionado,
       ]}
     >
       {linha ? (
@@ -87,7 +84,7 @@ export default function BotaoOpcao({
           {textos}
         </>
       )}
-    </Pressable>
+    </PressableEscala>
   );
 }
 
@@ -126,6 +123,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  subtituloSelecionado: { opacity: 0.76 },
-  pressionado: { transform: [{ translateY: 2 }, { scale: 0.99 }] },
 });

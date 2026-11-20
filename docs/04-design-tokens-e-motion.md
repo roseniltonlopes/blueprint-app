@@ -2,6 +2,8 @@
 
 Referência única de cores, tipografia, formas, sombras, movimento e acessibilidade da v2. Os valores vêm do canvas editável: https://claude.ai/artifact/Cae8a8KKv5bRKpx234Zh3h
 
+> **Atualização (redesign):** a paleta de neutros, as sombras e as durações de movimento foram revisadas. Os valores vigentes estão em [`07-plano-redesign.md`](07-plano-redesign.md) e em `src/styles/theme.ts`. As tabelas abaixo guardam a v2 original; a marca (laranja, índigo, preto) e a fonte não mudaram.
+
 > **Implementação:** os tokens desta página estão em [`src/styles/theme.ts`](../src/styles/theme.ts) desde a Etapa 1. A seção 7 guarda a proposta original como referência.
 
 ---

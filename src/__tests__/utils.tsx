@@ -2,10 +2,13 @@ import { render } from "@testing-library/react-native";
 import type { ReactElement } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import type { AgendaRepository } from "../data/AgendaRepository";
+import type { PerfilRepository } from "../data/PerfilRepository";
 import type { Acao } from "../domain/acoes";
 import type { DadosAgenda } from "../domain/agenda";
+import type { Perfil } from "../domain/perfil";
 import { AcoesProvider, type Relogio } from "../hooks/useAcoes";
 import { AgendaProvider } from "../hooks/useAgenda";
+import { PerfilProvider } from "../hooks/usePerfil";
 import { ThemeProvider, type ThemeMode } from "../theme/ThemeProvider";
 
 const METRICAS = {
@@ -26,16 +29,28 @@ type Opcoes = {
   acoes?: Acao[];
   agenda?: DadosAgenda;
   repositorioAgenda?: AgendaRepository;
+  perfil?: Perfil;
+  repositorioPerfil?: PerfilRepository;
 };
 
 export function renderComTema(ui: ReactElement, opcoes: Opcoes = {}) {
-  const { modo = "light", relogio = relogioFixo(), acoes = [], agenda, repositorioAgenda } = opcoes;
+  const {
+    modo = "light",
+    relogio = relogioFixo(),
+    acoes = [],
+    agenda,
+    repositorioAgenda,
+    perfil,
+    repositorioPerfil,
+  } = opcoes;
   return render(
     <SafeAreaProvider initialMetrics={METRICAS}>
       <ThemeProvider initialMode={modo}>
         <AcoesProvider relogio={relogio} acoesIniciais={acoes}>
           <AgendaProvider agendaInicial={agenda} repositorio={repositorioAgenda}>
-            {ui}
+            <PerfilProvider perfilInicial={perfil} repositorio={repositorioPerfil}>
+              {ui}
+            </PerfilProvider>
           </AgendaProvider>
         </AcoesProvider>
       </ThemeProvider>

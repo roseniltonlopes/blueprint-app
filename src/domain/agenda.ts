@@ -275,7 +275,9 @@ export function ocorrenciasDoDia(dados: DadosAgenda, data: Date): Ocorrencia[] {
   return ocorrencias.sort(compararOcorrencias);
 }
 
-function sobrepoeNoDia(a: Ocorrencia, b: Ocorrencia): boolean {
+type Horario = { inicio: string; fim: string | null };
+
+function sobrepoeNoDia(a: Horario, b: Horario): boolean {
   const inicioA = minutosDoDia(a.inicio);
   const fimA = a.fim === null ? inicioA : minutosDoDia(a.fim);
   const inicioB = minutosDoDia(b.inicio);
@@ -285,6 +287,21 @@ function sobrepoeNoDia(a: Ocorrencia, b: Ocorrencia): boolean {
   if (inicioA === fimA) return inicioB <= inicioA && inicioA < fimB;
   if (inicioB === fimB) return inicioA <= inicioB && inicioB < fimA;
   return inicioA < fimB && inicioB < fimA;
+}
+
+/** Ids dos compromissos que dividem algum dia da semana com outro de horário sobreposto. */
+export function compromissosEmConflito(compromissos: readonly Compromisso[]): Set<string> {
+  const ids = new Set<string>();
+  for (let i = 0; i < compromissos.length; i++) {
+    for (let j = i + 1; j < compromissos.length; j++) {
+      const [a, b] = [compromissos[i], compromissos[j]];
+      if (a.dias.some((dia) => b.dias.includes(dia)) && sobrepoeNoDia(a, b)) {
+        ids.add(a.id);
+        ids.add(b.id);
+      }
+    }
+  }
+  return ids;
 }
 
 /** Chaves das ocorrências cujos horários se sobrepõem a outra do mesmo dia. */

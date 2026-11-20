@@ -11,6 +11,8 @@ export type RaizParamList = {
     avulsoId?: string;
     /** AAAA-MM-DD */
     data?: string;
+    /** Novo compromisso vindo da semana modelo: abre sem nenhum dia marcado */
+    modelo?: boolean;
   };
   /** `nova` abre a tela já com o formulário de nova agenda; `data` (AAAA-MM-DD) escolhe o mês e o trecho livre */
   Agendas: { nova?: boolean; data?: string } | undefined;

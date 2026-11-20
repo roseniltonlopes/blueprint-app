@@ -3,6 +3,7 @@ import type { CategoriaId } from "../domain/categorias";
 import { formatarIntervalo, inicioDaSemana, rotuloDoDia, somarDias } from "../domain/datas";
 import {
   agruparPorDia,
+  contagemPorCategoria,
   contarPorDia,
   indiceDoMelhorDia,
   semanaDoGrafico,
@@ -82,5 +83,35 @@ describe("lista agrupada", () => {
   it("rótulo do dia", () => {
     expect(rotuloDoDia(HOJE, HOJE)).toBe("Hoje");
     expect(rotuloDoDia(somarDias(HOJE, -1), HOJE)).toBe("Ontem");
+  });
+});
+
+describe("contagemPorCategoria", () => {
+  const acaoEm = (categoria: "exercicio" | "estudo" | "hidratacao", dia: number, mes = 9) =>
+    criarAcao(categoria, new Date(2026, mes, dia, 9, 0));
+
+  it("conta só o mês pedido, da categoria mais frequente para a menos", () => {
+    const acoes = [
+      acaoEm("estudo", 1),
+      acaoEm("exercicio", 2),
+      acaoEm("exercicio", 3),
+      acaoEm("exercicio", 4),
+      acaoEm("estudo", 5),
+      acaoEm("hidratacao", 6, 8),
+    ];
+    expect(contagemPorCategoria(acoes, 2026, 9)).toEqual([
+      { categoria: "exercicio", total: 3 },
+      { categoria: "estudo", total: 2 },
+    ]);
+    expect(contagemPorCategoria(acoes, 2026, 8)).toEqual([{ categoria: "hidratacao", total: 1 }]);
+  });
+
+  it("empate segue a ordem da Home e mês sem ações devolve lista vazia", () => {
+    const acoes = [acaoEm("estudo", 1), acaoEm("hidratacao", 2)];
+    expect(contagemPorCategoria(acoes, 2026, 9).map((c) => c.categoria)).toEqual([
+      "hidratacao",
+      "estudo",
+    ]);
+    expect(contagemPorCategoria(acoes, 2026, 0)).toEqual([]);
   });
 });

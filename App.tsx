@@ -16,8 +16,10 @@ import { PREFERENCIAS_PADRAO } from "./src/data/PreferenciasRepository";
 import type { Acao } from "./src/domain/acoes";
 import { carregarAgendaSegura } from "./src/data/AgendaRepository";
 import type { DadosAgenda } from "./src/domain/agenda";
+import { PERFIL_PADRAO, type Perfil } from "./src/domain/perfil";
 import { AcoesProvider } from "./src/hooks/useAcoes";
 import { AgendaProvider } from "./src/hooks/useAgenda";
+import { PerfilProvider } from "./src/hooks/usePerfil";
 import Raiz from "./src/navigation/Raiz";
 import { ThemeProvider, useTheme, type Destaque, type ThemeMode } from "./src/theme/ThemeProvider";
 
@@ -29,6 +31,7 @@ type DadosIniciais = {
   preferencias: Preferencias;
   acoes: Acao[];
   agenda: DadosAgenda;
+  perfil: Perfil;
   /** false quando a leitura da agenda falhou: não regravar por cima do que está no disco */
   agendaGravavel: boolean;
 };
@@ -49,9 +52,13 @@ function useDadosIniciais(): DadosIniciais | null {
         return [] as Acao[];
       }),
       carregarAgendaSegura(repositorios.agenda),
-    ]).then(([preferencias, acoes, { dados: agenda, gravar }]) => {
+      repositorios.perfil.carregar().catch((erro: unknown) => {
+        console.warn("Falha ao ler o perfil; usando o padrão.", erro);
+        return { ...PERFIL_PADRAO };
+      }),
+    ]).then(([preferencias, acoes, { dados: agenda, gravar }, perfil]) => {
       if (ativo) {
-        setDados({ preferencias, acoes, agenda, agendaGravavel: gravar });
+        setDados({ preferencias, acoes, agenda, perfil, agendaGravavel: gravar });
       }
     });
     return () => {
@@ -128,7 +135,9 @@ export default function App() {
             agendaInicial={dados.agenda}
             repositorio={dados.agendaGravavel ? repositorios.agenda : undefined}
           >
-            <Root />
+            <PerfilProvider perfilInicial={dados.perfil} repositorio={repositorios.perfil}>
+              <Root />
+            </PerfilProvider>
           </AgendaProvider>
         </AcoesProvider>
       </ThemeProvider>

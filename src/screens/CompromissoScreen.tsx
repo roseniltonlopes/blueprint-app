@@ -66,16 +66,25 @@ export default function CompromissoScreen({ route, navigation }: Props) {
       </Screen>
     );
   }
-  return <Formulario alvo={alvo} data={params?.data} navigation={navigation} />;
+  return (
+    <Formulario
+      alvo={alvo}
+      data={params?.data}
+      semDiaInicial={params?.modelo === true}
+      navigation={navigation}
+    />
+  );
 }
 
 type FormularioProps = {
   alvo: Exclude<Alvo, { tipo: "nao-encontrado" }>;
   data: string | undefined;
+  /** Novo compromisso sem dia pré-marcado (vem da semana modelo) */
+  semDiaInicial: boolean;
   navigation: Props["navigation"];
 };
 
-function Formulario({ alvo, data, navigation }: FormularioProps) {
+function Formulario({ alvo, data, semDiaInicial, navigation }: FormularioProps) {
   const {
     dados,
     relogio,
@@ -101,7 +110,11 @@ function Formulario({ alvo, data, navigation }: FormularioProps) {
     existente?.atividadeId ?? avulsoExistente?.atividadeId ?? null,
   );
   const [dias, setDias] = useState<DiaDaSemana[]>(
-    existente ? [...existente.dias] : dataDaRota ? [dataDaRota.getDay() as DiaDaSemana] : [],
+    existente
+      ? [...existente.dias]
+      : dataDaRota && !semDiaInicial
+        ? [dataDaRota.getDay() as DiaDaSemana]
+        : [],
   );
   const [inicio, setInicio] = useState<string | null>(
     existente?.inicio ?? avulsoExistente?.inicio ?? null,
@@ -287,7 +300,7 @@ function Formulario({ alvo, data, navigation }: FormularioProps) {
       {repeticao === "semana" ? (
         <View style={styles.bloco}>
           <Text variant="section">Dias da semana</Text>
-          <SeletorDeDias valor={dias} aoMudar={setDias} />
+          <SeletorDeDias valor={dias} aoMudar={setDias} atalhos />
         </View>
       ) : (
         <Campo

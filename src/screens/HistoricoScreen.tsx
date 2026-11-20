@@ -1,30 +1,31 @@
 import { useMemo, useState } from "react";
-import { Pressable, SectionList, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
 import GraficoSemanal from "../components/GraficoSemanal";
+import ListaDeDias from "../components/ListaDeDias";
 import Resumo from "../components/Resumo";
+import ResumoPorCategoria from "../components/ResumoPorCategoria";
 import { gerarDadosDeExemplo } from "../dev/dadosDeExemplo";
 import type { Acao } from "../domain/acoes";
-import { nomeDaCategoria } from "../domain/categorias";
 import {
   DIAS_ABREVIADOS,
-  formatarHora,
+  chaveDoDia,
   formatarIntervalo,
+  formatarMesAno,
   inicioDaSemana,
   somarDias,
 } from "../domain/datas";
 import {
-  agruparPorDia,
+  contagemPorCategoria,
   contarPorDia,
   indiceDoMelhorDia,
+  resumoDoMes,
   semanaDoGrafico,
   sequenciaAtual,
-  type GrupoDoDia,
 } from "../domain/estatisticas";
-import { plural } from "../domain/texto";
 import { useAcoes } from "../hooks/useAcoes";
 import { useTheme } from "../theme/ThemeProvider";
-import { RADIUS, SIZES, SPACING } from "../styles/theme";
+import { SIZES, SPACING } from "../styles/theme";
 import { Card } from "../ui/Card";
 import { Icon } from "../ui/Icon";
 import { entrada } from "../ui/motion";
@@ -33,25 +34,6 @@ import { SegmentedControl } from "../ui/SegmentedControl";
 import { Text } from "../ui/Text";
 
 type Visao = "semana" | "mes";
-
-function ItemDaLista({ acao }: { acao: Acao }) {
-  const { colors } = useTheme();
-  const nome = acao.rotulo ?? nomeDaCategoria(acao.categoria);
-  const hora = formatarHora(new Date(acao.criadoEm));
-  return (
-    <View style={styles.item} accessible accessibilityLabel={`${hora}, ${nome}`}>
-      <Text variant="support" color="mute" style={styles.hora}>
-        {hora}
-      </Text>
-      <View style={[styles.circulo, { backgroundColor: colors.sunk }]}>
-        <Icon name={acao.categoria} color={colors.ink} size={20} />
-      </View>
-      <Text variant="body" numberOfLines={1} style={styles.nomeItem}>
-        {nome}
-      </Text>
-    </View>
-  );
-}
 
 function FerramentasDeDesenvolvimento() {
   const { substituir, relogio } = useAcoes();
@@ -81,23 +63,90 @@ function FerramentasDeDesenvolvimento() {
   );
 }
 
-/** Histórico (docs/03 tela 7; docs/05 F13, F14 e F15). */
+type NavegacaoProps = {
+  titulo: string;
+  rotuloAnterior: string;
+  rotuloProximo: string;
+  podeAvancar: boolean;
+  aoVoltar: () => void;
+  aoAvancar: () => void;
+};
+
+function Navegacao({
+  titulo,
+  rotuloAnterior,
+  rotuloProximo,
+  podeAvancar,
+  aoVoltar,
+  aoAvancar,
+}: NavegacaoProps) {
+  const { colors } = useTheme();
+  return (
+    <View style={styles.navegacao}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={rotuloAnterior}
+        onPress={aoVoltar}
+        style={styles.seta}
+      >
+        <Icon name="anterior" color={colors.ink} />
+      </Pressable>
+      <Text variant="support" weight={500} style={styles.intervalo}>
+        {titulo}
+      </Text>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={rotuloProximo}
+        accessibilityState={{ disabled: !podeAvancar }}
+        disabled={!podeAvancar}
+        onPress={aoAvancar}
+        style={[styles.seta, !podeAvancar && styles.desabilitado]}
+      >
+        <Icon name="proximo" color={colors.ink} />
+      </Pressable>
+    </View>
+  );
+}
+
+/**
+ * Histórico. A semana mostra o gráfico e uma linha por dia (as ações abrem ao tocar); o mês
+ * mostra quantas vezes cada categoria apareceu e como isso se compara ao mês anterior.
+ */
 export default function HistoricoScreen() {
   const { acoes, relogio } = useAcoes();
-  const { colors } = useTheme();
   const [visao, setVisao] = useState<Visao>("semana");
   const [semanasAtras, setSemanasAtras] = useState(0);
+  const [mesesAtras, setMesesAtras] = useState(0);
 
   const hoje = relogio();
   const porDia = useMemo(() => contarPorDia(acoes), [acoes]);
+  const acoesPorDia = useMemo(() => {
+    const mapa = new Map<string, Acao[]>();
+    const recentesPrimeiro = [...acoes].sort((a, b) => b.criadoEm.localeCompare(a.criadoEm));
+    for (const acao of recentesPrimeiro) {
+      const chave = chaveDoDia(new Date(acao.criadoEm));
+      mapa.set(chave, [...(mapa.get(chave) ?? []), acao]);
+    }
+    return mapa;
+  }, [acoes]);
+
   const domingo = somarDias(inicioDaSemana(hoje), -7 * semanasAtras);
   const dias = semanaDoGrafico(domingo, porDia, hoje);
   const totalSemana = dias.reduce((soma, dia) => soma + dia.total, 0);
   const melhor = indiceDoMelhorDia(dias);
-  const grupos = useMemo(() => agruparPorDia(acoes, relogio()), [acoes, relogio]);
 
-  const cabecalho = (
-    <View style={styles.cabecalho}>
+  const mesExibido = new Date(hoje.getFullYear(), hoje.getMonth() - mesesAtras, 1);
+  const anoDoMes = mesExibido.getFullYear();
+  const numeroDoMes = mesExibido.getMonth();
+  const mesAnterior = new Date(anoDoMes, numeroDoMes - 1, 1);
+  const anoAnterior = mesAnterior.getFullYear();
+  const numeroAnterior = mesAnterior.getMonth();
+  const doMes = contagemPorCategoria(acoes, anoDoMes, numeroDoMes);
+  const doMesAnterior = contagemPorCategoria(acoes, anoAnterior, numeroAnterior);
+  const resumoMes = resumoDoMes(porDia, anoDoMes, numeroDoMes);
+
+  return (
+    <Screen scroll contentStyle={styles.conteudo}>
       <Animated.View entering={entrada(0)}>
         <Text variant="h1" accessibilityRole="header">
           Histórico
@@ -120,29 +169,14 @@ export default function HistoricoScreen() {
         <>
           <Animated.View entering={entrada(100)}>
             <Card style={styles.cartaoGrafico}>
-              <View style={styles.navegacao}>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Semana anterior"
-                  onPress={() => setSemanasAtras((n) => n + 1)}
-                  style={styles.seta}
-                >
-                  <Icon name="anterior" color={colors.ink} />
-                </Pressable>
-                <Text variant="support" weight={500} style={styles.intervalo}>
-                  {formatarIntervalo(dias[0].data, dias[6].data)}
-                </Text>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Próxima semana"
-                  accessibilityState={{ disabled: semanasAtras === 0 }}
-                  disabled={semanasAtras === 0}
-                  onPress={() => setSemanasAtras((n) => Math.max(0, n - 1))}
-                  style={[styles.seta, semanasAtras === 0 && styles.desabilitado]}
-                >
-                  <Icon name="proximo" color={colors.ink} />
-                </Pressable>
-              </View>
+              <Navegacao
+                titulo={formatarIntervalo(dias[0].data, dias[6].data)}
+                rotuloAnterior="Semana anterior"
+                rotuloProximo="Próxima semana"
+                podeAvancar={semanasAtras > 0}
+                aoVoltar={() => setSemanasAtras((n) => n + 1)}
+                aoAvancar={() => setSemanasAtras((n) => Math.max(0, n - 1))}
+              />
               <GraficoSemanal dias={dias} />
             </Card>
           </Animated.View>
@@ -159,55 +193,61 @@ export default function HistoricoScreen() {
               ]}
             />
           </Animated.View>
+
+          {acoes.length === 0 ? (
+            <Text variant="support" color="mute" style={styles.vazio}>
+              Nenhuma ação registrada ainda. Registre a primeira na aba Hoje.
+            </Text>
+          ) : (
+            <>
+              <Text variant="section" accessibilityRole="header" style={styles.titulo}>
+                Dia a dia
+              </Text>
+              <ListaDeDias dias={dias} acoesPorDia={acoesPorDia} hoje={hoje} />
+            </>
+          )}
         </>
       ) : (
-        <Card style={styles.cartaoGrafico}>
-          <Text variant="body">Visão mensal</Text>
-          <Text variant="support" color="mute">
-            O conteúdo da visão por mês ainda não foi especificado no design (docs/05, F16).
-          </Text>
-        </Card>
+        <>
+          <Navegacao
+            titulo={formatarMesAno(anoDoMes, numeroDoMes)}
+            rotuloAnterior="Mês anterior"
+            rotuloProximo="Próximo mês"
+            podeAvancar={mesesAtras > 0}
+            aoVoltar={() => setMesesAtras((n) => n + 1)}
+            aoAvancar={() => setMesesAtras((n) => Math.max(0, n - 1))}
+          />
+          <Resumo
+            itens={[
+              { valor: String(resumoMes.total), rotulo: "ações no mês" },
+              { valor: String(resumoMes.diasComRegistro), rotulo: "dias com registro" },
+            ]}
+          />
+          {doMes.length === 0 ? (
+            <Text variant="support" color="mute" style={styles.vazio}>
+              Nenhuma ação registrada neste mês.
+            </Text>
+          ) : (
+            <>
+              <Text variant="section" accessibilityRole="header" style={styles.titulo}>
+                Por categoria
+              </Text>
+              <ResumoPorCategoria
+                atual={doMes}
+                anterior={doMesAnterior.length > 0 ? doMesAnterior : null}
+              />
+            </>
+          )}
+        </>
       )}
 
       <FerramentasDeDesenvolvimento />
-    </View>
-  );
-
-  return (
-    <Screen contentStyle={styles.semPadding}>
-      <SectionList<Acao, GrupoDoDia>
-        sections={grupos}
-        keyExtractor={(acao) => acao.id}
-        renderItem={({ item }) => <ItemDaLista acao={item} />}
-        renderSectionHeader={({ section }) => (
-          <View style={[styles.secao, { backgroundColor: colors.bg }]}>
-            <Text variant="section" accessibilityRole="header">
-              {section.titulo}
-            </Text>
-            <Text variant="support" color="mute">
-              {plural(section.total, "ação", "ações")}
-            </Text>
-          </View>
-        )}
-        ListHeaderComponent={cabecalho}
-        ListEmptyComponent={
-          <Text variant="support" color="mute" style={styles.vazio}>
-            Nenhuma ação registrada ainda. Registre a primeira na aba Hoje.
-          </Text>
-        }
-        stickySectionHeadersEnabled={false}
-        contentContainerStyle={styles.lista}
-        showsVerticalScrollIndicator={false}
-        initialNumToRender={20}
-      />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  semPadding: { paddingHorizontal: 0, paddingTop: 0, paddingBottom: 0 },
-  lista: { paddingHorizontal: SPACING.screen, paddingTop: SPACING.xxl, paddingBottom: SPACING.xxl },
-  cabecalho: { gap: 14 },
+  conteudo: { gap: 14, paddingBottom: SPACING.xxl },
   cartaoGrafico: { paddingTop: 6, paddingHorizontal: SPACING.md, paddingBottom: SPACING.lg },
   navegacao: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   seta: {
@@ -218,24 +258,8 @@ const styles = StyleSheet.create({
   },
   desabilitado: { opacity: 0.3 },
   intervalo: { fontSize: 15 },
-  secao: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    justifyContent: "space-between",
-    paddingTop: SPACING.xl,
-    paddingBottom: SPACING.xs,
-  },
-  item: { flexDirection: "row", alignItems: "center", gap: 14, height: 60 },
-  hora: { width: 46, fontVariant: ["tabular-nums"] },
-  circulo: {
-    width: 40,
-    height: 40,
-    borderRadius: RADIUS.pill,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  nomeItem: { flex: 1 },
-  vazio: { marginTop: SPACING.xl },
+  titulo: { marginTop: SPACING.sm },
+  vazio: { marginTop: SPACING.sm },
   dev: { flexDirection: "row", alignItems: "center", gap: SPACING.sm },
   devBotao: { minHeight: SIZES.touchMin, justifyContent: "center", paddingHorizontal: SPACING.sm },
 });

@@ -30,6 +30,8 @@ export function Card({
           backgroundColor: inverted ? colors.ink : colors.card,
           borderRadius: RADIUS[radius],
           padding: SPACING.lg,
+          borderWidth: elevation === "glow" || inverted ? 0 : 1,
+          borderColor: colors.hair,
           boxShadow: elevation === "none" ? "none" : shadows[elevation],
         },
         style,

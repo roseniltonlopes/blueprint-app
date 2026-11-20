@@ -26,7 +26,13 @@
     "plugins": [
       "expo-font",
       "expo-splash-screen",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O Blueprint usa as suas fotos só para você escolher a foto do seu perfil."
+        }
+      ]
     ]
   }
 }

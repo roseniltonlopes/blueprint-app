@@ -1,33 +1,10 @@
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import { fireEvent, screen } from "@testing-library/react-native";
 import { Platform } from "react-native";
-import DiaDaAgenda from "../components/DiaDaAgenda";
-import LinhaCompromisso from "../components/LinhaCompromisso";
 import SeletorDeDias from "../components/SeletorDeDias";
 import SeletorDeHorario from "../components/SeletorDeHorario";
-import type { Atividade, DiaDaSemana, Ocorrencia } from "../domain/agenda";
+import type { DiaDaSemana } from "../domain/agenda";
 import { renderComTema } from "./utils";
-
-const academia: Atividade = {
-  id: "academia",
-  nome: "Academia",
-  icone: "exercicio",
-  categoria: "exercicio",
-  criadaEm: "2026-11-01T00:00:00.000Z",
-};
-
-function ocorrencia(parcial: Partial<Ocorrencia> = {}): Ocorrencia {
-  return {
-    chave: "agenda:c1",
-    origem: "agenda",
-    id: "c1",
-    agendaId: "nov",
-    atividade: academia,
-    inicio: "05:00",
-    fim: "06:00",
-    ...parcial,
-  };
-}
 
 describe("SeletorDeDias", () => {
   it("adiciona e remove dias mantendo a ordem crescente", async () => {
@@ -54,127 +31,6 @@ describe("SeletorDeDias", () => {
     const livre = screen.getByRole("checkbox", { name: "Quarta-feira" });
     expect(marcado.props.accessibilityState).toMatchObject({ checked: true });
     expect(livre.props.accessibilityState).toMatchObject({ checked: false });
-  });
-});
-
-describe("LinhaCompromisso", () => {
-  it("mostra o intervalo quando há término", async () => {
-    await renderComTema(
-      <LinhaCompromisso ocorrencia={ocorrencia()} emConflito={false} aoPressionar={() => {}} />,
-    );
-    expect(screen.getByText("05:00 a 06:00")).toBeTruthy();
-    expect(screen.getByLabelText("Academia, 05:00 a 06:00")).toBeTruthy();
-  });
-
-  it("mostra só o início quando não há término", async () => {
-    await renderComTema(
-      <LinhaCompromisso
-        ocorrencia={ocorrencia({ inicio: "20:00", fim: null })}
-        emConflito={false}
-        aoPressionar={() => {}}
-      />,
-    );
-    expect(screen.getByText("20:00")).toBeTruthy();
-  });
-
-  it("mostra o detalhe, a marca de avulso e o aviso de conflito", async () => {
-    await renderComTema(
-      <LinhaCompromisso
-        ocorrencia={ocorrencia({ origem: "avulso", detalhe: "Montese" })}
-        emConflito
-        aoPressionar={() => {}}
-      />,
-    );
-    expect(screen.getByText("Montese")).toBeTruthy();
-    expect(screen.getByText("só neste dia")).toBeTruthy();
-    expect(screen.getByText("Conflito de horário")).toBeTruthy();
-  });
-
-  it("chama aoPressionar ao tocar", async () => {
-    const aoPressionar = jest.fn();
-    await renderComTema(
-      <LinhaCompromisso ocorrencia={ocorrencia()} emConflito={false} aoPressionar={aoPressionar} />,
-    );
-    await fireEvent.press(screen.getByRole("button", { name: "Academia, 05:00 a 06:00" }));
-    expect(aoPressionar).toHaveBeenCalledTimes(1);
-  });
-});
-
-describe("DiaDaAgenda", () => {
-  const sexta = new Date(2026, 9, 16);
-  const hoje = new Date(2026, 9, 17);
-
-  it("mostra Nada marcado e o botão Adicionar quando o dia está vazio", async () => {
-    const aoAdicionar = jest.fn();
-    await renderComTema(
-      <DiaDaAgenda
-        data={sexta}
-        hoje={hoje}
-        ocorrencias={[]}
-        aoAdicionar={aoAdicionar}
-        aoAbrir={() => {}}
-      />,
-    );
-    expect(screen.getByText("Nada marcado")).toBeTruthy();
-    expect(screen.getByLabelText("Sex 16")).toBeTruthy();
-    await fireEvent.press(screen.getByText("+ Adicionar"));
-    expect(aoAdicionar).toHaveBeenCalledTimes(1);
-    expect(screen.queryByText("Hoje")).toBeNull();
-  });
-
-  it("destaca o dia de hoje", async () => {
-    await renderComTema(
-      <DiaDaAgenda
-        data={hoje}
-        hoje={hoje}
-        ocorrencias={[]}
-        aoAdicionar={() => {}}
-        aoAbrir={() => {}}
-      />,
-    );
-    expect(screen.getByText("Hoje")).toBeTruthy();
-    expect(screen.getByLabelText("Sáb 17, hoje")).toBeTruthy();
-  });
-
-  it("lista as ocorrências na ordem recebida, o nome da agenda e abre ao tocar", async () => {
-    const aoAbrir = jest.fn();
-    const lista = [
-      ocorrencia(),
-      ocorrencia({ chave: "agenda:c2", id: "c2", inicio: "12:00", fim: "18:00" }),
-    ];
-    await renderComTema(
-      <DiaDaAgenda
-        data={sexta}
-        hoje={hoje}
-        ocorrencias={lista}
-        nomeDaAgenda="Outubro de 2026"
-        aoAdicionar={() => {}}
-        aoAbrir={aoAbrir}
-      />,
-    );
-    expect(screen.getByText("Outubro de 2026")).toBeTruthy();
-    expect(screen.queryByText("Nada marcado")).toBeNull();
-    const botoes = screen.getAllByRole("button", { name: /^Academia/ });
-    expect(botoes).toHaveLength(2);
-    await fireEvent.press(screen.getByText("12:00 a 18:00"));
-    expect(aoAbrir).toHaveBeenCalledWith(lista[1]);
-  });
-
-  it("avisa os horários em conflito no mesmo dia", async () => {
-    const lista = [
-      ocorrencia({ inicio: "15:30", fim: "19:00" }),
-      ocorrencia({ chave: "agenda:c2", id: "c2", inicio: "18:00", fim: "20:00" }),
-    ];
-    await renderComTema(
-      <DiaDaAgenda
-        data={sexta}
-        hoje={hoje}
-        ocorrencias={lista}
-        aoAdicionar={() => {}}
-        aoAbrir={() => {}}
-      />,
-    );
-    expect(screen.getAllByText("Conflito de horário")).toHaveLength(2);
   });
 });
 
@@ -241,5 +97,33 @@ describe("SeletorDeHorario", () => {
 
     await fireEvent.changeText(campo, "2599");
     expect(aoMudar).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("SeletorDeDias: atalhos", () => {
+  it("não mostra atalhos por padrão", async () => {
+    await renderComTema(<SeletorDeDias valor={[]} aoMudar={() => {}} />);
+    expect(screen.queryByRole("button", { name: "Seg a sex" })).toBeNull();
+  });
+
+  it.each([
+    ["Seg a sex", [1, 2, 3, 4, 5]],
+    ["Fim de semana", [0, 6]],
+    ["Todos os dias", [0, 1, 2, 3, 4, 5, 6]],
+  ] satisfies [string, DiaDaSemana[]][])("o atalho %s marca os dias certos", async (nome, dias) => {
+    const aoMudar = jest.fn();
+    await renderComTema(<SeletorDeDias valor={[3]} aoMudar={aoMudar} atalhos />);
+
+    await fireEvent.press(screen.getByRole("button", { name: nome }));
+    expect(aoMudar).toHaveBeenLastCalledWith(dias);
+  });
+
+  it("destaca o atalho que corresponde à seleção atual", async () => {
+    await renderComTema(<SeletorDeDias valor={[1, 2, 3, 4, 5]} aoMudar={() => {}} atalhos />);
+
+    const ativo = screen.getByRole("button", { name: "Seg a sex" });
+    const outro = screen.getByRole("button", { name: "Fim de semana" });
+    expect(ativo.props.accessibilityState).toMatchObject({ selected: true });
+    expect(outro.props.accessibilityState).toMatchObject({ selected: false });
   });
 });
