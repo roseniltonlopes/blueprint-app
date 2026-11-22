@@ -47,7 +47,7 @@ Lista das funções do **Blueprint**, com a situação real de cada uma e o crit
 | F31 | Agenda salva no aparelho, versionada, com dado corrompido guardado à parte | Todas | ✅ Implementado (agenda, etapa 1) | A1 |
 | F32 | Registrar "Feito" e "Não fui" em cada compromisso, com Desfazer; "Feito" gera a ação da categoria | Hoje | ✅ Implementado (agenda, etapa 2; só o dia de hoje) | A2 |
 | F33 | Alertas locais: despertar, antecedência por compromisso, botão "Feito" na notificação | Todas e Perfil | ✅ Implementado (agenda, etapa 3; falta conferir em aparelho) | A3 |
-| F34 | Painel de histórico por categoria, atividade e mês, com comparação entre meses | Histórico | 🎨 Planejado | A4 |
+| F34 | Painel de histórico por categoria, atividade e mês, com comparação entre meses | Histórico e Hoje | ✅ Implementado (agenda, etapa 4) | A4 |
 
 ---
 
@@ -66,7 +66,8 @@ Lista das funções do **Blueprint**, com a situação real de cada uma e o crit
 | **Desfazer e contadores** | Ao desfazer, contador, anel, calendário e histórico são recalculados. |
 | **Registro de compromisso** | No máximo um por compromisso por dia, com status "Feito" ou "Não fui". Guarda cópia do nome da atividade, da categoria e do horário: editar ou apagar a agenda depois não muda o passado. |
 | **Sem registro** | Compromisso não marcado continua "sem registro". Nunca vira "Não fui" sozinho. |
-| **Dia do registro** | Hoje ou dia passado; dia futuro é recusado. Na etapa 2 a tela só marca o dia de hoje. |
+| **Dia do registro** | Hoje ou dia passado; dia futuro é recusado. A Home marca hoje e ontem; a ação de hábito de um "Feito" de ontem fica datada de ontem, no horário do compromisso. |
+| **Painel do mês** | Feitos e "Não fui" vêm dos registros do mês, inclusive de compromissos que já saíram da agenda. "Sem registro" é o que estava na agenda em dias que já passaram e ninguém marcou; o dia de hoje não conta. Percentual = feitos ÷ (feitos + não fui + sem registro). |
 | **Feito e hábitos** | "Feito" de atividade com categoria também cria uma ação dessa categoria (rótulo só no "Outro", com o nome da atividade). Sair de "Feito" remove essa ação. Atividade sem categoria só gera o registro. |
 | **Alerta** | Só para compromisso recorrente com "Avisar antes" preenchido (0 a 120 minutos; 0 avisa na hora). O despertar é um compromisso comum, sem término e com antecedência 0. Não há alerta para o que já foi marcado no dia. |
 | **Janela de alertas** | O app agenda os próximos 14 dias (no máximo 120 alertas) e reagenda ao abrir, ao voltar ao primeiro plano e a cada mudança da agenda. Quem ficar mais de 14 dias sem abrir o app para de receber alertas. |
@@ -151,6 +152,13 @@ Lista das funções do **Blueprint**, com a situação real de cada uma e o crit
 - [ ] Editar ou remover um compromisso reagenda os alertas em menos de 1 segundo.
 - [ ] No Android, o aviso de bateria aparece com o atalho para as configurações do app.
 - [ ] Só pode ser conferido em development build ou APK (`eas.json`, perfis `development` ou `preview`), não no Expo Go.
+
+### F34: painel de compromissos (etapa 4)
+- [ ] Histórico > Mês mostra "Compromissos da agenda" com feitos, não fui, sem registro e "Cumpriu X% do que estava na agenda.".
+- [ ] Um cartão por categoria (e "Sem categoria"), com o total do mês e uma linha por atividade: "Academia, 18 vezes, 3 a mais que no mês anterior".
+- [ ] Tocar na atividade abre os dias: "Feito: 2, 5 e 7 de novembro", "Não fui: …", "Sem registro: …".
+- [ ] Editar ou apagar a agenda depois não muda a contagem de meses passados.
+- [ ] Na Home, "Hoje | Ontem" permite marcar os compromissos de ontem.
 
 ---
 

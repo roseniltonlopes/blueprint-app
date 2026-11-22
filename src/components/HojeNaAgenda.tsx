@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { rotuloDoHorario, type Ocorrencia } from "../domain/agenda";
-import { chaveDoDia } from "../domain/datas";
+import { chaveDoDia, somarDias } from "../domain/datas";
 import {
   registroDaOcorrencia,
   resumoDoDia,
@@ -14,6 +14,7 @@ import { useTheme } from "../theme/ThemeProvider";
 import { Card } from "../ui/Card";
 import { Icon } from "../ui/Icon";
 import { PressableEscala } from "../ui/PressableEscala";
+import { SegmentedControl } from "../ui/SegmentedControl";
 import { Text } from "../ui/Text";
 
 type HojeNaAgendaProps = {
@@ -94,18 +95,33 @@ function LinhaDeHoje({ ocorrencia, status, aoTocar }: LinhaProps) {
   );
 }
 
-/** Compromissos de hoje na Home, com "Feito" e "Não fui" (etapa 2 da agenda semanal). */
+type Dia = "hoje" | "ontem";
+
+const NOMES_DO_DIA: Record<Dia, string> = { hoje: "Hoje", ontem: "Ontem" };
+
+/**
+ * Compromissos do dia na Home, com "Feito" e "Não fui" (etapas 2 e 4 da agenda semanal).
+ * "Ontem" permite marcar o que ficou esquecido; dias mais antigos aparecem no painel do mês.
+ */
 export default function HojeNaAgenda({ aoMarcar, aoMontarAgenda }: HojeNaAgendaProps) {
   const { dados, relogio, ocorrenciasDe, agendaDe, marcar } = useAgenda();
   const [erro, setErro] = useState<string | null>(null);
+  const [qual, setQual] = useState<Dia>("hoje");
 
   const hoje = relogio();
-  const data = chaveDoDia(hoje);
-  const ocorrencias = ocorrenciasDe(hoje);
+  const dia = qual === "hoje" ? hoje : somarDias(hoje, -1);
+  const minusculo = NOMES_DO_DIA[qual].toLowerCase();
+  const data = chaveDoDia(dia);
+  const ocorrencias = ocorrenciasDe(dia);
   const resumo = resumoDoDia(ocorrencias, dados.registros, data);
 
+  function trocarDia(proximo: Dia) {
+    setErro(null);
+    setQual(proximo);
+  }
+
   function aoTocar(chave: string, status: StatusDoRegistro) {
-    const resultado = marcar(chave, status);
+    const resultado = marcar(chave, status, dia);
     if (resultado.ok) {
       setErro(null);
       aoMarcar(resultado.valor);
@@ -118,7 +134,7 @@ export default function HojeNaAgenda({ aoMarcar, aoMontarAgenda }: HojeNaAgendaP
     <View style={styles.secao}>
       <View style={styles.cabecalho}>
         <Text variant="section" accessibilityRole="header">
-          Hoje na agenda
+          {`${NOMES_DO_DIA[qual]} na agenda`}
         </Text>
         {ocorrencias.length > 0 ? (
           <Text variant="support" color="mute" testID="resumo-agenda-hoje">
@@ -127,11 +143,21 @@ export default function HojeNaAgenda({ aoMarcar, aoMontarAgenda }: HojeNaAgendaP
         ) : null}
       </View>
 
+      <SegmentedControl<Dia>
+        accessibilityLabel="Dia da agenda"
+        value={qual}
+        onChange={trocarDia}
+        options={[
+          { value: "hoje", label: "Hoje" },
+          { value: "ontem", label: "Ontem" },
+        ]}
+      />
+
       {ocorrencias.length === 0 ? (
         <Card style={styles.vazio}>
-          {agendaDe(hoje) === undefined ? (
+          {agendaDe(dia) === undefined ? (
             <>
-              <Text variant="body">Sem agenda para hoje</Text>
+              <Text variant="body">{`Sem agenda para ${minusculo}`}</Text>
               <Text variant="support" color="mute">
                 Monte a agenda do mês para ver aqui os compromissos de cada dia.
               </Text>
@@ -145,7 +171,7 @@ export default function HojeNaAgenda({ aoMarcar, aoMontarAgenda }: HojeNaAgendaP
             </>
           ) : (
             <Text variant="support" color="mute">
-              Nada marcado para hoje.
+              {`Nada marcado para ${minusculo}.`}
             </Text>
           )}
         </Card>

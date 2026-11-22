@@ -55,6 +55,12 @@ export function registroDaOcorrencia(
   return registros.find((r) => r.data === data && chaveDaOrigem(r) === chaveDaOcorrencia);
 }
 
+/** Data local de AAAA-MM-DD às HH:MM (horário do compromisso), para datar a ação de um dia passado. */
+export function instanteNoDia(data: string, hora: string): Date {
+  const [ano, mes, dia] = data.split("-").map(Number);
+  return new Date(ano, mes - 1, dia, 0, minutosDoDia(hora));
+}
+
 /** Hoje ou um dia que já passou. Dia futuro nunca é registrado. */
 export function podeRegistrarNaData(data: string, hoje: Date): boolean {
   return dataValida(data) && data <= chaveDoDia(hoje);

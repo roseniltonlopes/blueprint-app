@@ -71,7 +71,7 @@ A branch `main` recebe o código quando cada etapa estiver concluída. Na visual
 - [x] **1. Agenda semanal:** compromissos com início e fim, agendas por período, espaço livre, editar e duplicar para o mês seguinte.
 - [x] **2. Registro:** "Feito" e "Não fui" com Desfazer, e a Home com os compromissos de hoje.
 - [x] **3. Alertas:** despertar, antecedência por compromisso, botão "Feito" na notificação, permissões do Android e economia de bateria.
-- [ ] **4. Painel de histórico:** contagem por atividade e por mês, comparação entre meses, detalhe dos dias.
+- [x] **4. Painel de histórico:** contagem por atividade e por mês, comparação entre meses, detalhe dos dias.
 - [ ] **5. Supabase:** login, acesso por usuário (RLS), sincronização que funciona sem internet, subida dos dados locais. O SQL é revisado e aplicado pelo dono em um projeto de desenvolvimento.
 - [ ] **6. Gamificação e ganhos visuais:** sequência, "dia perfeito", conquistas e animações.
 - [ ] **7. APK de release:** checklist de segurança e build.

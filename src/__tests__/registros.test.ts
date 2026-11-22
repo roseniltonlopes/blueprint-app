@@ -1,6 +1,7 @@
 import type { Atividade, Ocorrencia } from "../domain/agenda";
 import {
   ERRO_DIA_FUTURO,
+  instanteNoDia,
   mensagemDaMarcacao,
   planejarMarcacao,
   podeRegistrarNaData,
@@ -247,5 +248,15 @@ describe("mensagemDaMarcacao", () => {
     expect(mensagemDaMarcacao("Academia", "feito")).toBe("Feito: Academia");
     expect(mensagemDaMarcacao("Academia", "nao_fui")).toBe("Não fui: Academia");
     expect(mensagemDaMarcacao("Academia", null)).toBe("Registro removido: Academia");
+  });
+});
+
+describe("instanteNoDia", () => {
+  it("monta a data local no horário do compromisso", () => {
+    const instante = instanteNoDia("2026-10-16", "05:30");
+    expect([instante.getFullYear(), instante.getMonth(), instante.getDate()]).toEqual([
+      2026, 9, 16,
+    ]);
+    expect([instante.getHours(), instante.getMinutes()]).toEqual([5, 30]);
   });
 });

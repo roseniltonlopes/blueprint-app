@@ -216,6 +216,26 @@ describe("Home: compromissos de hoje com Feito e Não fui (etapa 2)", () => {
     expect(screen.getByText("Nada marcado para hoje.")).toBeTruthy();
   });
 
+  it("Ontem marca o compromisso de ontem e data a ação no próprio dia", async () => {
+    // Academia também na sexta (16 de outubro, ontem).
+    const comSexta = {
+      ...outubro,
+      compromissos: [{ ...outubro.compromissos[0], dias: [5, 6] as Compromisso["dias"] }],
+    };
+    await abrirHome(dados([comSexta]));
+    await fireEvent.press(screen.getByRole("radio", { name: "Ontem" }));
+    expect(screen.getByText("Ontem na agenda")).toBeTruthy();
+
+    await fireEvent.press(screen.getByRole("button", { name: FEITO_ACADEMIA }));
+    expect(api.dados.registros[0]).toMatchObject({ data: "2026-10-16", status: "feito" });
+    // A ação foi para ontem às 05:00: o anel de hoje não muda.
+    expect(total()).toBe(0);
+    expect(marcado(FEITO_ACADEMIA)).toBe(true);
+
+    await fireEvent.press(screen.getByRole("radio", { name: "Hoje" }));
+    expect(marcado(FEITO_ACADEMIA)).toBe(false);
+  });
+
   it("o convite leva à aba Agenda", async () => {
     await renderComTema(
       <NavigationContainer>

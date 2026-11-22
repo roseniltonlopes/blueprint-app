@@ -34,6 +34,7 @@ import {
 import type { CategoriaId } from "../domain/categorias";
 import { chaveDoDia } from "../domain/datas";
 import {
+  instanteNoDia,
   planejarMarcacao,
   registroDaOcorrencia,
   remapearRegistros,
@@ -87,10 +88,11 @@ export type UseAgenda = {
   duplicarAgenda: (id: string) => Resultado<Agenda>;
   registroDe: (chaveDaOcorrencia: string, data: Date) => RegistroCompromisso | undefined;
   /**
-   * Marca "Feito" ou "Não fui" em um compromisso de hoje (tocar de novo no mesmo desmarca).
-   * "Feito" de atividade com categoria também registra a ação de hábito.
+   * Marca "Feito" ou "Não fui" em um compromisso de hoje ou de um dia passado (`dia`; o padrão é
+   * hoje). Tocar de novo no mesmo desmarca. "Feito" de atividade com categoria também registra a
+   * ação de hábito, datada no próprio dia.
    */
-  marcar: (chaveDaOcorrencia: string, status: StatusDoRegistro) => Resultado<Marcacao>;
+  marcar: (chaveDaOcorrencia: string, status: StatusDoRegistro, dia?: Date) => Resultado<Marcacao>;
   desfazerMarcacao: (marcacao: Marcacao) => void;
   /** Só para a ferramenta de desenvolvimento. */
   substituir: (dados: DadosAgenda) => void;
@@ -355,13 +357,17 @@ export function AgendaProvider({
   );
 
   const marcar = useCallback<UseAgenda["marcar"]>(
-    (chave, tocado) => {
+    (chave, tocado, dia) => {
       const base = atual.current;
       const agora = relogio();
-      const data = chaveDoDia(agora);
+      const alvo = dia ?? agora;
+      const data = chaveDoDia(alvo);
+      const ehHoje = data === chaveDoDia(agora);
       // A ocorrência vem da agenda atual, não da tela: o registro copia o nome de agora.
-      const ocorrencia = ocorrenciasDoDia(base, agora).find((o) => o.chave === chave);
-      if (!ocorrencia) return falha("Compromisso não encontrado na agenda de hoje");
+      const ocorrencia = ocorrenciasDoDia(base, alvo).find((o) => o.chave === chave);
+      if (!ocorrencia) {
+        return falha(`Compromisso não encontrado na agenda ${ehHoje ? "de hoje" : "deste dia"}`);
+      }
       const anterior = registroDaOcorrencia(base.registros, chave, data) ?? null;
       const plano = planejarMarcacao({
         ocorrencia,
@@ -377,7 +383,11 @@ export function AgendaProvider({
       let registro = plano.valor.registro;
       let acaoCriada: Acao | null = null;
       if (criarAcao !== null && registro !== null) {
-        acaoCriada = registrar(criarAcao.categoria, criarAcao.rotulo);
+        acaoCriada = registrar(
+          criarAcao.categoria,
+          criarAcao.rotulo,
+          ehHoje ? undefined : instanteNoDia(data, ocorrencia.inicio),
+        );
         registro = { ...registro, acaoId: acaoCriada.id };
       }
       // A ação pode já ter sido apagada pela pessoa; então não há o que recolocar no Desfazer.

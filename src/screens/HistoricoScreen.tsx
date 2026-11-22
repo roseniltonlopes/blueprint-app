@@ -3,12 +3,14 @@ import { Pressable, StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
 import GraficoSemanal from "../components/GraficoSemanal";
 import ListaDeDias from "../components/ListaDeDias";
+import PainelDeCompromissos from "../components/PainelDeCompromissos";
 import Resumo from "../components/Resumo";
 import ResumoPorCategoria from "../components/ResumoPorCategoria";
 import { gerarDadosDeExemplo } from "../dev/dadosDeExemplo";
 import type { Acao } from "../domain/acoes";
 import {
   DIAS_ABREVIADOS,
+  MESES,
   chaveDoDia,
   formatarIntervalo,
   formatarMesAno,
@@ -23,7 +25,9 @@ import {
   semanaDoGrafico,
   sequenciaAtual,
 } from "../domain/estatisticas";
+import { painelDoMes } from "../domain/painel";
 import { useAcoes } from "../hooks/useAcoes";
+import { useAgenda } from "../hooks/useAgenda";
 import { useTheme } from "../theme/ThemeProvider";
 import { SIZES, SPACING } from "../styles/theme";
 import { Card } from "../ui/Card";
@@ -114,6 +118,7 @@ function Navegacao({
  */
 export default function HistoricoScreen() {
   const { acoes, relogio } = useAcoes();
+  const { dados: agenda } = useAgenda();
   const [visao, setVisao] = useState<Visao>("semana");
   const [semanasAtras, setSemanasAtras] = useState(0);
   const [mesesAtras, setMesesAtras] = useState(0);
@@ -144,6 +149,8 @@ export default function HistoricoScreen() {
   const doMes = contagemPorCategoria(acoes, anoDoMes, numeroDoMes);
   const doMesAnterior = contagemPorCategoria(acoes, anoAnterior, numeroAnterior);
   const resumoMes = resumoDoMes(porDia, anoDoMes, numeroDoMes);
+  // Até 31 dias de ocorrências: barato o bastante para calcular a cada render.
+  const painel = painelDoMes(agenda, anoDoMes, numeroDoMes, hoje);
 
   return (
     <Screen scroll contentStyle={styles.conteudo}>
@@ -238,6 +245,10 @@ export default function HistoricoScreen() {
               />
             </>
           )}
+          <Text variant="section" accessibilityRole="header" style={styles.titulo}>
+            Compromissos da agenda
+          </Text>
+          <PainelDeCompromissos painel={painel} nomeDoMes={MESES[numeroDoMes]} />
         </>
       )}
 
