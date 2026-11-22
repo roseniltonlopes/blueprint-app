@@ -33,6 +33,19 @@ Os links de confirmação e de "Esqueci a senha" redirecionam para a *Site URL* 
 
 **O que fazer:** publicar a landing (`landing/`) num endereço fixo, apontar a Site URL para ele e criar uma página simples de "E-mail confirmado, volte ao app".
 
+### 2.2.1 Publicação da landing na Vercel
+
+A landing é publicada pela Vercel ligada ao repositório: cada push na `main` atualiza o site. O `config.js` não está no Git; a Vercel o recria a cada publicação com `landing/gerar-config.js`, a partir das variáveis do projeto. O script recusa chave secreta (`sb_secret_...` ou JWT `service_role`) e URL sem `https`, e falha o build se faltar alguma variável.
+
+Configuração (uma vez, no painel da Vercel, com a conta do GitHub dono do repositório):
+
+1. *Add New > Project* e importar `blueprint-app`.
+2. **Root Directory:** `landing`. O `landing/vercel.json` já define o build (`node gerar-config.js`) e a saída (`.`).
+3. **Environment Variables** (Production e Preview): `EXPO_PUBLIC_SUPABASE_URL` e `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, com os valores do `.env` do app.
+4. Publicar e conferir `https://<endereço>/config.js` (precisa mostrar a URL e a chave `sb_publishable_...`).
+
+Para testar o script no computador: `node landing/gerar-config.js` com as duas variáveis no ambiente.
+
 ### 2.3 "Esqueci a senha" não termina
 
 > **Atualização (feat/etapa-7-pendencias):** feita a saída 1, sem novo APK. `landing/nova-senha.html` recebe o link, pede a nova senha duas vezes com a mesma regra do app e chama `updateUser`. Como o app não envia `redirectTo`, o link cai na Site URL: `confirmado.html` e `index.html` reconhecem `type=recovery` e encaminham para a página de nova senha. A configuração fica em `landing/config.js`, **fora do Git** (modelo em `landing/config.example.js`): copie o modelo, preencha com a URL e a chave publicável do `.env` e publique a pasta `landing` na Vercel junto com esse arquivo. Sem isso a página avisa que não está configurada. Não testado contra o Supabase real.
