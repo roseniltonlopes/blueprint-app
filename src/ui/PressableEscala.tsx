@@ -11,6 +11,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { tocarHaptica, type TipoDeHaptica } from "../services/haptica";
 import { MOTION } from "../styles/theme";
 import { CURVA } from "./motion";
 
@@ -20,6 +21,8 @@ type PressableEscalaProps = Omit<PressableProps, "style"> & {
   style?: StyleProp<ViewStyle>;
   /** Escala durante o toque; o padrão vem de MOTION.press */
   escala?: number;
+  /** Retorno tátil disparado a cada toque */
+  haptica?: TipoDeHaptica;
 };
 
 /**
@@ -29,6 +32,8 @@ type PressableEscalaProps = Omit<PressableProps, "style"> & {
 export function PressableEscala({
   style,
   escala = MOTION.press.scale,
+  haptica,
+  onPress,
   onPressIn,
   onPressOut,
   ...resto
@@ -49,6 +54,12 @@ export function PressableEscala({
   return (
     <PressableAnimado
       {...resto}
+      onPress={(evento: GestureResponderEvent) => {
+        if (haptica) {
+          tocarHaptica(haptica);
+        }
+        onPress?.(evento);
+      }}
       onPressIn={(evento: GestureResponderEvent) => {
         ir(escala);
         onPressIn?.(evento);

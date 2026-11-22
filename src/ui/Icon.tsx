@@ -20,7 +20,14 @@ export type IconName =
   | "anterior"
   | "proximo"
   | "camera"
-  | "lapis";
+  | "lapis"
+  | "chama"
+  | "fechar"
+  | "alerta"
+  | "cadeado"
+  | "sino"
+  | "menos"
+  | "agendas";
 
 type IconProps = {
   name: IconName;
@@ -122,6 +129,32 @@ function desenho(name: IconName, color: string): ReactNode {
       );
     case "lapis":
       return <Path d="M17 3a2.85 2.85 0 0 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />;
+    case "chama":
+      return (
+        <Path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+      );
+    case "fechar":
+      return <Path d="M6 6l12 12M18 6 6 18" />;
+    case "alerta":
+      return <Path d="M12 4l9 16H3L12 4zM12 10v4M12 17h.01" />;
+    case "cadeado":
+      return (
+        <>
+          <Rect x="5" y="10.5" width="14" height="10" rx="2.5" />
+          <Path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" />
+        </>
+      );
+    case "sino":
+      return <Path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15L6 16zM10 20.5a2 2 0 0 0 4 0" />;
+    case "menos":
+      return <Path d="M5 12h14" />;
+    case "agendas":
+      return (
+        <>
+          <Rect x="3.5" y="7" width="17" height="13.5" rx="3" />
+          <Path d="M6.5 3.5h11" />
+        </>
+      );
     case "perfil":
       return (
         <>

@@ -5,6 +5,7 @@ import { comparacaoComMesAnterior, plural } from "../domain/texto";
 import { RADIUS, SIZES, SPACING } from "../styles/theme";
 import { useTheme } from "../theme/ThemeProvider";
 import { Card } from "../ui/Card";
+import { Gradiente } from "../ui/Gradiente";
 import { Icon } from "../ui/Icon";
 import { Text } from "../ui/Text";
 
@@ -44,12 +45,9 @@ export default function ResumoPorCategoria({ atual, anterior }: ResumoPorCategor
                 </Text>
               </View>
               <View style={[styles.trilha, { backgroundColor: colors.sunk }]}>
-                <View
-                  style={[
-                    styles.barra,
-                    { backgroundColor: colors.accent, width: `${(total / maximo) * 100}%` },
-                  ]}
-                />
+                <View style={[styles.barra, { width: `${(total / maximo) * 100}%` }]}>
+                  <Gradiente cores={colors.gradient} direcao="horizontal" />
+                </View>
               </View>
               {texto ? (
                 <Text variant="caption" color="mute">
@@ -77,5 +75,5 @@ const styles = StyleSheet.create({
   corpo: { flex: 1, minWidth: 0, gap: 6 },
   topo: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between" },
   trilha: { height: 8, borderRadius: RADIUS.pill, overflow: "hidden" },
-  barra: { height: 8, borderRadius: RADIUS.pill },
+  barra: { height: 8, borderRadius: RADIUS.pill, overflow: "hidden" },
 });

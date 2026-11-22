@@ -107,6 +107,49 @@ export function resumoDoMes(
   return { total, diasComRegistro };
 }
 
+export type FaixaDoMes = {
+  /** Primeiro e último dia da faixa (1 a 31) */
+  inicio: number;
+  fim: number;
+  total: number;
+  /** A faixa contém hoje */
+  atual: boolean;
+  /** A faixa começa depois de hoje */
+  futura: boolean;
+};
+
+/**
+ * O mês em faixas de 7 dias pelo número do dia (1 a 7, 8 a 14, ...), com o resto na última.
+ * Responde "em que parte do mês eu mais fiz" sem depender de onde cai o domingo.
+ */
+export function faixasDoMes(
+  porDia: ReadonlyMap<string, number>,
+  ano: number,
+  mes: number,
+  hoje: Date,
+): FaixaDoMes[] {
+  const ultimoDia = new Date(ano, mes + 1, 0).getDate();
+  const inicioHoje = inicioDoDia(hoje).getTime();
+  const faixas: FaixaDoMes[] = [];
+  for (let inicio = 1; inicio <= ultimoDia; inicio += 7) {
+    const fim = Math.min(inicio + 6, ultimoDia);
+    let total = 0;
+    for (let dia = inicio; dia <= fim; dia++) {
+      total += porDia.get(chaveDoDia(new Date(ano, mes, dia))) ?? 0;
+    }
+    const primeiro = new Date(ano, mes, inicio).getTime();
+    const ultimo = new Date(ano, mes, fim).getTime();
+    faixas.push({
+      inicio,
+      fim,
+      total,
+      atual: primeiro <= inicioHoje && inicioHoje <= ultimo,
+      futura: primeiro > inicioHoje,
+    });
+  }
+  return faixas;
+}
+
 export type CelulaDoMapa = {
   data: Date;
   total: number;

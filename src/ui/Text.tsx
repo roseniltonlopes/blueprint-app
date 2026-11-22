@@ -8,7 +8,10 @@ import {
   type ThemeColors,
 } from "../styles/theme";
 
-type TextColor = keyof Pick<ThemeColors, "ink" | "onInk" | "mute" | "accentText" | "placeholder">;
+type TextColor = keyof Pick<
+  ThemeColors,
+  "ink" | "onInk" | "onInkMute" | "mute" | "accentText" | "placeholder"
+>;
 
 export type TextProps = RNTextProps & {
   variant?: TextVariant;

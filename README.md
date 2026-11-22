@@ -30,15 +30,24 @@ O passado nunca é reescrito: editar a agenda de dezembro não muda a contagem d
 
 ## 2. Telas
 
-### App (capturas do app rodando)
+### App (capturas do app rodando, novo visual)
 
-| Hoje | Agenda | Agenda (escuro) |
+| Hoje | Hoje (escuro) | Agenda |
 |---|---|---|
-| ![Hoje](docs/assets/telas/app-hoje-claro.png) | ![Agenda da semana](docs/assets/telas/app-agenda-claro.png) | ![Agenda no modo escuro](docs/assets/telas/app-agenda-escuro.png) |
+| ![Hoje: compromisso de agora, progresso e linha do dia](docs/assets/telas/app-hoje-claro.jpg) | ![Hoje no modo escuro](docs/assets/telas/app-hoje-escuro.jpg) | ![Agenda: carga da semana e dias de cada compromisso](docs/assets/telas/app-agenda-escuro.jpg) |
 
-| Compromisso | Agendas |
-|---|---|
-| ![Editar compromisso](docs/assets/telas/app-compromisso-claro.png) | ![Gerenciar agendas](docs/assets/telas/app-agendas-claro.png) |
+| Novo compromisso | Calendário | Histórico | Perfil |
+|---|---|---|---|
+| ![Novo compromisso: atividade em chips, dias, horário e lembrete](docs/assets/telas/app-compromisso-claro.jpg) | ![Calendário com intensidade por dia](docs/assets/telas/app-calendario-escuro.jpg) | ![Histórico do mês com comparação e barras por semana](docs/assets/telas/app-historico-claro.jpg) | ![Perfil com mapa de calor](docs/assets/telas/app-perfil-escuro.jpg) |
+
+O que mudou no novo visual:
+- **Hoje:** o compromisso de agora (ou o próximo) fica no topo com um botão grande de concluir. Os compromissos do dia viram uma linha do tempo: tocar na bolinha marca Feito, e deslizar para a direita marca Feito, para a esquerda Não fui. Os hábitos se registram com 1 toque nos chips, com Desfazer no aviso.
+- **Agenda:** "Sua semana" mostra quantos compromissos caem em cada dia; os dias de cada compromisso são bolinhas que ligam e desligam com um toque; o botão "+" flutua no canto.
+- **Novo compromisso:** atividades em chips com busca, horários em blocos grandes, lembrete com menos e mais e o resumo do que vai ser salvo.
+- **Calendário e Histórico:** dias pintados pela intensidade, total do mês com a comparação com o mês anterior e barras por semana.
+- **Em todo o app:** retorno tátil nos toques (Android e iOS), marcador da aba que desliza e controles segmentados animados, respeitando "reduzir movimento".
+
+As capturas usam os dados de exemplo do modo de desenvolvimento, com o relógio do navegador fixado numa segunda-feira às 14:20.
 
 ### Design (canvas v2)
 
@@ -48,7 +57,7 @@ O passado nunca é reescrito: editar a agenda de dezembro não muda a contagem d
 | ![Home opção Outro](docs/assets/telas/home-opcao-outro.png) | ![Home modo escuro](docs/assets/telas/home-escuro.png) | ![Calendário modo escuro](docs/assets/telas/calendario-escuro.png) |
 | ![Histórico](docs/assets/telas/historico.png) | ![Perfil modo escuro](docs/assets/telas/perfil-escuro.png) | |
 
-As telas da agenda não têm prancha no canvas; as capturas acima são do app. Alertas e painel de histórico entram aqui quando prontos.
+O canvas acima é a v2 original. O novo visual das capturas segue o canvas de sugestões: https://claude.ai/artifact/X7PDSqziagmNYHRughMKHp (privado até o dono compartilhar).
 
 ---
 
@@ -60,6 +69,7 @@ As telas da agenda não têm prancha no canvas; as capturas acima são do app. A
 | **Agenda semanal (etapa 1)** | Concluída e integrada na `main`, com testes automatizados (261 testes). Especificação em [`docs/superpowers/specs/2026-11-15-agenda-semanal-design.md`](docs/superpowers/specs/2026-11-15-agenda-semanal-design.md). |
 | **Login e nuvem (etapa 5)** | Código integrado na `feat/nilton`: entrar, criar conta, "Esqueci a senha" e sair (e-mail e senha), cartão "Conta" no Perfil e sincronização offline-first por mesclagem de três vias, testada com uma nuvem falsa. Migrações 002 e 003 aplicadas pelo dono em 2026-11-22. Falta conferir no aparelho contra o Supabase real. A foto do perfil ainda fica só no aparelho. |
 | **Privacidade (LGPD) e lembretes** | Aceite dos Termos de Uso e da Política de Privacidade no cadastro, textos no app (Perfil > Privacidade) e na landing, exclusão da conta e dos dados pelo app (migração 003, aplicada). "Avisar antes" por toque, também nos avulsos, com a permissão pedida só ao salvar um aviso. O APK não leva dados de exemplo. Os textos legais ainda precisam de revisão jurídica: [`docs/09`](docs/09-lgpd-pendencias-juridicas.md). |
+| **Novo visual** | Home com "Agora" e linha do dia com gesto, registro rápido com 1 toque, Agenda com carga da semana, formulário refeito, Calendário pintado por intensidade e Histórico do mês com destaque e barras por semana. Dependências: `expo-haptics` e `react-native-gesture-handler`. |
 | **APK** | `eas.json` pronto (`buildType: apk`). Alertas só podem ser validados em APK ou development build, não no Expo Go. |
 
 A branch `main` recebe o código quando cada etapa estiver concluída. Na visualização web (`npx expo start --web`) as animações de entrada ficam desligadas, para a tela se ajustar ao redimensionar a janela; no celular elas continuam.

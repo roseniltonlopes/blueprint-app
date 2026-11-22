@@ -1,5 +1,9 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
+import ReanimatedSwipeable, {
+  SwipeDirection,
+  type SwipeableMethods,
+} from "react-native-gesture-handler/ReanimatedSwipeable";
 import { AGENDA_COMECA_VAZIA, rotuloDoHorario, type Ocorrencia } from "../domain/agenda";
 import { chaveDoDia, somarDias } from "../domain/datas";
 import {
@@ -14,7 +18,6 @@ import { useTheme } from "../theme/ThemeProvider";
 import { Card } from "../ui/Card";
 import { Icon } from "../ui/Icon";
 import { PressableEscala } from "../ui/PressableEscala";
-import { SegmentedControl } from "../ui/SegmentedControl";
 import { Text } from "../ui/Text";
 
 type HojeNaAgendaProps = {
@@ -22,76 +25,158 @@ type HojeNaAgendaProps = {
   aoMarcar: (marcacao: Marcacao) => void;
   /** Leva à aba Agenda. Sem ele, o convite não mostra o botão. */
   aoMontarAgenda?: () => void;
+  /** Chave da ocorrência em curso agora, destacada na linha do dia */
+  chaveAgora?: string | null;
 };
 
-const ROTULOS: Record<StatusDoRegistro, string> = { feito: "Feito", nao_fui: "Não fiz" };
+/** Quanto arrastar para a linha abrir a ação; abaixo disso ela volta sem marcar nada. */
+const LIMIAR_DO_GESTO = 80;
+const LARGURA_DA_HORA = 44;
+const TAMANHO_DO_NO = 24;
 
-type BotaoDeStatusProps = {
-  status: StatusDoRegistro;
-  marcado: boolean;
-  descricao: string;
-  aoPressionar: () => void;
-};
+type NoProps = { status: StatusDoRegistro | null; emCurso: boolean };
 
-/** Feito marcado fica laranja; Não fiz marcado fica escuro. Os dois têm 44 de altura. */
-function BotaoDeStatus({ status, marcado, descricao, aoPressionar }: BotaoDeStatusProps) {
+/** Bolinha da linha do tempo: laranja com check (Feito), cinza com x (Não fiz) ou vazia. */
+function NoDaLinha({ status, emCurso }: NoProps) {
   const { colors } = useTheme();
-  const fundo = !marcado ? colors.sunk : status === "feito" ? colors.accent : colors.ink;
-  const corDoTexto = !marcado ? colors.ink : status === "feito" ? BRAND.black : colors.onInk;
+  if (status === "feito") {
+    return (
+      <View style={[styles.no, { backgroundColor: colors.accent }]}>
+        <Icon name="check" color={BRAND.black} size={14} strokeWidth={3} />
+      </View>
+    );
+  }
+  if (status === "nao_fui") {
+    return (
+      <View style={[styles.no, { backgroundColor: colors.sunk }]}>
+        <Icon name="fechar" color={colors.mute} size={12} strokeWidth={3} />
+      </View>
+    );
+  }
   return (
-    <PressableEscala
-      accessibilityRole="button"
-      accessibilityLabel={`${ROTULOS[status]}: ${descricao}`}
-      accessibilityHint={marcado ? "Toque de novo para desmarcar" : undefined}
-      accessibilityState={{ selected: marcado }}
-      onPress={aoPressionar}
-      style={[styles.botao, { backgroundColor: fundo }]}
+    <View
+      style={[
+        styles.no,
+        styles.noVazio,
+        { backgroundColor: colors.card, borderColor: emCurso ? colors.accent : colors.hair },
+      ]}
     >
-      {marcado && status === "feito" ? <Icon name="check" color={corDoTexto} size={16} /> : null}
-      <Text variant="support" weight={600} style={{ color: corDoTexto }}>
-        {ROTULOS[status]}
-      </Text>
-    </PressableEscala>
+      {emCurso ? <View style={[styles.miolo, { backgroundColor: colors.accent }]} /> : null}
+    </View>
   );
 }
 
 type LinhaProps = {
   ocorrencia: Ocorrencia;
   status: StatusDoRegistro | null;
+  emCurso: boolean;
+  primeira: boolean;
+  ultima: boolean;
   aoTocar: (status: StatusDoRegistro) => void;
 };
 
-function LinhaDeHoje({ ocorrencia, status, aoTocar }: LinhaProps) {
+function LinhaDoDia({ ocorrencia, status, emCurso, primeira, ultima, aoTocar }: LinhaProps) {
   const { colors } = useTheme();
+  const gesto = useRef<SwipeableMethods>(null);
+  const nome = ocorrencia.atividade.nome;
   const horario = rotuloDoHorario(ocorrencia);
-  const descricao = `${ocorrencia.atividade.nome}, ${horario}`;
+  const descricao = `${nome}, ${horario}`;
+  const apoio = [ocorrencia.fim ? `até ${ocorrencia.fim}` : null, ocorrencia.detalhe ?? null]
+    .filter((parte): parte is string => parte !== null)
+    .join("  ·  ");
+  const marcado = status !== null;
+
+  function aoAbrir(direcao: SwipeDirection) {
+    aoTocar(direcao === SwipeDirection.RIGHT ? "feito" : "nao_fui");
+    gesto.current?.close();
+  }
+
   return (
-    <Card style={styles.cartao}>
-      <View style={styles.topo}>
-        <View style={[styles.circulo, { backgroundColor: colors.sunk }]}>
-          <Icon name={ocorrencia.atividade.icone} color={colors.ink} size={20} />
-        </View>
-        <View style={styles.texto}>
-          <Text variant="body" numberOfLines={1}>
-            {ocorrencia.atividade.nome}
+    <ReanimatedSwipeable
+      ref={gesto}
+      friction={1.4}
+      leftThreshold={LIMIAR_DO_GESTO}
+      rightThreshold={LIMIAR_DO_GESTO}
+      overshootLeft={false}
+      overshootRight={false}
+      onSwipeableOpen={aoAbrir}
+      renderLeftActions={() => (
+        <View style={[styles.acao, styles.acaoEsquerda, { backgroundColor: colors.accent }]}>
+          <Icon name="check" color={BRAND.black} size={20} strokeWidth={2.6} />
+          <Text variant="support" weight={700} style={{ color: BRAND.black }}>
+            Feito
           </Text>
-          <Text variant="support" color="mute" numberOfLines={1}>
-            {ocorrencia.detalhe ? `${horario}  ·  ${ocorrencia.detalhe}` : horario}
+        </View>
+      )}
+      renderRightActions={() => (
+        <View style={[styles.acao, styles.acaoDireita, { backgroundColor: colors.ink }]}>
+          <Text variant="support" weight={700} color="onInk">
+            Não fiz
           </Text>
         </View>
-      </View>
-      <View style={styles.botoes}>
-        {(["feito", "nao_fui"] as const).map((opcao) => (
-          <BotaoDeStatus
-            key={opcao}
-            status={opcao}
-            marcado={status === opcao}
-            descricao={descricao}
-            aoPressionar={() => aoTocar(opcao)}
+      )}
+    >
+      <View style={[styles.linha, { backgroundColor: colors.card }]}>
+        <Text
+          variant="caption"
+          weight={emCurso ? 600 : 400}
+          color={emCurso ? "ink" : "mute"}
+          style={styles.hora}
+        >
+          {ocorrencia.inicio}
+        </Text>
+        <View style={styles.colunaDoNo}>
+          <View
+            style={[
+              styles.fio,
+              {
+                backgroundColor: colors.sunk,
+                top: primeira ? "50%" : 0,
+                bottom: ultima ? "50%" : 0,
+              },
+            ]}
           />
-        ))}
+          <PressableEscala
+            accessibilityRole="button"
+            accessibilityLabel={`Feito: ${descricao}`}
+            accessibilityHint={status === "feito" ? "Toque de novo para desmarcar" : undefined}
+            accessibilityState={{ selected: status === "feito" }}
+            onPress={() => aoTocar("feito")}
+            escala={0.88}
+            style={styles.alvoDoNo}
+          >
+            <NoDaLinha status={status} emCurso={emCurso} />
+          </PressableEscala>
+        </View>
+        <View style={styles.textos}>
+          <Text
+            variant="body"
+            weight={emCurso ? 600 : 500}
+            color={marcado ? "mute" : "ink"}
+            numberOfLines={1}
+          >
+            {nome}
+          </Text>
+          {apoio ? (
+            <Text variant="caption" color="mute" numberOfLines={1}>
+              {apoio}
+            </Text>
+          ) : null}
+        </View>
+        <PressableEscala
+          accessibilityRole="button"
+          accessibilityLabel={`Não fiz: ${descricao}`}
+          accessibilityHint={status === "nao_fui" ? "Toque de novo para desmarcar" : undefined}
+          accessibilityState={{ selected: status === "nao_fui" }}
+          onPress={() => aoTocar("nao_fui")}
+          style={[styles.naoFui, status === "nao_fui" && { backgroundColor: colors.sunk }]}
+        >
+          <Text variant="caption" weight={600} color={status === "nao_fui" ? "ink" : "mute"}>
+            Não fiz
+          </Text>
+        </PressableEscala>
       </View>
-    </Card>
+    </ReanimatedSwipeable>
   );
 }
 
@@ -99,11 +184,43 @@ type Dia = "hoje" | "ontem";
 
 const NOMES_DO_DIA: Record<Dia, string> = { hoje: "Hoje", ontem: "Ontem" };
 
+/** Alternância compacta entre hoje e ontem, no canto do título. */
+function AlternarDia({ valor, aoMudar }: { valor: Dia; aoMudar: (dia: Dia) => void }) {
+  const { colors } = useTheme();
+  return (
+    <View
+      accessibilityRole="radiogroup"
+      accessibilityLabel="Dia da agenda"
+      style={[styles.alternar, { backgroundColor: colors.sunk }]}
+    >
+      {(["hoje", "ontem"] as const).map((dia) => {
+        const ativo = dia === valor;
+        return (
+          <PressableEscala
+            key={dia}
+            accessibilityRole="radio"
+            accessibilityLabel={NOMES_DO_DIA[dia]}
+            accessibilityState={{ selected: ativo }}
+            onPress={() => aoMudar(dia)}
+            haptica={ativo ? undefined : "selecao"}
+            style={[styles.opcaoDia, ativo && { backgroundColor: colors.ink }]}
+          >
+            <Text variant="caption" weight={600} color={ativo ? "onInk" : "mute"}>
+              {NOMES_DO_DIA[dia]}
+            </Text>
+          </PressableEscala>
+        );
+      })}
+    </View>
+  );
+}
+
 /**
- * Compromissos do dia na Home, com "Feito" e "Não fiz" (etapas 2 e 4 da agenda semanal).
- * "Ontem" permite marcar o que ficou esquecido; dias mais antigos aparecem no painel do mês.
+ * Compromissos do dia na Home como uma linha do tempo (etapas 2 e 4 da agenda semanal).
+ * Tocar na bolinha marca Feito; "Não fiz" fica à direita. Deslizar faz o mesmo: para a direita
+ * é Feito, para a esquerda é Não fiz. "Ontem" permite marcar o que ficou esquecido.
  */
-export default function HojeNaAgenda({ aoMarcar, aoMontarAgenda }: HojeNaAgendaProps) {
+export default function HojeNaAgenda({ aoMarcar, aoMontarAgenda, chaveAgora }: HojeNaAgendaProps) {
   const { dados, relogio, ocorrenciasDe, agendaDe, marcar } = useAgenda();
   const [erro, setErro] = useState<string | null>(null);
   const [qual, setQual] = useState<Dia>("hoje");
@@ -133,25 +250,18 @@ export default function HojeNaAgenda({ aoMarcar, aoMontarAgenda }: HojeNaAgendaP
   return (
     <View style={styles.secao}>
       <View style={styles.cabecalho}>
-        <Text variant="section" accessibilityRole="header">
-          {`${NOMES_DO_DIA[qual]} na agenda`}
-        </Text>
-        {ocorrencias.length > 0 ? (
-          <Text variant="support" color="mute" testID="resumo-agenda-hoje">
-            {textoDoResumo(resumo)}
+        <View style={styles.titulo}>
+          <Text variant="section" accessibilityRole="header">
+            {`${NOMES_DO_DIA[qual]} na agenda`}
           </Text>
-        ) : null}
+          {ocorrencias.length > 0 ? (
+            <Text variant="caption" color="mute" testID="resumo-agenda-hoje">
+              {textoDoResumo(resumo)}
+            </Text>
+          ) : null}
+        </View>
+        <AlternarDia valor={qual} aoMudar={trocarDia} />
       </View>
-
-      <SegmentedControl<Dia>
-        accessibilityLabel="Dia da agenda"
-        value={qual}
-        onChange={trocarDia}
-        options={[
-          { value: "hoje", label: "Hoje" },
-          { value: "ontem", label: "Ontem" },
-        ]}
-      />
 
       {ocorrencias.length === 0 ? (
         <Card style={styles.vazio}>
@@ -178,14 +288,26 @@ export default function HojeNaAgenda({ aoMarcar, aoMontarAgenda }: HojeNaAgendaP
           )}
         </Card>
       ) : (
-        ocorrencias.map((ocorrencia) => (
-          <LinhaDeHoje
-            key={ocorrencia.chave}
-            ocorrencia={ocorrencia}
-            status={registroDaOcorrencia(dados.registros, ocorrencia.chave, data)?.status ?? null}
-            aoTocar={(status) => aoTocar(ocorrencia.chave, status)}
-          />
-        ))
+        <>
+          <Card style={styles.lista}>
+            {ocorrencias.map((ocorrencia, indice) => (
+              <LinhaDoDia
+                key={ocorrencia.chave}
+                ocorrencia={ocorrencia}
+                status={
+                  registroDaOcorrencia(dados.registros, ocorrencia.chave, data)?.status ?? null
+                }
+                emCurso={qual === "hoje" && ocorrencia.chave === chaveAgora}
+                primeira={indice === 0}
+                ultima={indice === ocorrencias.length - 1}
+                aoTocar={(status) => aoTocar(ocorrencia.chave, status)}
+              />
+            ))}
+          </Card>
+          <Text variant="caption" color="mute">
+            Deslize um compromisso: para a direita marca Feito, para a esquerda Não fiz.
+          </Text>
+        </>
       )}
 
       {erro ? (
@@ -198,33 +320,64 @@ export default function HojeNaAgenda({ aoMarcar, aoMontarAgenda }: HojeNaAgendaP
 }
 
 const styles = StyleSheet.create({
-  secao: { gap: SPACING.gap },
+  secao: { gap: SPACING.md },
   cabecalho: {
     flexDirection: "row",
-    alignItems: "baseline",
+    alignItems: "center",
     justifyContent: "space-between",
     gap: SPACING.md,
   },
-  cartao: { gap: SPACING.md },
-  topo: { flexDirection: "row", alignItems: "center", gap: SPACING.md },
-  circulo: {
-    width: SIZES.iconCircle,
-    height: SIZES.iconCircle,
-    borderRadius: SIZES.iconCircle / 2,
+  titulo: { flex: 1, minWidth: 0 },
+  alternar: { flexDirection: "row", padding: 3, borderRadius: RADIUS.pill },
+  opcaoDia: {
+    minHeight: 38,
+    paddingHorizontal: SPACING.md,
+    borderRadius: RADIUS.pill,
     alignItems: "center",
     justifyContent: "center",
   },
-  texto: { flex: 1, minWidth: 0 },
-  botoes: { flexDirection: "row", gap: SPACING.sm },
-  botao: {
-    flex: 1,
-    minHeight: SIZES.touchMin,
-    borderRadius: RADIUS.button,
+  lista: { paddingVertical: SPACING.xs, paddingHorizontal: 0, overflow: "hidden" },
+  linha: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    minHeight: 60,
+    paddingHorizontal: SPACING.lg,
     gap: SPACING.xs,
   },
+  hora: { width: LARGURA_DA_HORA, fontVariant: ["tabular-nums"] },
+  colunaDoNo: {
+    width: SIZES.touchMin,
+    alignSelf: "stretch",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  fio: { position: "absolute", width: 2 },
+  alvoDoNo: {
+    width: SIZES.touchMin,
+    height: SIZES.touchMin,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  no: {
+    width: TAMANHO_DO_NO,
+    height: TAMANHO_DO_NO,
+    borderRadius: TAMANHO_DO_NO / 2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  noVazio: { borderWidth: 2 },
+  miolo: { width: 10, height: 10, borderRadius: 5 },
+  textos: { flex: 1, minWidth: 0, paddingLeft: SPACING.xs },
+  naoFui: {
+    minHeight: SIZES.touchMin,
+    paddingHorizontal: SPACING.md,
+    borderRadius: RADIUS.pill,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  acao: { flex: 1, flexDirection: "row", alignItems: "center", gap: SPACING.sm },
+  acaoEsquerda: { justifyContent: "flex-start", paddingLeft: SPACING.xl },
+  acaoDireita: { justifyContent: "flex-end", paddingRight: SPACING.xl },
   vazio: { gap: SPACING.xs },
   alvo: { minHeight: SIZES.touchMin, justifyContent: "center" },
 });

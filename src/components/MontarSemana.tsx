@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import {
   agendaEmCurso,
+  cargaDaSemana,
   compromissosEmConflito,
   dataDaChave,
   rotuloDoHorario,
@@ -17,7 +18,7 @@ import { useTheme } from "../theme/ThemeProvider";
 import { Card } from "../ui/Card";
 import { Icon } from "../ui/Icon";
 import { Text } from "../ui/Text";
-import BotaoAcao from "./BotaoAcao";
+import CargaDaSemana from "./CargaDaSemana";
 import SeletorDeDias from "./SeletorDeDias";
 
 type MontarSemanaProps = {
@@ -26,7 +27,8 @@ type MontarSemanaProps = {
   avulsos: readonly Avulso[];
   aoAbrir: (compromisso: Compromisso) => void;
   aoAbrirAvulso: (avulso: Avulso) => void;
-  aoNovo: () => void;
+  /** Dia da semana de hoje, destacado na carga da semana; null fora do mês atual */
+  diaDeHoje: number | null;
 };
 
 type ErroDeLinha = { compromissoId: string; texto: string };
@@ -41,7 +43,7 @@ export default function MontarSemana({
   avulsos,
   aoAbrir,
   aoAbrirAvulso,
-  aoNovo,
+  diaDeHoje,
 }: MontarSemanaProps) {
   const { dados, relogio, salvarCompromisso } = useAgenda();
   const { colors } = useTheme();
@@ -77,8 +79,13 @@ export default function MontarSemana({
     setErro(resultado.ok ? null : { compromissoId: compromisso.id, texto: resultado.erro });
   }
 
+  const carga = useMemo(() => cargaDaSemana(agenda.compromissos), [agenda.compromissos]);
+
   return (
     <View style={styles.lista}>
+      {agenda.compromissos.length > 0 ? (
+        <CargaDaSemana carga={carga} diaDeHoje={diaDeHoje} />
+      ) : null}
       <Text variant="support" color="mute">
         {emCurso
           ? "Esta agenda já começou: as mudanças valem a partir de hoje."
@@ -99,7 +106,10 @@ export default function MontarSemana({
           const horario = rotuloDoHorario(compromisso);
           const emConflito = conflitos.has(compromisso.id);
           return (
-            <Card key={compromisso.id} style={styles.cartao}>
+            <Card
+              key={compromisso.id}
+              style={[styles.cartao, emConflito && { borderColor: colors.accentText }]}
+            >
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={`Editar ${nome}, ${horario}${emConflito ? ", conflito de horário" : ""}`}
@@ -118,9 +128,12 @@ export default function MontarSemana({
                     {compromisso.detalhe ? `  ·  ${compromisso.detalhe}` : ""}
                   </Text>
                   {emConflito ? (
-                    <Text variant="caption" color="accentText" weight={600}>
-                      Conflito de horário
-                    </Text>
+                    <View style={styles.conflito}>
+                      <Icon name="alerta" color={colors.accentText} size={14} strokeWidth={2.2} />
+                      <Text variant="caption" color="accentText" weight={600}>
+                        Conflito de horário
+                      </Text>
+                    </View>
                   ) : null}
                 </View>
                 <Icon name="proximo" color={colors.mute} size={18} />
@@ -128,6 +141,7 @@ export default function MontarSemana({
               <SeletorDeDias
                 valor={compromisso.dias}
                 aoMudar={(dias) => mudarDias(compromisso, dias)}
+                compacto
               />
               {erro?.compromissoId === compromisso.id ? (
                 <Text variant="caption" color="accentText" weight={600} accessibilityRole="alert">
@@ -138,8 +152,6 @@ export default function MontarSemana({
           );
         })
       )}
-
-      <BotaoAcao titulo="Novo compromisso" aoPressionar={aoNovo} />
 
       {avulsos.length > 0 ? (
         <View style={styles.avulsos}>
@@ -180,7 +192,8 @@ export default function MontarSemana({
 
 const styles = StyleSheet.create({
   lista: { gap: SPACING.gap },
-  cartao: { gap: SPACING.md },
+  cartao: { gap: SPACING.xs, paddingBottom: SPACING.sm },
+  conflito: { flexDirection: "row", alignItems: "center", gap: SPACING.xs, marginTop: 2 },
   vazio: { gap: SPACING.sm },
   avulsos: { gap: SPACING.gap, marginTop: SPACING.sm },
   topo: {

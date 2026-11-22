@@ -1,28 +1,27 @@
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { Pressable, StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
-import BotaoAcao from "../components/BotaoAcao";
-import BotaoOpcao from "../components/BotaoOpcao";
+import AvatarDoPerfil from "../components/AvatarDoPerfil";
+import CartaoAgora from "../components/CartaoAgora";
 import CartaoProgresso from "../components/CartaoProgresso";
-import ChaveDeTema from "../components/ChaveDeTema";
 import HojeNaAgenda from "../components/HojeNaAgenda";
 import OutraAcaoSheet from "../components/OutraAcaoSheet";
+import RegistroRapido from "../components/RegistroRapido";
 import Toast from "../components/Toast";
 import type { Acao } from "../domain/acoes";
-import {
-  CATEGORIAS_FIXAS,
-  CATEGORIA_OUTRO,
-  nomeDaCategoria,
-  type CategoriaId,
-} from "../domain/categorias";
-import { formatarDataCabecalho, formatarHora } from "../domain/datas";
-import { mensagemDaMarcacao } from "../domain/registros";
+import { nomeDaCategoria, type CategoriaId } from "../domain/categorias";
+import { chaveDoDia, formatarDataCabecalho, formatarHora } from "../domain/datas";
+import { contarPorDia, sequenciaAtual } from "../domain/estatisticas";
+import { destaqueDoDia, saudacao } from "../domain/hoje";
+import { mensagemDaMarcacao, type StatusDoRegistro } from "../domain/registros";
 import { useAcoes } from "../hooks/useAcoes";
 import { useAgenda, type Marcacao } from "../hooks/useAgenda";
+import { usePerfil } from "../hooks/usePerfil";
 import type { AbasParamList } from "../navigation/Abas";
-import { SPACING } from "../styles/theme";
-import { cascata, entrada } from "../ui/motion";
+import { tocarHaptica } from "../services/haptica";
+import { SIZES, SPACING } from "../styles/theme";
+import { entrada } from "../ui/motion";
 import { Screen } from "../ui/Screen";
 import { Text } from "../ui/Text";
 
@@ -38,23 +37,27 @@ function mensagemDeConfirmacao(acao: Acao): string {
   return `${nome} registrado às ${formatarHora(new Date(acao.criadoEm))}`;
 }
 
-/** Fora do navegador (testes da tela isolada) não há `navigation`; o convite fica sem botão. */
+/** Fora do navegador (testes da tela isolada) não há `navigation`; os atalhos ficam sem destino. */
 type HomeScreenProps = Partial<BottomTabScreenProps<AbasParamList, "Hoje">>;
 
-/** Home (docs/03, telas 2 a 5; docs/05, F01 a F07, F09 e F32). */
+/**
+ * Home: o compromisso de agora em destaque, o progresso do dia, a linha do dia com Feito e
+ * Não fiz (toque ou gesto) e o registro rápido de hábitos com 1 toque (docs/05, F01 a F07).
+ */
 export default function HomeScreen({ navigation }: HomeScreenProps) {
-  const { totalHoje, porCategoriaHoje, meta, registrar, remover, relogio } = useAcoes();
-  const { desfazerMarcacao } = useAgenda();
-  const [selecionada, setSelecionada] = useState<CategoriaId | null>(null);
+  const { acoes, porCategoriaHoje, totalHoje, meta, registrar, remover, relogio } = useAcoes();
+  const { dados, ocorrenciasDe, marcar, desfazerMarcacao } = useAgenda();
+  const { perfil, nomeExibido } = usePerfil();
   const [sheetAberto, setSheetAberto] = useState(false);
   const [confirmacao, setConfirmacao] = useState<Confirmacao | null>(null);
+  const [erroDoDestaque, setErroDoDestaque] = useState<string | null>(null);
   const contadorDeConfirmacoes = useRef(0);
-  // Bloqueia toques repetidos antes do React aplicar a limpeza da seleção.
-  const registrando = useRef(false);
 
-  useEffect(() => {
-    registrando.current = false;
-  }, [selecionada]);
+  const hoje = relogio();
+  const chaveHoje = chaveDoDia(hoje);
+  const porDia = useMemo(() => contarPorDia(acoes), [acoes]);
+  const sequencia = sequenciaAtual(porDia, hoje);
+  const destaque = destaqueDoDia(ocorrenciasDe(hoje), dados.registros, chaveHoje, hoje);
 
   function confirmar(mensagem: string, desfazer: () => void) {
     contadorDeConfirmacoes.current += 1;
@@ -62,23 +65,32 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   }
 
   function confirmarRegistro(acao: Acao) {
+    tocarHaptica("confirmar");
     confirmar(mensagemDeConfirmacao(acao), () => remover(acao.id));
   }
 
   function confirmarMarcacao(marcacao: Marcacao) {
+    const status = marcacao.atual?.status ?? null;
+    tocarHaptica(status === "feito" ? "confirmar" : status === "nao_fui" ? "rejeitar" : "selecao");
     const nome = marcacao.atual?.nomeAtividade ?? marcacao.anterior?.nomeAtividade ?? "";
-    confirmar(mensagemDaMarcacao(nome, marcacao.atual?.status ?? null), () =>
-      desfazerMarcacao(marcacao),
-    );
+    confirmar(mensagemDaMarcacao(nome, status), () => desfazerMarcacao(marcacao));
   }
 
-  function aoRegistrar() {
-    if (selecionada === null || registrando.current) {
+  function marcarDestaque(status: StatusDoRegistro) {
+    if (!destaque) {
       return;
     }
-    registrando.current = true;
-    confirmarRegistro(registrar(selecionada));
-    setSelecionada(null);
+    const resultado = marcar(destaque.ocorrencia.chave, status, hoje);
+    if (resultado.ok) {
+      setErroDoDestaque(null);
+      confirmarMarcacao(resultado.valor);
+    } else {
+      setErroDoDestaque(resultado.erro);
+    }
+  }
+
+  function registrarCategoria(categoria: CategoriaId) {
+    confirmarRegistro(registrar(categoria));
   }
 
   function aoRegistrarOutro(rotulo: string) {
@@ -86,44 +98,27 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     confirmarRegistro(registrar("outro", rotulo));
   }
 
-  function abrirOutro() {
-    setSelecionada(null);
-    setSheetAberto(true);
-  }
-
   function desfazer() {
+    tocarHaptica("selecao");
     confirmacao?.desfazer();
     setConfirmacao(null);
   }
 
   const fecharToast = useCallback(() => setConfirmacao(null), []);
 
-  const hoje = relogio();
-  const tituloBotao = selecionada
-    ? `Registrar ${nomeDaCategoria(selecionada)}`
-    : "Escolha uma categoria para registrar";
-
   return (
     <Screen
       scroll
+      contentStyle={styles.conteudo}
       footer={
-        <Animated.View entering={entrada(500)}>
-          {confirmacao ? (
-            <View style={styles.areaToast} pointerEvents="box-none">
-              <Toast
-                key={confirmacao.chave}
-                mensagem={confirmacao.mensagem}
-                aoDesfazer={desfazer}
-                aoSumir={fecharToast}
-              />
-            </View>
-          ) : null}
-          <BotaoAcao
-            titulo={tituloBotao}
-            desabilitado={selecionada === null}
-            aoPressionar={aoRegistrar}
+        confirmacao ? (
+          <Toast
+            key={confirmacao.chave}
+            mensagem={confirmacao.mensagem}
+            aoDesfazer={desfazer}
+            aoSumir={fecharToast}
           />
-        </Animated.View>
+        ) : undefined
       }
     >
       <Animated.View entering={entrada(0)} style={styles.cabecalho}>
@@ -132,62 +127,67 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
             {formatarDataCabecalho(hoje)}
           </Text>
           <Text variant="h1" accessibilityRole="header">
-            Olá!
+            {saudacao(hoje)}
           </Text>
         </View>
-        <ChaveDeTema />
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Abrir perfil"
+          onPress={navigation ? () => navigation.navigate("Perfil") : undefined}
+          style={styles.avatar}
+        >
+          <AvatarDoPerfil nome={nomeExibido} foto={perfil.foto} tamanho={SIZES.touchMin} />
+        </Pressable>
       </Animated.View>
 
-      <Animated.View entering={entrada(80)} style={styles.progresso}>
-        <CartaoProgresso total={totalHoje} meta={meta} />
+      {destaque ? (
+        <Animated.View entering={entrada(60)}>
+          <CartaoAgora
+            destaque={destaque}
+            aoMarcarFeito={() => marcarDestaque("feito")}
+            aoMarcarNaoFui={() => marcarDestaque("nao_fui")}
+          />
+          {erroDoDestaque ? (
+            <Text
+              variant="caption"
+              color="accentText"
+              weight={600}
+              accessibilityRole="alert"
+              style={styles.erro}
+            >
+              {erroDoDestaque}
+            </Text>
+          ) : null}
+        </Animated.View>
+      ) : null}
+
+      <Animated.View entering={entrada(100)}>
+        <CartaoProgresso total={totalHoje} meta={meta} sequencia={sequencia} />
       </Animated.View>
 
-      <Animated.View entering={entrada(120)} style={styles.agenda}>
+      <Animated.View entering={entrada(140)}>
         <HojeNaAgenda
           aoMarcar={confirmarMarcacao}
           aoMontarAgenda={navigation ? () => navigation.navigate("Agenda") : undefined}
+          chaveAgora={destaque?.tipo === "agora" ? destaque.ocorrencia.chave : null}
         />
       </Animated.View>
 
-      <Animated.View entering={entrada(160)}>
-        <Text variant="section" accessibilityRole="header" style={styles.tituloSecao}>
-          O que você fez agora?
-        </Text>
+      <Animated.View entering={entrada(180)} style={styles.rapido}>
+        <View style={styles.tituloRapido}>
+          <Text variant="section" accessibilityRole="header">
+            Registro rápido
+          </Text>
+          <Text variant="caption" color="mute">
+            1 toque registra
+          </Text>
+        </View>
+        <RegistroRapido
+          contagem={porCategoriaHoje}
+          aoRegistrar={registrarCategoria}
+          aoAbrirOutro={() => setSheetAberto(true)}
+        />
       </Animated.View>
-
-      <View style={styles.grade}>
-        {[CATEGORIAS_FIXAS.slice(0, 2), CATEGORIAS_FIXAS.slice(2, 4)].map((linha, l) => (
-          <View key={linha[0].id} style={styles.linhaGrade}>
-            {linha.map((categoria, c) => (
-              <Animated.View
-                key={categoria.id}
-                entering={entrada(cascata(l * 2 + c, 200))}
-                style={styles.celula}
-              >
-                <BotaoOpcao
-                  titulo={categoria.nome}
-                  subtitulo={`${porCategoriaHoje[categoria.id]} hoje`}
-                  icone={categoria.id}
-                  selecionado={selecionada === categoria.id}
-                  aoPressionar={() => setSelecionada(categoria.id)}
-                />
-              </Animated.View>
-            ))}
-          </View>
-        ))}
-        <Animated.View entering={entrada(cascata(4, 200))}>
-          <BotaoOpcao
-            formato="linha"
-            titulo={CATEGORIA_OUTRO.nome}
-            subtitulo={
-              porCategoriaHoje.outro > 0 ? `${porCategoriaHoje.outro} hoje` : "Algo fora da lista"
-            }
-            icone="outro"
-            selecionado={false}
-            aoPressionar={abrirOutro}
-          />
-        </Animated.View>
-      </View>
 
       {sheetAberto ? (
         <OutraAcaoSheet aoFechar={() => setSheetAberto(false)} aoRegistrar={aoRegistrarOutro} />
@@ -197,6 +197,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
 }
 
 const styles = StyleSheet.create({
+  conteudo: { gap: SPACING.xl, paddingBottom: SPACING.xxl },
   cabecalho: {
     flexDirection: "row",
     alignItems: "center",
@@ -204,17 +205,12 @@ const styles = StyleSheet.create({
     gap: SPACING.md,
   },
   saudacao: { flex: 1, minWidth: 0 },
-  progresso: { marginTop: 18 },
-  agenda: { marginTop: 22 },
-  tituloSecao: { marginTop: 22, marginBottom: 10 },
-  grade: { gap: SPACING.gap },
-  linhaGrade: { flexDirection: "row", gap: SPACING.gap },
-  celula: { flex: 1 },
-  areaToast: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: "100%",
-    marginBottom: SPACING.md,
+  avatar: { borderRadius: SIZES.touchMin / 2 },
+  erro: { marginTop: SPACING.sm },
+  rapido: { gap: SPACING.md },
+  tituloRapido: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    justifyContent: "space-between",
   },
 });

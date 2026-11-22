@@ -12,9 +12,12 @@ type SeletorDeHorarioProps = {
   valor: string | null;
   aoMudar: (hora: string) => void;
   rotulo: string;
+  /** Bloco alto com a hora em número grande (formulário do compromisso) */
+  bloco?: boolean;
 };
 
 const HORA_PADRAO = { horas: 8, minutos: 0 };
+const TAMANHO_DO_BLOCO = 30;
 
 function dataDaHora(hora: string | null): Date {
   const [horas, minutos] =
@@ -25,7 +28,7 @@ function dataDaHora(hora: string | null): Date {
 }
 
 /** Campo de texto com máscara HH:MM. Só avisa quando a hora digitada é válida. */
-function CampoWeb({ valor, aoMudar, rotulo }: SeletorDeHorarioProps) {
+function CampoWeb({ valor, aoMudar, rotulo, bloco = false }: SeletorDeHorarioProps) {
   const { colors } = useTheme();
   const [texto, setTexto] = useState(valor ?? "");
 
@@ -49,11 +52,13 @@ function CampoWeb({ valor, aoMudar, rotulo }: SeletorDeHorarioProps) {
       maxLength={5}
       style={[
         styles.campo,
+        bloco && styles.bloco,
         {
           borderColor: colors.hair,
+          backgroundColor: bloco ? colors.card : undefined,
           color: colors.ink,
-          fontFamily: FONT_FAMILY[500],
-          fontSize: TYPOGRAPHY.body.fontSize,
+          fontFamily: FONT_FAMILY[bloco ? 300 : 500],
+          fontSize: bloco ? TAMANHO_DO_BLOCO : TYPOGRAPHY.body.fontSize,
         },
       ]}
     />
@@ -61,7 +66,7 @@ function CampoWeb({ valor, aoMudar, rotulo }: SeletorDeHorarioProps) {
 }
 
 /** Botão que mostra a hora e abre o seletor nativo (diálogo no Android, roda no iOS). */
-function CampoNativo({ valor, aoMudar, rotulo }: SeletorDeHorarioProps) {
+function CampoNativo({ valor, aoMudar, rotulo, bloco = false }: SeletorDeHorarioProps) {
   const { colors } = useTheme();
   const [aberto, setAberto] = useState(false);
 
@@ -94,9 +99,19 @@ function CampoNativo({ valor, aoMudar, rotulo }: SeletorDeHorarioProps) {
         accessibilityRole="button"
         accessibilityLabel={rotulo}
         onPress={aoPressionar}
-        style={[styles.campo, styles.botao, { borderColor: colors.hair }]}
+        style={[
+          styles.campo,
+          styles.botao,
+          bloco && styles.bloco,
+          { borderColor: colors.hair, backgroundColor: bloco ? colors.card : undefined },
+        ]}
       >
-        <Text variant="body" color={valor === null ? "placeholder" : "ink"}>
+        <Text
+          variant={bloco ? "h1" : "body"}
+          weight={bloco ? 300 : undefined}
+          color={valor === null ? "placeholder" : "ink"}
+          style={bloco ? styles.numeroDoBloco : undefined}
+        >
           {valor ?? "--:--"}
         </Text>
       </Pressable>
@@ -128,4 +143,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.lg,
   },
   botao: { justifyContent: "center" },
+  bloco: { minHeight: 72, borderRadius: RADIUS.category },
+  numeroDoBloco: { fontSize: TAMANHO_DO_BLOCO, lineHeight: 38, fontVariant: ["tabular-nums"] },
 });

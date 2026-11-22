@@ -310,6 +310,52 @@ function sobrepoeNoDia(a: Horario, b: Horario): boolean {
 }
 
 /** Ids dos compromissos que dividem algum dia da semana com outro de horário sobreposto. */
+const ABREVIACOES = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"] as const;
+
+/** "Seg a sex", "Fim de semana", "Todos os dias" ou a lista abreviada ("seg, qua, sex"). */
+export function resumoDosDias(dias: readonly DiaDaSemana[]): string {
+  const unicos = [...new Set(dias)].sort((a, b) => a - b);
+  const chave = unicos.join(",");
+  if (chave === "1,2,3,4,5") return "Seg a sex";
+  if (chave === "0,6") return "Fim de semana";
+  if (chave === "0,1,2,3,4,5,6") return "Todos os dias";
+  if (unicos.length === 0) return "Nenhum dia";
+  return unicos.map((dia) => ABREVIACOES[dia]).join(", ");
+}
+
+/** Resumo do formulário, acima do Salvar: "Seg a sex, 05:00 a 06:00 · avisa 15 min antes". */
+export function resumoDoCompromisso(rascunho: {
+  dias: readonly DiaDaSemana[];
+  inicio: string | null;
+  fim: string | null;
+  antecedenciaMin: number | null;
+}): string {
+  const horario =
+    rascunho.inicio === null
+      ? "sem horário"
+      : rotuloDoHorario({ inicio: rascunho.inicio, fim: rascunho.fim });
+  const partes = [`${resumoDosDias(rascunho.dias)}, ${horario}`];
+  if (rascunho.antecedenciaMin !== null) {
+    partes.push(
+      rascunho.antecedenciaMin === 0
+        ? "avisa na hora"
+        : `avisa ${rascunho.antecedenciaMin} min antes`,
+    );
+  }
+  return partes.join(" · ");
+}
+
+/** Quantos compromissos recorrentes caem em cada dia da semana, de domingo (0) a sábado (6). */
+export function cargaDaSemana(compromissos: readonly Pick<Compromisso, "dias">[]): number[] {
+  const carga = [0, 0, 0, 0, 0, 0, 0];
+  for (const compromisso of compromissos) {
+    for (const dia of new Set(compromisso.dias)) {
+      carga[dia] += 1;
+    }
+  }
+  return carga;
+}
+
 export function compromissosEmConflito(compromissos: readonly Compromisso[]): Set<string> {
   const ids = new Set<string>();
   for (let i = 0; i < compromissos.length; i++) {
