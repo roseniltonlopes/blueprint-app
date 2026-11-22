@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-import { rotuloDoHorario, type Ocorrencia } from "../domain/agenda";
+import { AGENDA_COMECA_VAZIA, rotuloDoHorario, type Ocorrencia } from "../domain/agenda";
 import { chaveDoDia, somarDias } from "../domain/datas";
 import {
   registroDaOcorrencia,
@@ -24,7 +24,7 @@ type HojeNaAgendaProps = {
   aoMontarAgenda?: () => void;
 };
 
-const ROTULOS: Record<StatusDoRegistro, string> = { feito: "Feito", nao_fui: "Não fui" };
+const ROTULOS: Record<StatusDoRegistro, string> = { feito: "Feito", nao_fui: "Não fiz" };
 
 type BotaoDeStatusProps = {
   status: StatusDoRegistro;
@@ -33,7 +33,7 @@ type BotaoDeStatusProps = {
   aoPressionar: () => void;
 };
 
-/** Feito marcado fica laranja; Não fui marcado fica escuro. Os dois têm 44 de altura. */
+/** Feito marcado fica laranja; Não fiz marcado fica escuro. Os dois têm 44 de altura. */
 function BotaoDeStatus({ status, marcado, descricao, aoPressionar }: BotaoDeStatusProps) {
   const { colors } = useTheme();
   const fundo = !marcado ? colors.sunk : status === "feito" ? colors.accent : colors.ink;
@@ -100,7 +100,7 @@ type Dia = "hoje" | "ontem";
 const NOMES_DO_DIA: Record<Dia, string> = { hoje: "Hoje", ontem: "Ontem" };
 
 /**
- * Compromissos do dia na Home, com "Feito" e "Não fui" (etapas 2 e 4 da agenda semanal).
+ * Compromissos do dia na Home, com "Feito" e "Não fiz" (etapas 2 e 4 da agenda semanal).
  * "Ontem" permite marcar o que ficou esquecido; dias mais antigos aparecem no painel do mês.
  */
 export default function HojeNaAgenda({ aoMarcar, aoMontarAgenda }: HojeNaAgendaProps) {
@@ -159,7 +159,9 @@ export default function HojeNaAgenda({ aoMarcar, aoMontarAgenda }: HojeNaAgendaP
             <>
               <Text variant="body">{`Sem agenda para ${minusculo}`}</Text>
               <Text variant="support" color="mute">
-                Monte a agenda do mês para ver aqui os compromissos de cada dia.
+                {dados.agendas.length === 0
+                  ? AGENDA_COMECA_VAZIA
+                  : "Monte a agenda do mês para ver aqui os compromissos de cada dia."}
               </Text>
               {aoMontarAgenda ? (
                 <Pressable accessibilityRole="button" onPress={aoMontarAgenda} style={styles.alvo}>

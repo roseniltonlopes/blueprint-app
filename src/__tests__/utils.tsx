@@ -117,8 +117,8 @@ export function autenticacaoFalsa(sessaoInicial: Sessao | null = null): Autentic
       if (conta === undefined || conta.senha !== senha) throw new ErroDaConta("credenciais");
       emitir({ userId: conta.userId, email: email.trim().toLowerCase() });
     },
-    cadastrar: async ({ email, senha, nome }) => {
-      porta.chamadas.push(`cadastrar:${email}:${nome ?? ""}`);
+    cadastrar: async ({ email, senha, nome, termosVersao }) => {
+      porta.chamadas.push(`cadastrar:${email}:${nome ?? ""}:termos=${termosVersao}`);
       lancarSePreciso();
       const userId = `usuario-${porta.contas.size + 1}`;
       porta.contas.set(email.trim().toLowerCase(), { senha, userId });
@@ -133,6 +133,11 @@ export function autenticacaoFalsa(sessaoInicial: Sessao | null = null): Autentic
     },
     sair: async () => {
       porta.chamadas.push("sair");
+      emitir(null);
+    },
+    excluirConta: async () => {
+      porta.chamadas.push("excluirConta");
+      lancarSePreciso();
       emitir(null);
     },
   };

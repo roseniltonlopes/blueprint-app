@@ -71,7 +71,7 @@ async function abrirHome(agenda: DadosAgenda = dados()) {
 }
 
 const FEITO_ACADEMIA = "Feito: Academia, 05:00 a 06:00";
-const NAO_FUI_ACADEMIA = "Não fui: Academia, 05:00 a 06:00";
+const NAO_FUI_ACADEMIA = "Não fiz: Academia, 05:00 a 06:00";
 
 function resumo() {
   return screen.getByTestId("resumo-agenda-hoje").props.children;
@@ -85,7 +85,7 @@ function marcado(nome: string) {
   return screen.getByRole("button", { name: nome }).props.accessibilityState?.selected;
 }
 
-describe("Home: compromissos de hoje com Feito e Não fui (etapa 2)", () => {
+describe("Home: compromissos de hoje com Feito e Não fiz (etapa 2)", () => {
   it("lista só os compromissos de hoje, em ordem de horário", async () => {
     await abrirHome();
     expect(screen.getByText("Hoje na agenda")).toBeTruthy();
@@ -127,16 +127,16 @@ describe("Home: compromissos de hoje com Feito e Não fui (etapa 2)", () => {
     expect(screen.getByRole("button", { name: "Outro, 1 hoje" })).toBeTruthy();
   });
 
-  it("Não fui marca sem contar como feito nem gerar ação", async () => {
+  it("Não fiz marca sem contar como feito nem gerar ação", async () => {
     await abrirHome();
     await fireEvent.press(screen.getByRole("button", { name: NAO_FUI_ACADEMIA }));
     expect(resumo()).toBe("Feitos: 0 de 3");
     expect(marcado(NAO_FUI_ACADEMIA)).toBe(true);
     expect(total()).toBe(0);
-    expect(screen.getByText("Não fui: Academia")).toBeTruthy();
+    expect(screen.getByText("Não fiz: Academia")).toBeTruthy();
   });
 
-  it("trocar de Feito para Não fui remove a ação gerada", async () => {
+  it("trocar de Feito para Não fiz remove a ação gerada", async () => {
     await abrirHome();
     await fireEvent.press(screen.getByRole("button", { name: FEITO_ACADEMIA }));
     await fireEvent.press(screen.getByRole("button", { name: NAO_FUI_ACADEMIA }));
@@ -164,7 +164,7 @@ describe("Home: compromissos de hoje com Feito e Não fui (etapa 2)", () => {
     expect(api.dados.registros).toEqual([]);
   });
 
-  it("Desfazer a troca para Não fui devolve o Feito e a mesma ação", async () => {
+  it("Desfazer a troca para Não fiz devolve o Feito e a mesma ação", async () => {
     await abrirHome();
     await fireEvent.press(screen.getByRole("button", { name: FEITO_ACADEMIA }));
     const acaoId = api.dados.registros[0].acaoId;

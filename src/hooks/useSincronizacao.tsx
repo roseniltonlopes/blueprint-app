@@ -51,6 +51,13 @@ export type UseSincronizacao = {
   cancelarTroca: () => Promise<void>;
   /** Sai da conta. Sem `manterDados`, apaga ações, agenda, perfil e a base deste aparelho. */
   sair: (opcoes: { manterDados: boolean }) => Promise<Resultado<void>>;
+  /**
+   * Exclui a conta e os dados na nuvem (função do banco, migração 003), sai e apaga os dados deste
+   * aparelho. Se a nuvem recusar (sem internet, migração ausente), nada é apagado.
+   */
+  excluirConta: () => Promise<Resultado<void>>;
+  /** Sem conta: apaga ações, agenda, perfil e a base deste aparelho. */
+  apagarDadosDoAparelho: () => Promise<Resultado<void>>;
 };
 
 export type NuvemDaSincronizacao = {
@@ -73,6 +80,9 @@ export const ESPERA_APOS_MUDANCA_MS = 2000;
 export const ESPERA_APOS_FALHA_MS = 30_000;
 
 const ERRO_AO_APAGAR = "Não foi possível apagar os dados do aparelho. Tente de novo.";
+const ERRO_SINCRONIZANDO = "Aguarde a sincronização terminar e tente de novo.";
+const ERRO_APOS_EXCLUIR =
+  'A conta foi excluída, mas os dados deste aparelho não foram apagados. Use "Apagar dados deste aparelho".';
 
 type Modo = "normal" | "substituir";
 
@@ -333,26 +343,42 @@ export function SincronizacaoProvider({
     await conta.sair();
   }, [conta]);
 
+  /** Uma sincronização em andamento deixa de aplicar o resultado no aparelho. */
+  const suspender = useCallback(() => {
+    const anterior = sessaoAtual.current;
+    sessaoAtual.current = null;
+    if (espera.current !== null) {
+      clearTimeout(espera.current);
+      espera.current = null;
+    }
+    return anterior;
+  }, []);
+
+  /**
+   * Volta o aparelho ao estado da primeira abertura: ações, agenda e perfil vazios, sem base de
+   * sincronização e sem dono. As preferências de aparência ficam (não são dados pessoais). Com a
+   * agenda vazia, o AlertasProvider reagenda os alertas para nenhum.
+   */
+  const limparAparelho = useCallback(
+    async (userId: string | null) => {
+      await aplicarNoApp({ acoes: [], agenda: DADOS_AGENDA_VAZIOS, perfil: { ...PERFIL_PADRAO } });
+      if (nuvem !== null) {
+        const dono = await nuvem.repositorio.lerDono();
+        for (const id of new Set([userId, dono])) {
+          if (id !== null) await nuvem.repositorio.apagarBase(id);
+        }
+        await nuvem.repositorio.gravarDono(null);
+      }
+    },
+    [aplicarNoApp, nuvem],
+  );
+
   const sair = useCallback<UseSincronizacao["sair"]>(
     async ({ manterDados }) => {
-      const anterior = sessaoAtual.current;
-      // Uma sincronização em andamento deixa de aplicar o resultado no aparelho.
-      sessaoAtual.current = null;
-      if (espera.current !== null) {
-        clearTimeout(espera.current);
-        espera.current = null;
-      }
+      const anterior = suspender();
       if (!manterDados) {
         try {
-          await aplicarNoApp({
-            acoes: [],
-            agenda: DADOS_AGENDA_VAZIOS,
-            perfil: { ...PERFIL_PADRAO },
-          });
-          if (nuvem !== null) {
-            if (anterior !== null) await nuvem.repositorio.apagarBase(anterior.userId);
-            await nuvem.repositorio.gravarDono(null);
-          }
+          await limparAparelho(anterior?.userId ?? null);
         } catch (erro) {
           console.warn("Falha ao apagar os dados do aparelho.", erro);
           sessaoAtual.current = anterior;
@@ -362,8 +388,35 @@ export function SincronizacaoProvider({
       await conta.sair();
       return { ok: true, valor: undefined };
     },
-    [aplicarNoApp, conta, nuvem],
+    [conta, limparAparelho, suspender],
   );
+
+  const excluirConta = useCallback<UseSincronizacao["excluirConta"]>(async () => {
+    if (emAndamento.current) return { ok: false, erro: ERRO_SINCRONIZANDO };
+    const anterior = suspender();
+    const resultado = await conta.excluirConta();
+    if (!resultado.ok) {
+      sessaoAtual.current = anterior;
+      return resultado;
+    }
+    try {
+      await limparAparelho(anterior?.userId ?? null);
+    } catch (erro) {
+      console.warn("Conta excluída, mas os dados do aparelho não foram apagados.", erro);
+      return { ok: false, erro: ERRO_APOS_EXCLUIR };
+    }
+    return { ok: true, valor: undefined };
+  }, [conta, limparAparelho, suspender]);
+
+  const apagarDadosDoAparelho = useCallback<UseSincronizacao["apagarDadosDoAparelho"]>(async () => {
+    try {
+      await limparAparelho(null);
+      return { ok: true, valor: undefined };
+    } catch (erro) {
+      console.warn("Falha ao apagar os dados do aparelho.", erro);
+      return { ok: false, erro: ERRO_AO_APAGAR };
+    }
+  }, [limparAparelho]);
 
   const estado = useMemo<EstadoDaSincronizacao>(() => {
     if (!ativa) return { tipo: "desligada" };
@@ -381,8 +434,19 @@ export function SincronizacaoProvider({
       confirmarTroca,
       cancelarTroca,
       sair,
+      excluirConta,
+      apagarDadosDoAparelho,
     }),
-    [estado, ultimaSincronizacao, sincronizarAgora, confirmarTroca, cancelarTroca, sair],
+    [
+      estado,
+      ultimaSincronizacao,
+      sincronizarAgora,
+      confirmarTroca,
+      cancelarTroca,
+      sair,
+      excluirConta,
+      apagarDadosDoAparelho,
+    ],
   );
 
   return <SincronizacaoContext.Provider value={valor}>{children}</SincronizacaoContext.Provider>;

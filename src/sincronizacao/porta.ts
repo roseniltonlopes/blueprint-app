@@ -21,10 +21,17 @@ export interface PortaDeAutenticacao {
     senha: string;
     nome: string | null;
     fuso: string;
+    /** Versão dos termos aceitos na caixa do cadastro (src/legal/versao.ts) */
+    termosVersao: string;
   }): Promise<ResultadoDoCadastro>;
   recuperarSenha(email: string): Promise<void>;
   /** Nunca lança: sem internet, encerra ao menos a sessão deste aparelho */
   sair(): Promise<void>;
+  /**
+   * Apaga a conta e todos os dados dela na nuvem (função public.excluir_minha_conta, migração 003)
+   * e encerra a sessão neste aparelho. Lança ErroDaConta; se lançar, nada foi apagado.
+   */
+  excluirConta(): Promise<void>;
 }
 
 export type MotivoDaFalha =
@@ -32,6 +39,8 @@ export type MotivoDaFalha =
   | "rede"
   /** Tabela que o app espera não existe (migração 002 não aplicada) */
   | "migracao"
+  /** Coluna nova que o app envia não existe (migração 003 não aplicada) */
+  | "migracao003"
   /** Sessão vencida ou recusada pelo servidor */
   | "sessao"
   /** O servidor recusou os dados (constraint, permissão) */
@@ -40,6 +49,7 @@ export type MotivoDaFalha =
 export const MENSAGENS_DA_SINCRONIZACAO: Record<MotivoDaFalha, string> = {
   rede: "Sem internet: tentaremos de novo",
   migracao: "O banco precisa da migração 002",
+  migracao003: "O banco precisa da migração 003",
   sessao: "A sessão expirou. Saia e entre de novo.",
   servidor: "O servidor recusou os dados. Tente de novo mais tarde.",
 };

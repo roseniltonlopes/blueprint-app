@@ -2,6 +2,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AgendasScreen from "../screens/AgendasScreen";
 import CompromissoScreen from "../screens/CompromissoScreen";
 import ContaScreen from "../screens/ContaScreen";
+import PrivacidadeScreen from "../screens/PrivacidadeScreen";
+import TermosScreen from "../screens/TermosScreen";
 import Abas from "./Abas";
 
 export type RaizParamList = {
@@ -19,6 +21,9 @@ export type RaizParamList = {
   Agendas: { nova?: boolean; data?: string } | undefined;
   /** Entrar, criar conta e recuperar a senha (aberta pelo Perfil) */
   Conta: undefined;
+  /** Termos de Uso e Política de Privacidade, embutidos no app (src/legal/textos.ts) */
+  Termos: undefined;
+  Privacidade: undefined;
 };
 
 const Stack = createNativeStackNavigator<RaizParamList>();
@@ -31,6 +36,8 @@ export default function Raiz() {
       <Stack.Screen name="Compromisso" component={CompromissoScreen} />
       <Stack.Screen name="Agendas" component={AgendasScreen} />
       <Stack.Screen name="Conta" component={ContaScreen} />
+      <Stack.Screen name="Termos" component={TermosScreen} />
+      <Stack.Screen name="Privacidade" component={PrivacidadeScreen} />
     </Stack.Navigator>
   );
 }

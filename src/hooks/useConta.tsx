@@ -27,10 +27,14 @@ export type UseConta = {
     email: string;
     senha: string;
     nome: string | null;
+    /** Versão dos termos que a pessoa aceitou na caixa do cadastro */
+    termosVersao: string;
   }) => Promise<Resultado<ResultadoDoCadastro>>;
   recuperarSenha: (email: string) => Promise<Resultado<void>>;
   /** Encerra a sessão. Nunca falha: sem internet, encerra ao menos neste aparelho. */
   sair: () => Promise<void>;
+  /** Apaga a conta e os dados na nuvem e sai. Em erro, nada foi apagado. */
+  excluirConta: () => Promise<Resultado<void>>;
 };
 
 const ContaContext = createContext<UseConta | null>(null);
@@ -105,7 +109,7 @@ export function ContaProvider({ children, porta }: ContaProviderProps) {
   );
 
   const criarConta = useCallback<UseConta["criarConta"]>(
-    async ({ email, senha, nome }) => {
+    async ({ email, senha, nome, termosVersao }) => {
       if (porta === null) return INDISPONIVEL;
       try {
         const valor = await porta.cadastrar({
@@ -113,6 +117,7 @@ export function ContaProvider({ children, porta }: ContaProviderProps) {
           senha,
           nome,
           fuso: fusoDoAparelho() ?? FUSO_PADRAO,
+          termosVersao,
         });
         return { ok: true, valor };
       } catch (erro) {
@@ -142,9 +147,20 @@ export function ContaProvider({ children, porta }: ContaProviderProps) {
     setEstado({ situacao: "desconectado" });
   }, [porta]);
 
+  const excluirConta = useCallback<UseConta["excluirConta"]>(async () => {
+    if (porta === null) return INDISPONIVEL;
+    try {
+      await porta.excluirConta();
+    } catch (erro) {
+      return falha(erro);
+    }
+    setEstado({ situacao: "desconectado" });
+    return { ok: true, valor: undefined };
+  }, [porta]);
+
   const valor = useMemo<UseConta>(
-    () => ({ estado, entrar, criarConta, recuperarSenha, sair }),
-    [estado, entrar, criarConta, recuperarSenha, sair],
+    () => ({ estado, entrar, criarConta, recuperarSenha, sair, excluirConta }),
+    [estado, entrar, criarConta, recuperarSenha, sair, excluirConta],
   );
 
   return <ContaContext.Provider value={valor}>{children}</ContaContext.Provider>;

@@ -1,6 +1,6 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import BotaoTexto from "../components/BotaoTexto";
 import CabecalhoDeTela from "../components/CabecalhoDeTela";
 import Campo from "../components/Campo";
@@ -15,10 +15,15 @@ import {
 import { useConta } from "../hooks/useConta";
 import { usePerfil } from "../hooks/usePerfil";
 import type { RaizParamList } from "../navigation/Raiz";
-import { SPACING } from "../styles/theme";
+import { VERSAO_DOS_TERMOS } from "../legal/textos";
+import { RADIUS, SIZES, SPACING } from "../styles/theme";
+import { useTheme } from "../theme/ThemeProvider";
+import { Icon } from "../ui/Icon";
 import { Card, Screen, SegmentedControl, Text } from "../ui";
 
 type Props = NativeStackScreenProps<RaizParamList, "Conta">;
+
+const TEXTO_DO_ACEITE = "Li e aceito os Termos de Uso e a Política de Privacidade";
 
 const TITULO_DO_BOTAO: Record<ModoDoFormulario, { parado: string; enviando: string }> = {
   entrar: { parado: "Entrar", enviando: "Entrando" },
@@ -29,6 +34,7 @@ const TITULO_DO_BOTAO: Record<ModoDoFormulario, { parado: string; enviando: stri
 /** Entrar, criar conta (e-mail e senha) e recuperar a senha. Aberta pelo cartão da conta no Perfil. */
 export default function ContaScreen({ navigation }: Props) {
   const { estado, entrar, criarConta, recuperarSenha } = useConta();
+  const { colors } = useTheme();
   const { perfil } = usePerfil();
   const [modo, setModo] = useState<ModoDoFormulario>("entrar");
   const [email, setEmail] = useState("");
@@ -37,6 +43,7 @@ export default function ContaScreen({ navigation }: Props) {
   const [erroGeral, setErroGeral] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
+  const [aceitouTermos, setAceitouTermos] = useState(false);
 
   function trocarModo(novo: ModoDoFormulario) {
     setModo(novo);
@@ -65,10 +72,15 @@ export default function ContaScreen({ navigation }: Props) {
       return;
     }
     if (modo === "criar") {
+      if (!aceitouTermos) {
+        setEnviando(false);
+        return;
+      }
       const resultado = await criarConta({
         email,
         senha,
         nome: perfil.nome.length > 0 ? perfil.nome : null,
+        termosVersao: VERSAO_DOS_TERMOS,
       });
       setEnviando(false);
       if (!resultado.ok) {
@@ -191,11 +203,60 @@ export default function ContaScreen({ navigation }: Props) {
           </Text>
         ) : null}
 
+        {modo === "criar" ? (
+          <View style={styles.aceite}>
+            <Pressable
+              accessibilityRole="checkbox"
+              accessibilityLabel={TEXTO_DO_ACEITE}
+              accessibilityState={{ checked: aceitouTermos }}
+              onPress={() => setAceitouTermos((atual) => !atual)}
+              style={styles.caixaAlvo}
+              testID="aceite-dos-termos"
+            >
+              <View
+                style={[
+                  styles.caixa,
+                  {
+                    borderColor: colors.ink,
+                    backgroundColor: aceitouTermos ? colors.ink : "transparent",
+                  },
+                ]}
+              >
+                {aceitouTermos ? <Icon name="check" color={colors.onInk} size={16} /> : null}
+              </View>
+            </Pressable>
+            <Text variant="support" style={styles.textoDoAceite}>
+              {"Li e aceito os "}
+              <Text
+                variant="support"
+                color="accentText"
+                weight={600}
+                accessibilityRole="link"
+                onPress={() => navigation.navigate("Termos")}
+                style={styles.link}
+              >
+                Termos de Uso
+              </Text>
+              {" e a "}
+              <Text
+                variant="support"
+                color="accentText"
+                weight={600}
+                accessibilityRole="link"
+                onPress={() => navigation.navigate("Privacidade")}
+                style={styles.link}
+              >
+                Política de Privacidade
+              </Text>
+            </Text>
+          </View>
+        ) : null}
+
         <BotaoTexto
           rotulo={enviando ? titulo.enviando : titulo.parado}
           aoPressionar={() => void enviar()}
           variante="primario"
-          desabilitado={enviando}
+          desabilitado={enviando || (modo === "criar" && !aceitouTermos)}
         />
 
         <View style={styles.links}>
@@ -215,6 +276,19 @@ export default function ContaScreen({ navigation }: Props) {
           ) : null}
         </View>
       </Card>
+
+      <View style={styles.legais}>
+        <BotaoTexto
+          rotulo="Termos de Uso"
+          aoPressionar={() => navigation.navigate("Termos")}
+          variante="link"
+        />
+        <BotaoTexto
+          rotulo="Política de Privacidade"
+          aoPressionar={() => navigation.navigate("Privacidade")}
+          variante="link"
+        />
+      </View>
     </Screen>
   );
 }
@@ -223,4 +297,22 @@ const styles = StyleSheet.create({
   conteudo: { gap: SPACING.gap, paddingBottom: SPACING.xxl },
   cartao: { gap: SPACING.md },
   links: { alignItems: "center" },
+  legais: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center" },
+  aceite: { flexDirection: "row", alignItems: "center", gap: SPACING.sm },
+  caixaAlvo: {
+    width: SIZES.touchMin,
+    height: SIZES.touchMin,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  caixa: {
+    width: 24,
+    height: 24,
+    borderWidth: 2,
+    borderRadius: RADIUS.field / 2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  textoDoAceite: { flex: 1 },
+  link: { textDecorationLine: "underline" },
 });

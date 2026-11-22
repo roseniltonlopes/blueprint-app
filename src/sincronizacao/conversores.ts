@@ -65,6 +65,8 @@ export type AvulsoLinha = {
   inicio: string;
   fim: string | null;
   detalhe: string | null;
+  /** Coluna criada pela migração 003 */
+  antecedencia_min: number | null;
 };
 
 export type RegistroLinha = {
@@ -241,6 +243,7 @@ export function avulsoParaLinha(a: Avulso, userId: string): AvulsoLinha {
     inicio: a.inicio,
     fim: a.fim,
     detalhe: a.detalhe ?? null,
+    antecedencia_min: a.antecedenciaMin ?? null,
   };
 }
 
@@ -254,6 +257,11 @@ export function avulsoDaLinha(bruto: unknown): Avulso | null {
   const detalhe = r && textoOuNulo(r.detalhe);
   if (!r || !id || !atividadeId || !data || !inicio || detalhe === undefined) return null;
   if (r.fim !== null && fim === null) return null;
+  // Antes da migração 003 a coluna não existe (undefined): o avulso fica sem aviso.
+  const antecedencia = r.antecedencia_min;
+  if (antecedencia !== undefined && antecedencia !== null && typeof antecedencia !== "number") {
+    return null;
+  }
   const avulso: Avulso = {
     id,
     atividadeId,
@@ -261,6 +269,7 @@ export function avulsoDaLinha(bruto: unknown): Avulso | null {
     inicio,
     fim: fim ?? null,
     ...(detalhe !== null ? { detalhe } : {}),
+    ...(typeof antecedencia === "number" ? { antecedenciaMin: antecedencia } : {}),
   };
   const { id: _id, ...conteudo } = avulso;
   return validarAvulso(conteudo) === null ? avulso : null;

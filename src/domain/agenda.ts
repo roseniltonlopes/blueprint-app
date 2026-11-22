@@ -54,13 +54,15 @@ export type Avulso = {
   inicio: string;
   fim: string | null;
   detalhe?: string;
+  /** Minutos de aviso antes do início (0 avisa na hora); ausente: sem aviso */
+  antecedenciaMin?: number;
 };
 
 export type DadosAgenda = {
   atividades: Atividade[];
   agendas: Agenda[];
   avulsos: Avulso[];
-  /** "Feito" e "Não fui" de cada compromisso por dia (src/domain/registros.ts) */
+  /** "Feito" e "Não fiz" de cada compromisso por dia (src/domain/registros.ts) */
   registros: RegistroCompromisso[];
 };
 
@@ -80,6 +82,10 @@ export const ANTECEDENCIA_MAX = 120;
 export const ERRO_HORARIO = "Informe um horário no formato HH:MM";
 export const ERRO_TERMINO = "O término deve ser depois do início";
 export const ERRO_PERIODO_OCUPADO = "Já existe agenda neste período";
+
+/** Primeiro acesso: o app não traz compromissos prontos. */
+export const AGENDA_COMECA_VAZIA =
+  "Sua agenda começa vazia. Monte a semana com os seus compromissos: o app não preenche nada por você.";
 
 const PADRAO_HORA = /^([01]\d|2[0-3]):([0-5]\d)$/;
 const PADRAO_DATA = /^(\d{4})-(\d{2})-(\d{2})$/;
@@ -150,6 +156,14 @@ export function validarAtividade(
   return repetida ? "Já existe uma atividade com este nome" : null;
 }
 
+/** "Avisar antes": ausente (sem aviso) ou um inteiro de 0 a 120 minutos. */
+export function validarAntecedencia(minutos: number | undefined): string | null {
+  if (minutos === undefined) return null;
+  return Number.isInteger(minutos) && minutos >= 0 && minutos <= ANTECEDENCIA_MAX
+    ? null
+    : `A antecedência deve ficar entre 0 e ${ANTECEDENCIA_MAX} minutos`;
+}
+
 function validarDetalhe(detalhe: string | undefined): string | null {
   return detalhe !== undefined && detalhe.length > DETALHE_MAX
     ? `O detalhe pode ter até ${DETALHE_MAX} caracteres`
@@ -168,26 +182,18 @@ export function validarCompromisso(c: Omit<Compromisso, "id">): string | null {
   if (erroHorario !== null) {
     return erroHorario;
   }
-  const erroDetalhe = validarDetalhe(c.detalhe);
-  if (erroDetalhe !== null) {
-    return erroDetalhe;
-  }
-  if (
-    c.antecedenciaMin !== undefined &&
-    (!Number.isInteger(c.antecedenciaMin) ||
-      c.antecedenciaMin < 0 ||
-      c.antecedenciaMin > ANTECEDENCIA_MAX)
-  ) {
-    return `A antecedência deve ficar entre 0 e ${ANTECEDENCIA_MAX} minutos`;
-  }
-  return null;
+  return validarDetalhe(c.detalhe) ?? validarAntecedencia(c.antecedenciaMin);
 }
 
 export function validarAvulso(a: Omit<Avulso, "id">): string | null {
   if (!dataValida(a.data)) {
     return "Informe uma data válida";
   }
-  return validarHorarios(a.inicio, a.fim) ?? validarDetalhe(a.detalhe);
+  return (
+    validarHorarios(a.inicio, a.fim) ??
+    validarDetalhe(a.detalhe) ??
+    validarAntecedencia(a.antecedenciaMin)
+  );
 }
 
 type Periodo = { inicio: string; fim: string };
@@ -282,6 +288,7 @@ export function ocorrenciasDoDia(dados: DadosAgenda, data: Date): Ocorrencia[] {
         inicio: v.inicio,
         fim: v.fim,
         ...(v.detalhe !== undefined ? { detalhe: v.detalhe } : {}),
+        ...(v.antecedenciaMin !== undefined ? { antecedenciaMin: v.antecedenciaMin } : {}),
       });
     }
   }

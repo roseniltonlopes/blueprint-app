@@ -26,7 +26,7 @@ export interface AgendaRepository {
 }
 
 export const CHAVE_AGENDA = "blueprint:agenda";
-/** 1: atividades, agendas e avulsos. 2: mais os registros de "Feito" e "Não fui". */
+/** 1: atividades, agendas e avulsos. 2: mais os registros de "Feito" e "Não fiz". */
 export const VERSAO_AGENDA = 2;
 const VERSOES_LIDAS: readonly unknown[] = [1, VERSAO_AGENDA];
 export const CHAVE_DESCARTADOS = `${CHAVE_AGENDA}:descartados`;
@@ -116,7 +116,17 @@ function lerAvulso(bruto: unknown): Avulso | null {
   const inicio = r && texto(r.inicio);
   const fim = r && textoOuNulo(r.fim);
   if (!r || !id || !atividadeId || !data || !inicio || fim === undefined) return null;
-  const avulso: Avulso = { id, atividadeId, data, inicio, fim, ...opcionais(r) };
+  // antecedenciaMin é opcional: avulsos gravados antes de existir o aviso continuam válidos.
+  const antecedenciaMin = typeof r.antecedenciaMin === "number" ? r.antecedenciaMin : undefined;
+  const avulso: Avulso = {
+    id,
+    atividadeId,
+    data,
+    inicio,
+    fim,
+    ...opcionais(r),
+    ...(antecedenciaMin !== undefined ? { antecedenciaMin } : {}),
+  };
   const { id: _id, ...semId } = avulso;
   return validarAvulso(semId) === null ? avulso : null;
 }

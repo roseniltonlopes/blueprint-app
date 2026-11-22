@@ -71,6 +71,8 @@ export type CodigoDeErroDaConta =
   | "cadastroDesativado"
   | "rede"
   | "indisponivel"
+  | "sessaoExpirada"
+  | "migracao003"
   | "desconhecido";
 
 export const MENSAGENS_DA_CONTA: Record<CodigoDeErroDaConta, string> = {
@@ -83,6 +85,8 @@ export const MENSAGENS_DA_CONTA: Record<CodigoDeErroDaConta, string> = {
   cadastroDesativado: "Novos cadastros estão desativados no momento.",
   rede: "Sem internet. Verifique a conexão e tente de novo.",
   indisponivel: "A conta na nuvem não está disponível nesta versão do app.",
+  sessaoExpirada: "A sessão expirou. Saia, entre de novo e tente outra vez.",
+  migracao003: "O banco precisa da migração 003",
   desconhecido: "Algo deu errado no servidor. Tente de novo em instantes.",
 };
 

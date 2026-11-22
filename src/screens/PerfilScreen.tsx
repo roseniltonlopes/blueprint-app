@@ -8,6 +8,7 @@ import AvatarDoPerfil from "../components/AvatarDoPerfil";
 import BotaoTexto from "../components/BotaoTexto";
 import CartaoDeAlertas from "../components/CartaoDeAlertas";
 import CartaoDeConta from "../components/CartaoDeConta";
+import CartaoDePrivacidade from "../components/CartaoDePrivacidade";
 import Campo from "../components/Campo";
 import MapaDeCalor from "../components/MapaDeCalor";
 import { NOME_MAX } from "../domain/perfil";
@@ -288,6 +289,16 @@ export default function PerfilScreen({ navigation }: Partial<Props>) {
           Conta
         </Text>
         <CartaoDeConta aoAbrirConta={() => navigation?.navigate("Conta")} />
+      </Animated.View>
+
+      <Animated.View entering={entrada(255)} style={styles.secao}>
+        <Text variant="section" accessibilityRole="header">
+          Privacidade
+        </Text>
+        <CartaoDePrivacidade
+          aoAbrirTermos={() => navigation?.navigate("Termos")}
+          aoAbrirPrivacidade={() => navigation?.navigate("Privacidade")}
+        />
       </Animated.View>
 
       <Animated.View entering={entrada(260)} style={styles.secao}>

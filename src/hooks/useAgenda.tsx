@@ -88,7 +88,7 @@ export type UseAgenda = {
   duplicarAgenda: (id: string) => Resultado<Agenda>;
   registroDe: (chaveDaOcorrencia: string, data: Date) => RegistroCompromisso | undefined;
   /**
-   * Marca "Feito" ou "Não fui" em um compromisso de hoje ou de um dia passado (`dia`; o padrão é
+   * Marca "Feito" ou "Não fiz" em um compromisso de hoje ou de um dia passado (`dia`; o padrão é
    * hoje). Tocar de novo no mesmo desmarca. "Feito" de atividade com categoria também registra a
    * ação de hábito, datada no próprio dia.
    */

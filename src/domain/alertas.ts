@@ -21,6 +21,38 @@ export type AlertaPlanejado = {
 /** Dados que viajam dentro da notificação para o botão "Feito" saber o que marcar. */
 export type DadosDoAlerta = { chave: string; data: string };
 
+/** Opções de "Avisar antes" (minutos); undefined é "Sem aviso" e 0 é "Na hora". */
+export const OPCOES_DE_ANTECEDENCIA: readonly (number | undefined)[] = [
+  undefined,
+  0,
+  5,
+  10,
+  15,
+  30,
+  60,
+];
+
+/** Aviso com que um compromisso novo já vem marcado. */
+export const ANTECEDENCIA_PADRAO = 10;
+
+/**
+ * As opções do seletor para um valor salvo. Um valor fora da lista (ex.: 20 ou 120, de versões
+ * antigas) vira uma opção extra, em ordem, para não se perder ao salvar de novo.
+ */
+export function opcoesDeAntecedencia(atual: number | undefined): (number | undefined)[] {
+  if (atual === undefined || OPCOES_DE_ANTECEDENCIA.includes(atual)) {
+    return [...OPCOES_DE_ANTECEDENCIA];
+  }
+  const minutos = OPCOES_DE_ANTECEDENCIA.filter((m): m is number => m !== undefined);
+  return [undefined, ...[...minutos, atual].sort((a, b) => a - b)];
+}
+
+/** "Sem aviso", "Na hora", "10 min" ou "1 h". */
+export function rotuloDaAntecedencia(minutos: number | undefined): string {
+  if (minutos === undefined) return "Sem aviso";
+  return minutos === 0 ? "Na hora" : formatarAntecedencia(minutos);
+}
+
 /** "15 min", "1 h" ou "1 h 30 min". */
 export function formatarAntecedencia(minutos: number): string {
   const horas = Math.floor(minutos / 60);

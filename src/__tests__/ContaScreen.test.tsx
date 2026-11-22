@@ -18,6 +18,8 @@ function renderizarTela(autenticacao: ReturnType<typeof autenticacaoFalsa> | nul
   return { navigation, resultado };
 }
 
+const TEXTO_DO_ACEITE = "Li e aceito os Termos de Uso e a Política de Privacidade";
+
 async function preencher(email: string, senha?: string) {
   await fireEvent.changeText(screen.getByLabelText("E-mail"), email);
   if (senha !== undefined) await fireEvent.changeText(screen.getByLabelText("Senha"), senha);
@@ -85,6 +87,7 @@ describe("ContaScreen: criar conta e recuperar senha", () => {
 
     await fireEvent.press(screen.getByRole("radio", { name: "Criar conta" }));
     await preencher("ana@exemplo.com", "1234567");
+    await fireEvent.press(screen.getByRole("checkbox", { name: TEXTO_DO_ACEITE }));
     await fireEvent.press(screen.getByRole("button", { name: "Criar conta" }));
     expect(screen.getByText(ERRO_SENHA_CURTA)).toBeTruthy();
     expect(autenticacao.chamadas).toEqual([]);
@@ -98,6 +101,7 @@ describe("ContaScreen: criar conta e recuperar senha", () => {
 
     await fireEvent.press(screen.getByRole("radio", { name: "Criar conta" }));
     await preencher("ana@exemplo.com", "senha-forte-1");
+    await fireEvent.press(screen.getByRole("checkbox", { name: TEXTO_DO_ACEITE }));
     await fireEvent.press(screen.getByRole("button", { name: "Criar conta" }));
 
     await waitFor(() =>
@@ -105,7 +109,9 @@ describe("ContaScreen: criar conta e recuperar senha", () => {
         "Enviamos um link para ana@exemplo.com. Confirme o e-mail e depois entre.",
       ),
     );
-    expect(autenticacao.chamadas).toEqual(["cadastrar:ana@exemplo.com:Ana Souza"]);
+    expect(autenticacao.chamadas).toEqual([
+      "cadastrar:ana@exemplo.com:Ana Souza:termos=2026-11-22",
+    ]);
     expect(screen.getByRole("button", { name: "Entrar" })).toBeTruthy();
     expect(navigation.goBack).not.toHaveBeenCalled();
   });
@@ -118,6 +124,7 @@ describe("ContaScreen: criar conta e recuperar senha", () => {
 
     await fireEvent.press(screen.getByRole("radio", { name: "Criar conta" }));
     await preencher("ana@exemplo.com", "senha-forte-1");
+    await fireEvent.press(screen.getByRole("checkbox", { name: TEXTO_DO_ACEITE }));
     await fireEvent.press(screen.getByRole("button", { name: "Criar conta" }));
     await waitFor(() =>
       expect(screen.getByRole("alert")).toHaveTextContent(MENSAGENS_DA_CONTA.emailJaCadastrado),

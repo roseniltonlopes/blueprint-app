@@ -135,7 +135,7 @@ export type ResultadoDoPlano = { ok: true; valor: PlanoDeMarcacao } | { ok: fals
 export const ERRO_DIA_FUTURO = "Só é possível registrar hoje ou dias que já passaram";
 
 /**
- * Decide o que muda ao tocar em "Feito" ou "Não fui". Só "Feito" de atividade com categoria
+ * Decide o que muda ao tocar em "Feito" ou "Não fiz". Só "Feito" de atividade com categoria
  * gera ação de hábito; sair de "Feito" remove a ação que ele gerou.
  */
 export function planejarMarcacao({
@@ -242,7 +242,7 @@ export function resumoDoDia(
 /** Texto do toast depois de marcar. */
 export function mensagemDaMarcacao(nome: string, status: StatusDoRegistro | null): string {
   if (status === "feito") return `Feito: ${nome}`;
-  if (status === "nao_fui") return `Não fui: ${nome}`;
+  if (status === "nao_fui") return `Não fiz: ${nome}`;
   return `Registro removido: ${nome}`;
 }
 

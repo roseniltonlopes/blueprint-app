@@ -22,7 +22,7 @@ function LinhaDeAtividade({ linha, nomeDoMes }: { linha: LinhaDoPainel; nomeDoMe
   const comparacao = comparacaoComMesAnterior(linha.feitos, linha.feitosNoMesAnterior);
   const detalhes = [
     { rotulo: "Feito", dias: linha.diasFeitos },
-    { rotulo: "Não fui", dias: linha.diasNaoFui },
+    { rotulo: "Não fiz", dias: linha.diasNaoFui },
     { rotulo: "Sem registro", dias: linha.diasSemRegistro },
   ].filter((d) => d.dias.length > 0);
 
@@ -63,7 +63,7 @@ function LinhaDeAtividade({ linha, nomeDoMes }: { linha: LinhaDoPainel; nomeDoMe
   );
 }
 
-/** Compromissos do mês: feitos, não fui e sem registro, por categoria e por atividade (etapa 4). */
+/** Compromissos do mês: feitos, não fiz e sem registro, por categoria e por atividade (etapa 4). */
 export default function PainelDeCompromissos({ painel, nomeDoMes }: PainelDeCompromissosProps) {
   const { colors } = useTheme();
   if (painel.grupos.length === 0) {
@@ -78,7 +78,7 @@ export default function PainelDeCompromissos({ painel, nomeDoMes }: PainelDeComp
       <Resumo
         itens={[
           { valor: String(painel.feitos), rotulo: "feitos" },
-          { valor: String(painel.naoFui), rotulo: "não fui" },
+          { valor: String(painel.naoFui), rotulo: "não fiz" },
           { valor: String(painel.semRegistro), rotulo: "sem registro" },
         ]}
       />

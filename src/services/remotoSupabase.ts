@@ -15,8 +15,10 @@ type RespostaDoPostgrest = {
   status: number;
 };
 
-/** Códigos do PostgREST e do Postgres para "a tabela não existe". */
+/** Códigos do PostgREST e do Postgres para "a tabela não existe" (migração 002). */
 const TABELA_AUSENTE = new Set(["PGRST205", "42P01"]);
+/** "A coluna não existe" (antecedencia_min dos avulsos, migração 003). */
+const COLUNA_AUSENTE = new Set(["PGRST204", "42703"]);
 /** JWT vencido ou inválido. */
 const SESSAO_INVALIDA = new Set(["PGRST301", "PGRST302", "PGRST303"]);
 
@@ -28,6 +30,7 @@ export function falhaDaResposta(resposta: RespostaDoPostgrest): ErroDeSincroniza
   // status 0: o fetch falhou (sem internet). 5xx: servidor fora do ar, vale tentar de novo.
   if (status === 0 || status >= 500) return new ErroDeSincronizacao("rede");
   if (TABELA_AUSENTE.has(codigo)) return new ErroDeSincronizacao("migracao", error.message);
+  if (COLUNA_AUSENTE.has(codigo)) return new ErroDeSincronizacao("migracao003", error.message);
   if (status === 401 || SESSAO_INVALIDA.has(codigo)) return new ErroDeSincronizacao("sessao");
   return new ErroDeSincronizacao("servidor", codigo || error.message);
 }

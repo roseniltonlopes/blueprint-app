@@ -38,6 +38,27 @@ export function traduzirErroDeAutenticacao(erro: unknown): ErroDaConta {
   return new ErroDaConta("desconhecido");
 }
 
+/** Função ausente no banco: PostgREST (PGRST202) ou Postgres (42883). */
+const FUNCAO_AUSENTE = new Set(["PGRST202", "42883"]);
+
+/** Traduz a resposta do rpc excluir_minha_conta. null quando deu certo. */
+export function falhaDaExclusao(resposta: {
+  error: { code?: string; message: string } | null;
+  status: number;
+}): ErroDaConta | null {
+  const { error, status } = resposta;
+  if (error === null) return null;
+  const codigo = error.code ?? "";
+  // status 0: o fetch falhou (sem internet). 5xx: servidor fora do ar.
+  if (status === 0 || status >= 500) return new ErroDaConta("rede");
+  if (FUNCAO_AUSENTE.has(codigo)) return new ErroDaConta("migracao003");
+  // 42501: a função não viu sessão; 401 e PGRST30x: token vencido ou inválido.
+  if (codigo === "42501" || status === 401 || codigo.startsWith("PGRST30")) {
+    return new ErroDaConta("sessaoExpirada");
+  }
+  return new ErroDaConta("desconhecido");
+}
+
 function sessaoDe(sessao: Session | null): Sessao | null {
   if (sessao === null) return null;
   return { userId: sessao.user.id, email: sessao.user.email ?? "" };
@@ -72,13 +93,16 @@ export function criarAutenticacaoSupabase(cliente: SupabaseClient): PortaDeAuten
       }
     },
 
-    async cadastrar({ email, senha, nome, fuso }) {
+    async cadastrar({ email, senha, nome, fuso, termosVersao }) {
       try {
-        // nome e fuso vão no user_metadata: o gatilho do banco cria o perfil com eles.
+        // nome, fuso e a versão dos termos aceitos vão no user_metadata: o gatilho do banco cria
+        // o perfil com eles e grava a hora do aceite pelo relógio do servidor (migração 003).
         const { data, error } = await cliente.auth.signUp({
           email: normalizarEmail(email),
           password: senha,
-          options: { data: { ...(nome !== null ? { nome } : {}), fuso } },
+          options: {
+            data: { ...(nome !== null ? { nome } : {}), fuso, termos_versao: termosVersao },
+          },
         });
         if (error) throw error;
         // Sem sessão: o projeto exige confirmar o e-mail. A mesma resposta vale para e-mail já
@@ -96,6 +120,21 @@ export function criarAutenticacaoSupabase(cliente: SupabaseClient): PortaDeAuten
       } catch (erro) {
         throw traduzirErroDeAutenticacao(erro);
       }
+    },
+
+    async excluirConta() {
+      let resposta: { error: { code?: string; message: string } | null; status: number };
+      try {
+        resposta = await cliente.rpc("excluir_minha_conta");
+      } catch (erro) {
+        throw traduzirErroDeAutenticacao(erro);
+      }
+      const falha = falhaDaExclusao(resposta);
+      if (falha !== null) throw falha;
+      // A conta não existe mais no servidor: encerra só neste aparelho (sem chamar o servidor).
+      await cliente.auth.signOut({ scope: "local" }).catch((erro: unknown) => {
+        console.warn("Falha ao encerrar a sessão no aparelho depois de excluir a conta.", erro);
+      });
     },
 
     async sair() {

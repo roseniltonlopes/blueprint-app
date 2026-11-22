@@ -73,7 +73,7 @@ const DADOS: DadosAgenda = {
 };
 
 describe("painelDoMes", () => {
-  it("conta feitos, não fui e sem registro por categoria e atividade", () => {
+  it("conta feitos, não fiz e sem registro por categoria e atividade", () => {
     const painel = painelDoMes(DADOS, 2026, 9, AGORA);
     expect(painel).toMatchObject({ feitos: 5, naoFui: 1, semRegistro: 14, percentual: 25 });
     expect(painel.grupos.map((g) => [g.categoria, g.feitos])).toEqual([
@@ -140,7 +140,7 @@ describe("Histórico: painel de compromissos do mês (etapa 4)", () => {
     expect(screen.queryByText("Feito: 2, 5 e 7 de outubro")).toBeNull();
     await fireEvent.press(linha);
     expect(screen.getByText("Feito: 2, 5 e 7 de outubro")).toBeTruthy();
-    expect(screen.getByText("Não fui: 9 de outubro")).toBeTruthy();
+    expect(screen.getByText("Não fiz: 9 de outubro")).toBeTruthy();
     expect(screen.getByText("Sem registro: 12, 14 e 16 de outubro")).toBeTruthy();
   });
 

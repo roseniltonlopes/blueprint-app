@@ -11,7 +11,9 @@ Checklist para gerar o `.apk` de release do Blueprint com o EAS Build. A primeir
 | Dados no servidor | RLS em todas as tabelas, cada pessoa só lê e grava as próprias linhas; `anon` sem privilégio (migrações 001 e 002). |
 | Backup do Android | `android.allowBackup: false`: o AsyncStorage (sessão do Supabase e dados pessoais) não vai para o backup do Google nem sai por `adb backup`. Reinstalar o app começa vazio; os dados voltam ao entrar na conta. |
 | Permissões | Câmera e microfone bloqueados no `expo-image-picker`. Declaradas a mais: `SCHEDULE_EXACT_ALARM` e `USE_EXACT_ALARM` (alertas na hora certa). As do `expo-notifications` (notificações e reagendar após reiniciar) vêm do próprio pacote. |
-| Logs | Nenhum `console` imprime token, sessão ou senha. Ferramentas de desenvolvimento só aparecem com `__DEV__`. |
+| Logs | Nenhum `console` imprime token, sessão ou senha. |
+| Dados fictícios | Os dados de exemplo (`src/dev/`, com nomes e lugares reais do caderno do dono) só são carregados por `require` dentro de `if (__DEV__)`; o Metro descarta o bloco no build de produção. Conferido no bundle de produção do Android (veja a seção 5). |
+| LGPD | Aceite dos termos no cadastro (versão gravada pelo servidor), Termos e Política no app e na landing, exclusão da conta e dos dados pelo app (migração 003). Pendências jurídicas em `docs/09`. |
 | Tráfego | Só HTTPS (o Android bloqueia texto claro por padrão). |
 | Dependências | `npm audit --omit=dev`: 3 moderadas no `minimatch` dentro do `@expo/fingerprint` (ferramenta de build, não vai no APK). A correção sugerida rebaixaria o Expo para o SDK 52; não aplicar. |
 | Fonte | Sora, licença OFL (uso comercial livre). A Nohemi não é usada. |
@@ -51,12 +53,24 @@ Cada comando usa a cota de builds da conta Expo. Ao terminar, o EAS mostra o lin
 ## 4. Conferência no aparelho (APK `preview`)
 
 - [ ] Instala e abre sem tela branca; fonte Sora carregada.
-- [ ] Agenda: carregar a agenda, marcar "Feito" e "Não fui", Desfazer, aba "Ontem" (docs/05, F32).
+- [ ] Agenda: carregar a agenda, marcar "Feito" e "Não fiz", Desfazer, aba "Ontem" (docs/05, F32).
 - [ ] Alertas: permitir no Perfil; compromisso com "Avisar antes" toca com o app fechado e a tela bloqueada; botão "Feito" na notificação (F33).
 - [ ] Histórico > Mês: painel de compromissos (F34).
 - [ ] Conta: criar conta, confirmar o e-mail, entrar, ver "Sincronizado às HH:MM"; entrar em outro aparelho e ver o mesmo histórico (etapa 5).
 - [ ] Sem internet: o app segue funcionando e sincroniza quando a conexão volta.
 - [ ] Reiniciar o celular: os alertas continuam agendados.
 - [ ] Modo claro e escuro; TalkBack nos botões principais.
+- [ ] Primeiro acesso: agenda vazia com o aviso "Sua agenda começa vazia"; nenhuma ferramenta "DEV" na tela.
+- [ ] Permissão de notificação só aparece ao salvar um compromisso com aviso, depois da explicação do app.
+- [ ] Criar conta com a caixa de aceite; Termos e Política abrem sem internet.
+- [ ] Excluir a conta pelo Perfil: some do Supabase (Authentication > Users) e o app fica vazio.
 
 Se tudo passar, gerar o perfil `production`, atualizar a página de venda (`landing/`: tirar "Em breve" do que já estiver no APK e preencher `DOWNLOAD_URL` em `landing/script.js`) e marcar a etapa 7 no README.
+
+## 5. O que mudou nos ajustes de 2026-11-22
+
+- "Não fui" virou "Não fiz" em todos os textos. O valor gravado continua `nao_fui` no aparelho e no banco.
+- "Avisar antes" com opções de toque (Sem aviso, Na hora, 5, 10, 15, 30 e 60 min), 10 min por padrão em compromisso novo, também nos avulsos. A permissão de notificação só é pedida ao salvar um aviso, depois de uma explicação do app.
+- Dados de exemplo fora do APK: verificação feita com `npx expo export --platform android` (resultado no relatório da tarefa e abaixo).
+- Termos de Uso e Política de Privacidade (`src/legal/textos.ts`), caixa de aceite no cadastro, telas no app e páginas `landing/termos.html` e `landing/privacidade.html`.
+- Excluir a conta e os dados (função `excluir_minha_conta`, migração 003) e, sem conta, apagar os dados do aparelho.

@@ -87,7 +87,7 @@ A migração **não foi aplicada nem testada** no projeto Supabase. Revise e tes
 
 ## 2.1 Banco atual e sincronização offline-first (etapa 5)
 
-O esquema em uso está em [`supabase/migrations/`](../supabase/migrations/): a `001_schema_inicial.sql` (aplicada pelo dono) cria `perfis`, `acoes`, `atividades`, `agendas`, `compromissos`, `avulsos` e o bucket `avatares`, todas com RLS por usuário (`auth.uid() = user_id`) e sem nenhum acesso para `anon`. A tabela `blueprint_actions` descrita acima é do protótipo e não existe no projeto atual. A `002_registros_e_exclusao.sql` (escrita, **não aplicada**) cria `registros` ("Feito" e "Não fui") e troca a policy de exclusão de ações de 5 minutos por "qualquer ação própria".
+O esquema em uso está em [`supabase/migrations/`](../supabase/migrations/): a `001_schema_inicial.sql` (aplicada pelo dono) cria `perfis`, `acoes`, `atividades`, `agendas`, `compromissos`, `avulsos` e o bucket `avatares`, todas com RLS por usuário (`auth.uid() = user_id`) e sem nenhum acesso para `anon`. A tabela `blueprint_actions` descrita acima é do protótipo e não existe no projeto atual. A `002_registros_e_exclusao.sql` cria `registros` ("Feito" e "Não fiz") e troca a policy de exclusão de ações de 5 minutos por "qualquer ação própria". A `003_termos_avulsos_e_exclusao.sql` (aplicada pelo dono em 2026-11-22) acrescenta o aceite dos termos em `perfis`, o aviso `antecedencia_min` nos avulsos e a função `public.excluir_minha_conta()` (veja abaixo).
 
 **Princípios**
 - A regra de negócio fica no app; o banco guarda e isola por usuário (RLS).
@@ -120,6 +120,13 @@ Outra conta no mesmo aparelho nunca é misturada: o app pede confirmação e tro
 2. Painel do Supabase > SQL Editor > New query > cole `supabase/migrations/002_registros_e_exclusao.sql` > Run (uma vez só).
 3. Rode as consultas do bloco CONFERÊNCIA no fim do arquivo.
 4. Abra o app, entre e confira no Perfil "Sincronizado às HH:MM". Antes da 002, o Perfil mostra "O banco precisa da migração 002" e nada é enviado.
+
+**Migração 003: termos, avisos nos avulsos e exclusão da conta**
+- `perfis.termos_versao` e `perfis.termos_aceitos_em`: gravados só pelo gatilho de cadastro, a partir de `raw_user_meta_data.termos_versao` (o app envia `VERSAO_DOS_TERMOS` de `src/legal/textos.ts` no `signUp`). A data é `now()` do servidor. O app só tem `insert` e `update` nas colunas `id, nome, foto_path, fuso, tema, destaque, meta_diaria`; o upsert do nome na sincronização continua permitido.
+- `avulsos.antecedencia_min` (0 a 120 ou nulo): o conversor de avulsos envia e lê a coluna. Se o banco não tiver a coluna, a sincronização mostra "O banco precisa da migração 003".
+- `public.excluir_minha_conta()`: sem parâmetros, `security definer`, `search_path` vazio, só para `authenticated`. Apaga na ordem `registros`, `acoes`, `avulsos`, `compromissos`, `agendas`, `atividades`, `perfis` e por fim `auth.users` (compromissos e avulsos têm `on delete restrict` para atividades, por isso a ordem explícita). Sem sessão, dispara exceção `42501`.
+- No app (`src/services/contaSupabase.ts`, `excluirConta`): `rpc('excluir_minha_conta')` com a chave publicável (nunca a service_role) e, só se der certo, `signOut({ scope: "local" })`. Em seguida `useSincronizacao().excluirConta()` apaga os dados do aparelho. Função ausente (`PGRST202`/`42883`) vira "O banco precisa da migração 003"; sem internet (`status 0` ou 5xx) vira erro de rede; `42501`/401 vira "sessão expirou". Em qualquer erro nada é apagado.
+- Limitação: o token de acesso já emitido vale até expirar (cerca de 1 hora), mas não há mais usuário nem dados. Arquivos do bucket `avatares` não são apagados pela função (hoje o app não envia fotos).
 
 **Configuração do Auth no painel (dono)**
 - Ligar a proteção contra senhas vazadas (Authentication > Policies/Passwords).

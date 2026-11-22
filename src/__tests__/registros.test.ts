@@ -121,7 +121,7 @@ describe("planejarMarcacao", () => {
     expect(plano.ok && plano.valor.registro?.status).toBe("feito");
   });
 
-  it("Não fui não gera ação", () => {
+  it("Não fiz não gera ação", () => {
     const plano = planejar("nao_fui");
     expect(plano.ok && plano.valor).toMatchObject({
       criarAcao: null,
@@ -130,7 +130,7 @@ describe("planejarMarcacao", () => {
     });
   });
 
-  it("trocar de Feito para Não fui remove a ação e mantém o id do registro", () => {
+  it("trocar de Feito para Não fiz remove a ação e mantém o id do registro", () => {
     const plano = planejar("nao_fui", registro());
     expect(plano.ok && plano.valor).toMatchObject({
       criarAcao: null,
@@ -184,7 +184,7 @@ describe("validarRegistro", () => {
     ["hora inválida", { inicio: "25:00" }],
     ["término antes do início", { fim: "04:00" }],
     ["status desconhecido", { status: "talvez" }],
-    ["ação em registro Não fui", { status: "nao_fui" }],
+    ["ação em registro Não fiz", { status: "nao_fui" }],
     ["instante ilegível", { registradoEm: "ontem" }],
   ])("recusa %s", (_nome, mudanca) => {
     expect(validarRegistro({ ...valido, ...mudanca } as typeof valido)).not.toBeNull();
@@ -225,7 +225,7 @@ describe("remapearRegistros", () => {
 });
 
 describe("resumoDoDia", () => {
-  it("conta feitos, não fui e pendentes só entre os compromissos de agora", () => {
+  it("conta feitos, não fiz e pendentes só entre os compromissos de agora", () => {
     const ocorrencias = [
       ocorrencia(),
       ocorrencia({ chave: "agenda:c2", id: "c2" }),
@@ -246,7 +246,7 @@ describe("resumoDoDia", () => {
 describe("mensagemDaMarcacao", () => {
   it("descreve o que mudou", () => {
     expect(mensagemDaMarcacao("Academia", "feito")).toBe("Feito: Academia");
-    expect(mensagemDaMarcacao("Academia", "nao_fui")).toBe("Não fui: Academia");
+    expect(mensagemDaMarcacao("Academia", "nao_fui")).toBe("Não fiz: Academia");
     expect(mensagemDaMarcacao("Academia", null)).toBe("Registro removido: Academia");
   });
 });

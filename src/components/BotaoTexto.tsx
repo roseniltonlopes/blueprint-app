@@ -8,8 +8,12 @@ type BotaoTextoProps = {
   /** Quando o texto visível não basta para distinguir botões iguais (ex.: um por agenda) */
   rotuloAcessivel?: string;
   aoPressionar: () => void;
-  /** "primario" é o botão preto; "secundario" é o tom de superfície; "link" não tem fundo */
-  variante?: "primario" | "secundario" | "link";
+  /**
+   * "primario" é o botão preto; "secundario" é o tom de superfície; "link" não tem fundo;
+   * "perigo" (ações que apagam dados) tem contorno laranja e texto ink: laranja como texto não
+   * tem contraste no modo claro.
+   */
+  variante?: "primario" | "secundario" | "link" | "perigo";
   /** Bloqueia o toque (por exemplo, enquanto um envio está em andamento) */
   desabilitado?: boolean;
   testID?: string;
@@ -26,6 +30,7 @@ export default function BotaoTexto({
   const { colors } = useTheme();
   const fundo =
     variante === "primario" ? colors.ink : variante === "secundario" ? colors.sunk : "transparent";
+  const contorno = variante === "perigo" ? { borderWidth: 1, borderColor: colors.accent } : null;
 
   return (
     <Pressable
@@ -35,7 +40,7 @@ export default function BotaoTexto({
       disabled={desabilitado}
       onPress={aoPressionar}
       testID={testID}
-      style={[styles.botao, { backgroundColor: fundo, opacity: desabilitado ? 0.6 : 1 }]}
+      style={[styles.botao, contorno, { backgroundColor: fundo, opacity: desabilitado ? 0.6 : 1 }]}
     >
       <Text
         variant="body"

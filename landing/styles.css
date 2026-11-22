@@ -658,6 +658,48 @@ h3 {
   }
 }
 
+/* ---------- Termos de Uso e Política de Privacidade ---------- */
+
+.legal {
+  max-width: 760px;
+  padding-block: clamp(32px, 6vw, 72px);
+}
+
+.legal article {
+  display: grid;
+  gap: 20px;
+}
+
+.legal h1 {
+  font-size: clamp(2rem, 6vw, 2.75rem);
+  line-height: 1.15;
+}
+
+.legal h2 {
+  font-size: 1.125rem;
+  line-height: 1.4;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.legal section {
+  display: grid;
+  gap: 8px;
+  padding: 20px;
+  background: var(--card);
+  border-radius: 22px;
+}
+
+.legal__versao {
+  color: var(--mute);
+  font-size: 0.875rem;
+}
+
+.rodape nav a[aria-current="page"] {
+  color: var(--ink);
+  font-weight: 600;
+}
+
 /* ---------- Rodapé ---------- */
 
 .rodape {

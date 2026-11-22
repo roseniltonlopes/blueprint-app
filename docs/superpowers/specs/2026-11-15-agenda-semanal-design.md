@@ -20,7 +20,7 @@ O asterisco (`*`) do caderno marca um espaço livre onde se pode encaixar outra 
 
 **Objetivos**
 - Agenda semanal com compromissos que têm início e fim, repetem por dia da semana e podem mudar de um mês para outro sem apagar o passado.
-- Registro de cada compromisso com 1 toque ("Feito" ou "Não fui"), para que o histórico seja verdadeiro.
+- Registro de cada compromisso com 1 toque ("Feito" ou "Não fiz"), para que o histórico seja verdadeiro.
 - Alertas locais confiáveis com o app fechado, em um APK Android.
 - Painel de histórico por atividade e por mês.
 - Dados no Supabase por usuário, com o app funcionando sem internet.
@@ -117,7 +117,7 @@ type DadosAgenda = {
 | # | Etapa | Entrega testável |
 | :-: | :--- | :--- |
 | 1 | **Agenda semanal** (este documento, seção 7) | Ver a semana, criar, editar, remover, duplicar para o mês seguinte |
-| 2 | **Registro Feito / Não fui**, Home com os compromissos de hoje, e "Feito" gerando a ação da categoria (seção 8) | Tocar em Feito e ver o dia e o anel da Home andarem; Desfazer |
+| 2 | **Registro Feito / Não fiz**, Home com os compromissos de hoje, e "Feito" gerando a ação da categoria (seção 8) | Tocar em Feito e ver o dia e o anel da Home andarem; Desfazer |
 | 3 | **Alertas locais**: despertar às 4:30, antecedência por compromisso, botão Feito na notificação, permissões Android (notificações, alarme exato, economia de bateria) | Receber o alerta com o app fechado, em APK ou development build |
 | 4 | **Painel de histórico**: contagem por atividade e por mês, comparação entre meses, detalhe dos dias | "Quantas vezes fui à academia em novembro" |
 | 5 | **Supabase**: login, migração com acesso por usuário (RLS), sincronização offline-first, subida dos dados locais | Entrar em outro aparelho e ver o mesmo histórico |
@@ -195,7 +195,7 @@ Reaproveita `theme.ts`, `Card`, `Text`, `Screen`, `SegmentedControl`, `Icon` e a
 - Dia da semana sem compromissos: texto "Nada marcado" e o "+ Adicionar".
 - **Fuso:** até a etapa 5, "hoje", o início da semana e os horários dos alertas e registros seguem o **relógio do aparelho** (regra já vigente em `src/domain/datas.ts`). As funções de `agenda.ts` recebem a data como `Date` e não conhecem fuso. Quando o Supabase entrar, os registros passam a guardar também o fuso IANA do aparelho (`fusoDoAparelho()`), sem mudar a agenda.
 - Troca de horário de verão e virada de dia com o app aberto: usa as funções de data existentes (calendário local).
-- **Dia passado sem registro:** não vira "Não fui" automaticamente. O painel da etapa 4 mostra "feitas" como número principal e, ao lado, "sem registro" para o que estava planejado e não foi marcado. A porcentagem usa as agendas vigentes em cada dia (por isso a divisão "a partir de hoje" existe).
+- **Dia passado sem registro:** não vira "Não fiz" automaticamente. O painel da etapa 4 mostra "feitas" como número principal e, ao lado, "sem registro" para o que estava planejado e não foi marcado. A porcentagem usa as agendas vigentes em cada dia (por isso a divisão "a partir de hoje" existe).
 - Falha ao gravar: aviso no console de desenvolvimento, estado mantido em memória (mesmo padrão das ações).
 
 ### 7.5 Testes
