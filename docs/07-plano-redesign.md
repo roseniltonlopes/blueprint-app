@@ -40,6 +40,8 @@ Decisões tomadas com o dono do trabalho:
 | `sunk` | `#EDEAE4` | `#26231F` |
 | `ink` | `#17140F` | `#F1EEE8` |
 | `onInk` | `#F6F4F0` | `#0F0E0C` |
+| `onInkMute` | `#BDB7AD` | `#5F5A52` |
+| `onInkTrack` | `rgba(246,244,240,0.16)` | `rgba(15,14,12,0.12)` |
 | `mute` | `#5F5A52` | `#A39D93` |
 | `hair` | `rgba(23,20,15,0.10)` | `rgba(241,238,232,0.12)` |
 | `accent` | `#FF4B00` | `#FF4B00` |
@@ -123,3 +125,17 @@ Problema: a lista mostrava cada ação de cada dia (mais de cem linhas) e a vis�
 - **Armazenamento:** `PerfilRepository` local (`blueprint:perfil`), no mesmo padrão da agenda, com `PerfilProvider` e `usePerfil`. Ao ligar a conta na nuvem, a foto deve migrar para um bucket do Supabase Storage em vez de ir dentro da linha do banco.
 - **Visual:** cartão de identidade centralizado, e as configurações agrupadas em cartões ("Aparência" e "Sobre").
 - **Ainda não exercitado em aparelho real:** o seletor de fotos foi testado com simulação e a edição do nome foi conferida no navegador. Escolher e recortar uma foto de verdade precisa ser testado no celular (Expo Go ou build).
+
+## 9. Novos componentes criados no redesign
+
+- `CartaoAgora`: mostra o compromisso atual da agenda, tempo restante e barra fina de progresso sobre fundo `ink`.
+- `CartaoProgresso`: anel compacto com `${total} de ${meta} ações hoje` e selo de sequência com ícone de chama.
+- `RegistroRapido`: chips compactos para registrar hábitos com 1 toque imediato, com feedback háptico e toast de Desfazer.
+- `CargaDaSemana`: cartão "Sua semana" na Agenda, com quantos compromissos caem em cada dia e o dia de hoje destacado.
+- `BotaoFlutuante`: botão flutuante com elevação para ação rápida ("Novo compromisso").
+- `DestaqueDoMes` e `GraficoDoMes`: cards da visão mensal do Histórico com visual moderno e métricas consolidadas.
+- `LegendaDeIntensidade`: escala compartilhada entre calendário e mapa de calor.
+- `CartaoDeConquistas`: conquistas previstas na etapa 6, mostradas bloqueadas como "Em breve".
+- `SeletorDeAntecedencia`: ajuste de antecedência para alertas com botões − e + de 5 em 5 minutos.
+- `HojeNaAgenda` (refeito): linha do tempo do dia; tocar na bolinha marca Feito, deslizar para a direita marca Feito e para a esquerda Não fui.
+- Base: `PressableEscala` com retorno tátil (`expo-haptics`), marcador deslizante na `BarraDeAbas`, pílula deslizante no `SegmentedControl`, `Gradiente` horizontal e `Screen` com botão flutuante.

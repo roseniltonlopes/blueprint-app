@@ -14,9 +14,9 @@ Lista das funções do **Blueprint**, com a situação real de cada uma e o crit
 
 | ID | Função | Tela | Situação | Fase (A1 a A4: etapas da agenda) |
 | :-: | :--- | :--- | :--- | :-: |
-| F01 | Selecionar uma entre 5 categorias (Hidratação, Exercício, Descanso, Estudo, Outro) | Home | 🟡 Parcial: seleção única com `useState` e `BotaoOpcao` | 2 |
-| F02 | Registrar ação da categoria selecionada com 1 toque | Home | 🟡 Parcial: incrementa o contador, mas não valida a categoria (veja a seção 3) | 2 |
-| F03 | Contador de ações do dia | Home | 🟡 Parcial: número simples em memória, sem meta | 2 |
+| F01 | Seleção e registro rápido por categorias (Hidratação, Exercício, Descanso, Estudo, Outro) | Home | ✅ Implementado: 1 toque no chip registra direto | 2 |
+| F02 | Registrar ação com 1 toque no chip e aviso com Desfazer | Home | ✅ Implementado | 2 |
+| F03 | Contador de ações do dia no anel compacto | Home | ✅ Implementado | 2 |
 | F04 | Anel de progresso com meta diária de 5 ações | Home | 🧪 Desenhado, meta é proposta | 2 |
 | F05 | Contador por categoria no cartão ("2 hoje") | Home | 🎨 Desenhado | 2 |
 | F06 | "Outro" com nome livre e sugestões rápidas | Home | 🎨 Desenhado (hoje só seleciona a categoria "Outro") | 2 |
@@ -78,14 +78,11 @@ Lista das funções do **Blueprint**, com a situação real de cada uma e o crit
 
 ## 3. Critérios de aceite
 
-### F01 e F02: seleção e registro
-- [ ] Ao abrir a Home, nenhuma categoria está selecionada e o botão principal está **desabilitado** com o texto "Escolha uma categoria para registrar".
-- [ ] Tocar em uma categoria a destaca (cartão invertido com selo) e habilita o botão com o texto "Registrar {categoria}".
-- [ ] Tocar em outra categoria move o destaque. Só uma categoria fica selecionada por vez.
-- [ ] Tocar em "Registrar" cria **uma** ação, incrementa o contador do dia e o contador da categoria, anima o anel, mostra o toast e **limpa a seleção**.
-- [ ] Toques repetidos e rápidos em "Registrar" não criam registros duplicados além dos tocados (o botão fica desabilitado até a resposta local).
-
-> **Defeito conhecido no código atual:** `registrarAcaoNoPlano()` em `BlueprintHomeScreen.js` incrementa `quantidade` mesmo quando `categoria` ainda é o texto inicial `"Nenhuma categoria selecionada"`, e nunca limpa a seleção. O critério acima corrige os dois pontos.
+### F01 a F03: registro rápido com 1 toque
+- [x] Tocar em um chip de categoria padrão (Hidratação, Exercício, Descanso, Estudo) registra imediatamente a ação.
+- [x] O chip "Outro" abre o bottom sheet para definir o nome antes de registrar.
+- [x] O contador do dia e o anel de progresso atualizam instantaneamente.
+- [x] Um toast de aviso com o botão "Desfazer" permite reverter a ação imediatamente.
 
 ### F06: "Outro"
 - [ ] Tocar em "Outro" abre o bottom sheet com o campo focado.
