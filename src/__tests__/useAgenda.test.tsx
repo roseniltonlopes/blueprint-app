@@ -42,7 +42,7 @@ const compromisso: Compromisso = {
 };
 
 function comAgenda(agenda: Agenda = agendaDeOutubro([compromisso])): DadosAgenda {
-  return { atividades: [academia], agendas: [agenda], avulsos: [] };
+  return { atividades: [academia], agendas: [agenda], avulsos: [], registros: [] };
 }
 
 function repositorioFalso() {
@@ -58,7 +58,7 @@ const SEXTA = new Date(2026, 9, 16);
 describe("useAgenda", () => {
   it("cria atividade e compromisso e devolve a ocorrência do dia", async () => {
     await renderComTema(<Sonda />, {
-      agenda: { atividades: [], agendas: [agendaDeOutubro()], avulsos: [] },
+      agenda: { atividades: [], agendas: [agendaDeOutubro()], avulsos: [], registros: [] },
     });
     let atividadeId = "";
     await act(async () => {

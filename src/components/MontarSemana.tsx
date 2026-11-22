@@ -4,6 +4,7 @@ import {
   agendaEmCurso,
   compromissosEmConflito,
   dataDaChave,
+  rotuloDoHorario,
   type Agenda,
   type Avulso,
   type Compromisso,
@@ -29,10 +30,6 @@ type MontarSemanaProps = {
 };
 
 type ErroDeLinha = { compromissoId: string; texto: string };
-
-function horarioDe(horario: { inicio: string; fim: string | null }): string {
-  return horario.fim === null ? horario.inicio : `${horario.inicio} a ${horario.fim}`;
-}
 
 /**
  * Semana modelo: uma linha por compromisso, com os sete dias ao lado. Tocar num dia liga ou
@@ -99,7 +96,7 @@ export default function MontarSemana({
         ordenados.map((compromisso) => {
           const atividade = atividades.get(compromisso.atividadeId);
           const nome = atividade?.nome ?? "Atividade removida";
-          const horario = horarioDe(compromisso);
+          const horario = rotuloDoHorario(compromisso);
           const emConflito = conflitos.has(compromisso.id);
           return (
             <Card key={compromisso.id} style={styles.cartao}>
@@ -153,7 +150,7 @@ export default function MontarSemana({
             const nome = atividades.get(avulso.atividadeId)?.nome ?? "Atividade removida";
             const data = dataDaChave(avulso.data);
             const dia = data ? formatarDataCabecalho(data) : avulso.data;
-            const horario = horarioDe(avulso);
+            const horario = rotuloDoHorario(avulso);
             return (
               <Card key={avulso.id}>
                 <Pressable

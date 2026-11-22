@@ -48,6 +48,7 @@ function dados(extra: Partial<DadosAgenda> = {}): DadosAgenda {
     atividades: [academia, trabalho, aula],
     agendas: [novembro()],
     avulsos: [],
+    registros: [],
     ...extra,
   };
 }

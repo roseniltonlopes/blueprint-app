@@ -1,5 +1,6 @@
 import { CATEGORIAS, type CategoriaId } from "./categorias";
 import { MESES, chaveDoDia, somarDias } from "./datas";
+import type { RegistroCompromisso } from "./registros";
 
 /** 0 = domingo, como em `Date.getDay()`. */
 export type DiaDaSemana = 0 | 1 | 2 | 3 | 4 | 5 | 6;
@@ -59,11 +60,18 @@ export type DadosAgenda = {
   atividades: Atividade[];
   agendas: Agenda[];
   avulsos: Avulso[];
+  /** "Feito" e "Não fui" de cada compromisso por dia (src/domain/registros.ts) */
+  registros: RegistroCompromisso[];
 };
 
 export type Resultado<T> = { ok: true; valor: T } | { ok: false; erro: string };
 
-export const DADOS_AGENDA_VAZIOS: DadosAgenda = { atividades: [], agendas: [], avulsos: [] };
+export const DADOS_AGENDA_VAZIOS: DadosAgenda = {
+  atividades: [],
+  agendas: [],
+  avulsos: [],
+  registros: [],
+};
 
 export const NOME_ATIVIDADE_MAX = 40;
 export const DETALHE_MAX = 60;
@@ -78,6 +86,11 @@ const PADRAO_DATA = /^(\d{4})-(\d{2})-(\d{2})$/;
 
 export function horaValida(hora: string): boolean {
   return PADRAO_HORA.test(hora);
+}
+
+/** "05:00 a 06:00", ou só "20:00" para evento sem término. */
+export function rotuloDoHorario(horario: { inicio: string; fim: string | null }): string {
+  return horario.fim === null ? horario.inicio : `${horario.inicio} a ${horario.fim}`;
 }
 
 /** Minutos desde a meia-noite de uma hora já validada. */

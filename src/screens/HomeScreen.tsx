@@ -1,3 +1,4 @@
+import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
@@ -5,6 +6,7 @@ import BotaoAcao from "../components/BotaoAcao";
 import BotaoOpcao from "../components/BotaoOpcao";
 import CartaoProgresso from "../components/CartaoProgresso";
 import ChaveDeTema from "../components/ChaveDeTema";
+import HojeNaAgenda from "../components/HojeNaAgenda";
 import OutraAcaoSheet from "../components/OutraAcaoSheet";
 import Toast from "../components/Toast";
 import type { Acao } from "../domain/acoes";
@@ -15,15 +17,20 @@ import {
   type CategoriaId,
 } from "../domain/categorias";
 import { formatarDataCabecalho, formatarHora } from "../domain/datas";
+import { mensagemDaMarcacao } from "../domain/registros";
 import { useAcoes } from "../hooks/useAcoes";
+import { useAgenda, type Marcacao } from "../hooks/useAgenda";
+import type { AbasParamList } from "../navigation/Abas";
 import { SPACING } from "../styles/theme";
 import { cascata, entrada } from "../ui/motion";
 import { Screen } from "../ui/Screen";
 import { Text } from "../ui/Text";
 
 type Confirmacao = {
-  acaoId: string;
+  /** Muda a cada confirmação, para o toast reiniciar a contagem */
+  chave: number;
   mensagem: string;
+  desfazer: () => void;
 };
 
 function mensagemDeConfirmacao(acao: Acao): string {
@@ -31,12 +38,17 @@ function mensagemDeConfirmacao(acao: Acao): string {
   return `${nome} registrado às ${formatarHora(new Date(acao.criadoEm))}`;
 }
 
-/** Home (docs/03, telas 2 a 5; docs/05, F01 a F07 e F09). */
-export default function HomeScreen() {
+/** Fora do navegador (testes da tela isolada) não há `navigation`; o convite fica sem botão. */
+type HomeScreenProps = Partial<BottomTabScreenProps<AbasParamList, "Hoje">>;
+
+/** Home (docs/03, telas 2 a 5; docs/05, F01 a F07, F09 e F32). */
+export default function HomeScreen({ navigation }: HomeScreenProps) {
   const { totalHoje, porCategoriaHoje, meta, registrar, remover, relogio } = useAcoes();
+  const { desfazerMarcacao } = useAgenda();
   const [selecionada, setSelecionada] = useState<CategoriaId | null>(null);
   const [sheetAberto, setSheetAberto] = useState(false);
   const [confirmacao, setConfirmacao] = useState<Confirmacao | null>(null);
+  const contadorDeConfirmacoes = useRef(0);
   // Bloqueia toques repetidos antes do React aplicar a limpeza da seleção.
   const registrando = useRef(false);
 
@@ -44,8 +56,20 @@ export default function HomeScreen() {
     registrando.current = false;
   }, [selecionada]);
 
+  function confirmar(mensagem: string, desfazer: () => void) {
+    contadorDeConfirmacoes.current += 1;
+    setConfirmacao({ chave: contadorDeConfirmacoes.current, mensagem, desfazer });
+  }
+
   function confirmarRegistro(acao: Acao) {
-    setConfirmacao({ acaoId: acao.id, mensagem: mensagemDeConfirmacao(acao) });
+    confirmar(mensagemDeConfirmacao(acao), () => remover(acao.id));
+  }
+
+  function confirmarMarcacao(marcacao: Marcacao) {
+    const nome = marcacao.atual?.nomeAtividade ?? marcacao.anterior?.nomeAtividade ?? "";
+    confirmar(mensagemDaMarcacao(nome, marcacao.atual?.status ?? null), () =>
+      desfazerMarcacao(marcacao),
+    );
   }
 
   function aoRegistrar() {
@@ -68,9 +92,7 @@ export default function HomeScreen() {
   }
 
   function desfazer() {
-    if (confirmacao) {
-      remover(confirmacao.acaoId);
-    }
+    confirmacao?.desfazer();
     setConfirmacao(null);
   }
 
@@ -89,7 +111,7 @@ export default function HomeScreen() {
           {confirmacao ? (
             <View style={styles.areaToast} pointerEvents="box-none">
               <Toast
-                key={confirmacao.acaoId}
+                key={confirmacao.chave}
                 mensagem={confirmacao.mensagem}
                 aoDesfazer={desfazer}
                 aoSumir={fecharToast}
@@ -118,6 +140,13 @@ export default function HomeScreen() {
 
       <Animated.View entering={entrada(80)} style={styles.progresso}>
         <CartaoProgresso total={totalHoje} meta={meta} />
+      </Animated.View>
+
+      <Animated.View entering={entrada(120)} style={styles.agenda}>
+        <HojeNaAgenda
+          aoMarcar={confirmarMarcacao}
+          aoMontarAgenda={navigation ? () => navigation.navigate("Agenda") : undefined}
+        />
       </Animated.View>
 
       <Animated.View entering={entrada(160)}>
@@ -176,6 +205,7 @@ const styles = StyleSheet.create({
   },
   saudacao: { flex: 1, minWidth: 0 },
   progresso: { marginTop: 18 },
+  agenda: { marginTop: 22 },
   tituloSecao: { marginTop: 22, marginBottom: 10 },
   grade: { gap: SPACING.gap },
   linhaGrade: { flexDirection: "row", gap: SPACING.gap },

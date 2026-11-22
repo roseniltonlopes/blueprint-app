@@ -36,6 +36,8 @@ export type UseAcoes = {
   relogio: Relogio;
   registrar: (categoria: CategoriaId, rotulo?: string) => Acao;
   remover: (id: string) => void;
+  /** Recoloca uma ação removida, com o mesmo id e horário (Desfazer) */
+  restaurar: (acao: Acao) => void;
   substituir: (acoes: Acao[]) => void;
 };
 
@@ -88,6 +90,7 @@ export function AcoesProvider({
     [relogio],
   );
   const remover = useCallback((id: string) => despachar({ tipo: "remover", id }), []);
+  const restaurar = useCallback((acao: Acao) => despachar({ tipo: "registrar", acao }), []);
   const substituir = useCallback((acoes: Acao[]) => despachar({ tipo: "substituir", acoes }), []);
 
   const valor = useMemo<UseAcoes>(
@@ -100,9 +103,20 @@ export function AcoesProvider({
       relogio,
       registrar,
       remover,
+      restaurar,
       substituir,
     }),
-    [estado.acoes, hoje, porCategoriaHoje, meta, relogio, registrar, remover, substituir],
+    [
+      estado.acoes,
+      hoje,
+      porCategoriaHoje,
+      meta,
+      relogio,
+      registrar,
+      remover,
+      restaurar,
+      substituir,
+    ],
   );
 
   return <AcoesContext.Provider value={valor}>{children}</AcoesContext.Provider>;

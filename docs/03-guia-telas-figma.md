@@ -101,6 +101,13 @@ Os arquivos `docs/assets/blueprint_mvp_screens.jpg` e `docs/figma/blueprint_ui_k
 - Por agenda: **Duplicar para o próximo mês**, **Editar período** e **Remover**.
 - **Nova agenda** abre o formulário com o mês atual preenchido.
 
+### 📱 Home: seção "Hoje na agenda" (etapa 2, sem prancha no canvas)
+- Fica entre o cartão de progresso e "O que você fez agora?".
+- **Cabeçalho:** "Hoje na agenda" e, à direita, "Feitos: 2 de 5".
+- **Cartão por compromisso de hoje:** ícone da atividade, nome, horário ("05:00 a 06:00" ou só "20:00") e detalhe. Embaixo, dois botões de largura igual: **Feito** (marcado: fundo laranja, texto preto e selo de confirmação) e **Não fui** (marcado: fundo `ink`, texto `onInk`). Desmarcados usam `sunk`.
+- **Toast:** o mesmo da Home, com "Feito: Academia", "Não fui: Academia" ou "Registro removido: Academia" e **Desfazer**.
+- **Sem agenda para hoje:** cartão "Sem agenda para hoje", texto de apoio e **Montar agenda** (abre a aba Agenda). **Com agenda e nada hoje:** "Nada marcado para hoje.".
+
 ---
 
 ## 3. Como exportar imagens das telas para este repositório

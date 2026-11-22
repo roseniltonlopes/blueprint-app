@@ -3,6 +3,7 @@ import { criarAcoesRepositoryLocal } from "../data/AcoesRepository";
 import { criarArmazenamentoEmMemoria } from "../data/armazenamento";
 import { criarAcao } from "../domain/acoes";
 import { AcoesProvider } from "../hooks/useAcoes";
+import { AgendaProvider } from "../hooks/useAgenda";
 import { PerfilProvider } from "../hooks/usePerfil";
 import HomeScreen from "../screens/HomeScreen";
 import PerfilScreen from "../screens/PerfilScreen";
@@ -26,7 +27,9 @@ describe("AcoesProvider com repositório", () => {
       <SafeAreaProvider initialMetrics={METRICAS}>
         <ThemeProvider initialMode="light">
           <AcoesProvider relogio={relogioFixo()} acoesIniciais={[existente]} repositorio={repo}>
-            <HomeScreen />
+            <AgendaProvider>
+              <HomeScreen />
+            </AgendaProvider>
           </AcoesProvider>
         </ThemeProvider>
       </SafeAreaProvider>,
@@ -47,7 +50,9 @@ describe("AcoesProvider com repositório", () => {
       <SafeAreaProvider initialMetrics={METRICAS}>
         <ThemeProvider initialMode="light">
           <AcoesProvider relogio={relogioFixo()} meta={8}>
-            <HomeScreen />
+            <AgendaProvider>
+              <HomeScreen />
+            </AgendaProvider>
           </AcoesProvider>
         </ThemeProvider>
       </SafeAreaProvider>,

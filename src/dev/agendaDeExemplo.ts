@@ -73,5 +73,6 @@ export function gerarAgendaDeExemplo(novoId: () => string, agora: Date): DadosAg
       },
     ],
     avulsos: [],
+    registros: [],
   };
 }

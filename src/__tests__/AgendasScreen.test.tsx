@@ -65,7 +65,12 @@ const avulso: Avulso = {
   fim: null,
 };
 
-const DADOS: DadosAgenda = { atividades: [academia], agendas: [novembro], avulsos: [avulso] };
+const DADOS: DadosAgenda = {
+  atividades: [academia],
+  agendas: [novembro],
+  avulsos: [avulso],
+  registros: [],
+};
 
 // AGORA nos testes é sábado, 17/10/2026.
 async function abrir(params?: RaizParamList["Agendas"], dados: DadosAgenda = DADOS) {
@@ -89,7 +94,7 @@ describe("AgendasScreen: lista", () => {
   });
 
   it("explica que não há agendas quando a lista está vazia", async () => {
-    await abrir(undefined, { atividades: [], agendas: [], avulsos: [] });
+    await abrir(undefined, { atividades: [], agendas: [], avulsos: [], registros: [] });
     expect(screen.getByText("Nenhuma agenda ainda")).toBeTruthy();
   });
 });

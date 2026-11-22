@@ -116,6 +116,7 @@ const DADOS: DadosAgenda = {
   atividades: [academia, aula],
   agendas: [outubro, novembro],
   avulsos: [avulso],
+  registros: [],
 };
 
 async function abrir(params?: RaizParamList["Compromisso"], dados: DadosAgenda = DADOS) {

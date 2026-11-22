@@ -45,7 +45,7 @@ Lista das funções do **Blueprint**, com a situação real de cada uma e o crit
 | F29 | Editar ou remover "a partir de hoje" numa agenda em curso, sem alterar os dias passados | Compromisso | ✅ Implementado (agenda, etapa 1) | A1 |
 | F30 | Catálogo de atividades com categoria opcional (Academia, Corrida em Exercício) | Compromisso | ✅ Implementado (agenda, etapa 1) | A1 |
 | F31 | Agenda salva no aparelho, versionada, com dado corrompido guardado à parte | Todas | ✅ Implementado (agenda, etapa 1) | A1 |
-| F32 | Registrar "Feito" e "Não fui" em cada compromisso, com Desfazer; "Feito" gera a ação da categoria | Agenda e Hoje | 🎨 Planejado | A2 |
+| F32 | Registrar "Feito" e "Não fui" em cada compromisso, com Desfazer; "Feito" gera a ação da categoria | Hoje | ✅ Implementado (agenda, etapa 2; só o dia de hoje) | A2 |
 | F33 | Alertas locais: despertar, antecedência por compromisso, botão "Feito" na notificação | Todas | 🎨 Planejado | A3 |
 | F34 | Painel de histórico por categoria, atividade e mês, com comparação entre meses | Histórico | 🎨 Planejado | A4 |
 
@@ -64,6 +64,11 @@ Lista das funções do **Blueprint**, com a situação real de cada uma e o crit
 | **Intensidade** | 0, 1 a 2, 3 a 4, 5, 6 ou mais ações, mapeadas para os 4 níveis da rampa de cor. |
 | **Desfazer** | Remove a última ação registrada, disponível por 5 minutos (regra reforçada na policy de exclusão da migração proposta). |
 | **Desfazer e contadores** | Ao desfazer, contador, anel, calendário e histórico são recalculados. |
+| **Registro de compromisso** | No máximo um por compromisso por dia, com status "Feito" ou "Não fui". Guarda cópia do nome da atividade, da categoria e do horário: editar ou apagar a agenda depois não muda o passado. |
+| **Sem registro** | Compromisso não marcado continua "sem registro". Nunca vira "Não fui" sozinho. |
+| **Dia do registro** | Hoje ou dia passado; dia futuro é recusado. Na etapa 2 a tela só marca o dia de hoje. |
+| **Feito e hábitos** | "Feito" de atividade com categoria também cria uma ação dessa categoria (rótulo só no "Outro", com o nome da atividade). Sair de "Feito" remove essa ação. Atividade sem categoria só gera o registro. |
+| **Tocar de novo** | Tocar no status já marcado desmarca. O toast permite desfazer qualquer marcação, voltando registro e ação ao estado anterior. |
 
 ---
 
@@ -122,6 +127,17 @@ Lista das funções do **Blueprint**, com a situação real de cada uma e o crit
 - [ ] Duas agendas nunca se sobrepõem em datas.
 - [ ] Fechar o app por completo e reabrir mantém atividades, agendas e avulsos.
 - [ ] Dado ilegível no aparelho não derruba o app: a agenda abre vazia e o conteúdo é guardado à parte.
+
+### F32: registro "Feito" e "Não fui" (etapa 2)
+- [ ] A Home mostra "Hoje na agenda" com os compromissos de hoje (recorrentes e avulsos) em ordem de horário e o resumo "Feitos: X de Y".
+- [ ] Cada compromisso tem "Feito" e "Não fui", com 44 de altura e leitor de tela anunciando atividade, horário e se está marcado.
+- [ ] "Feito" em atividade com categoria anda o anel e o contador da categoria; em atividade sem categoria, só o resumo da agenda muda.
+- [ ] "Não fui" não conta como feito e não cria ação.
+- [ ] Trocar de "Feito" para "Não fui" remove a ação; tocar de novo no status marcado desmarca.
+- [ ] Toda marcação mostra o toast com "Desfazer", que restaura o registro e a ação anteriores (com o mesmo id e horário).
+- [ ] Editar a agenda "a partir de hoje" mantém a marcação de hoje.
+- [ ] Sem agenda para hoje, aparece "Sem agenda para hoje" com o botão "Montar agenda", que abre a aba Agenda. Com agenda e nada hoje, aparece "Nada marcado para hoje.".
+- [ ] Fechar e reabrir o app mantém as marcações. A agenda gravada na versão 1 abre sem perda, com a lista de registros vazia.
 
 ---
 

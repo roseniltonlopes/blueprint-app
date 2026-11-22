@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import type { AgendaRepository } from "../data/AgendaRepository";
-import { gerarIdLocal } from "../domain/acoes";
+import { gerarIdLocal, type Acao } from "../domain/acoes";
 import {
   DADOS_AGENDA_VAZIOS,
   agendaDaData,
@@ -32,9 +32,28 @@ import {
   type Resultado,
 } from "../domain/agenda";
 import type { CategoriaId } from "../domain/categorias";
+import { chaveDoDia } from "../domain/datas";
+import {
+  planejarMarcacao,
+  registroDaOcorrencia,
+  remapearRegistros,
+  substituirRegistro,
+  type RegistroCompromisso,
+  type StatusDoRegistro,
+} from "../domain/registros";
 import { useAcoes, type Relogio } from "./useAcoes";
 
 export type EscopoDaEdicao = "periodo" | "a-partir-de-hoje";
+
+/** O que uma marcação mudou, para o Desfazer voltar exatamente ao estado anterior. */
+export type Marcacao = {
+  chave: string;
+  data: string;
+  anterior: RegistroCompromisso | null;
+  atual: RegistroCompromisso | null;
+  acaoCriada: Acao | null;
+  acaoRemovida: Acao | null;
+};
 export type CompromissoRascunho = Omit<Compromisso, "id"> & { id?: string };
 export type AvulsoRascunho = Omit<Avulso, "id"> & { id?: string };
 export type PeriodoDaAgenda = { nome: string; inicio: string; fim: string };
@@ -66,6 +85,13 @@ export type UseAgenda = {
   editarAgenda: (id: string, periodo: PeriodoDaAgenda) => Resultado<void>;
   removerAgenda: (id: string) => Resultado<void>;
   duplicarAgenda: (id: string) => Resultado<Agenda>;
+  registroDe: (chaveDaOcorrencia: string, data: Date) => RegistroCompromisso | undefined;
+  /**
+   * Marca "Feito" ou "Não fui" em um compromisso de hoje (tocar de novo no mesmo desmarca).
+   * "Feito" de atividade com categoria também registra a ação de hábito.
+   */
+  marcar: (chaveDaOcorrencia: string, status: StatusDoRegistro) => Resultado<Marcacao>;
+  desfazerMarcacao: (marcacao: Marcacao) => void;
   /** Só para a ferramenta de desenvolvimento. */
   substituir: (dados: DadosAgenda) => void;
 };
@@ -103,7 +129,7 @@ export function AgendaProvider({
   repositorio,
   gerarId = gerarIdPadrao,
 }: AgendaProviderProps) {
-  const { relogio } = useAcoes();
+  const { relogio, acoes, registrar, remover, restaurar } = useAcoes();
   const [dados, setDados] = useState<DadosAgenda>(agendaInicial);
   // Chamadas seguidas no mesmo ciclo precisam enxergar o estado mais novo.
   const atual = useRef(dados);
@@ -157,15 +183,24 @@ export function AgendaProvider({
     [aplicar],
   );
 
-  /** Agendas depois da divisão (se couber) e a agenda onde a mudança deve ser aplicada. */
+  /**
+   * Agendas depois da divisão (se couber), a agenda onde a mudança deve ser aplicada e os
+   * registros de hoje em diante já apontando para as cópias dos compromissos.
+   */
   const prepararEscopo = useCallback(
     (base: DadosAgenda, agenda: Agenda, escopo: EscopoDaEdicao) => {
-      if (escopo !== "a-partir-de-hoje" || !agendaEmCurso(agenda, relogio())) {
-        return { agendas: base.agendas, alvo: agenda, idsNovos: null };
+      const hoje = relogio();
+      if (escopo !== "a-partir-de-hoje" || !agendaEmCurso(agenda, hoje)) {
+        return { agendas: base.agendas, alvo: agenda, idsNovos: null, registros: base.registros };
       }
-      const { anterior, nova, idsNovos } = dividirAPartirDe(agenda, relogio(), gerarId);
+      const { anterior, nova, idsNovos } = dividirAPartirDe(agenda, hoje, gerarId);
       const agendas = base.agendas.map((a) => (a.id === agenda.id ? anterior : a));
-      return { agendas: [...agendas, nova], alvo: nova, idsNovos };
+      return {
+        agendas: [...agendas, nova],
+        alvo: nova,
+        idsNovos,
+        registros: remapearRegistros(base.registros, idsNovos, chaveDoDia(hoje)),
+      };
     },
     [gerarId, relogio],
   );
@@ -182,7 +217,7 @@ export function AgendaProvider({
       const erro = validarCompromisso(conteudo);
       if (erro !== null) return falha(erro);
 
-      const { agendas, alvo, idsNovos } = prepararEscopo(base, agenda, escopo);
+      const { agendas, alvo, idsNovos, registros } = prepararEscopo(base, agenda, escopo);
       const idNoAlvo = id === undefined ? undefined : (idsNovos?.[id] ?? id);
       if (idNoAlvo !== undefined && !alvo.compromissos.some((c) => c.id === idNoAlvo)) {
         return falha("Compromisso não encontrado");
@@ -194,6 +229,7 @@ export function AgendaProvider({
           : alvo.compromissos.map((c) => (c.id === idNoAlvo ? compromisso : c));
       aplicar({
         ...base,
+        registros,
         agendas: ordenarAgendas(
           agendas.map((a) => (a.id === alvo.id ? { ...alvo, compromissos } : a)),
         ),
@@ -208,7 +244,7 @@ export function AgendaProvider({
       const base = atual.current;
       const agenda = base.agendas.find((a) => a.id === agendaId);
       if (!agenda) return falha("Agenda não encontrada");
-      const { agendas, alvo, idsNovos } = prepararEscopo(base, agenda, escopo);
+      const { agendas, alvo, idsNovos, registros } = prepararEscopo(base, agenda, escopo);
       const idNoAlvo = idsNovos?.[compromissoId] ?? compromissoId;
       if (!alvo.compromissos.some((c) => c.id === idNoAlvo)) {
         return falha("Compromisso não encontrado");
@@ -216,6 +252,7 @@ export function AgendaProvider({
       const compromissos = alvo.compromissos.filter((c) => c.id !== idNoAlvo);
       aplicar({
         ...base,
+        registros,
         agendas: ordenarAgendas(
           agendas.map((a) => (a.id === alvo.id ? { ...alvo, compromissos } : a)),
         ),
@@ -312,6 +349,69 @@ export function AgendaProvider({
     [aplicar, gerarId],
   );
 
+  const registroDe = useCallback<UseAgenda["registroDe"]>(
+    (chave, data) => registroDaOcorrencia(dados.registros, chave, chaveDoDia(data)),
+    [dados],
+  );
+
+  const marcar = useCallback<UseAgenda["marcar"]>(
+    (chave, tocado) => {
+      const base = atual.current;
+      const agora = relogio();
+      const data = chaveDoDia(agora);
+      // A ocorrência vem da agenda atual, não da tela: o registro copia o nome de agora.
+      const ocorrencia = ocorrenciasDoDia(base, agora).find((o) => o.chave === chave);
+      if (!ocorrencia) return falha("Compromisso não encontrado na agenda de hoje");
+      const anterior = registroDaOcorrencia(base.registros, chave, data) ?? null;
+      const plano = planejarMarcacao({
+        ocorrencia,
+        data,
+        anterior,
+        tocado,
+        agora,
+        novoId: gerarId,
+      });
+      if (!plano.ok) return plano;
+
+      const { criarAcao, removerAcaoId } = plano.valor;
+      let registro = plano.valor.registro;
+      let acaoCriada: Acao | null = null;
+      if (criarAcao !== null && registro !== null) {
+        acaoCriada = registrar(criarAcao.categoria, criarAcao.rotulo);
+        registro = { ...registro, acaoId: acaoCriada.id };
+      }
+      // A ação pode já ter sido apagada pela pessoa; então não há o que recolocar no Desfazer.
+      const acaoRemovida =
+        removerAcaoId === null ? null : (acoes.find((a) => a.id === removerAcaoId) ?? null);
+      if (removerAcaoId !== null) remover(removerAcaoId);
+
+      aplicar({ ...base, registros: substituirRegistro(base.registros, chave, data, registro) });
+      return {
+        ok: true,
+        valor: { chave, data, anterior, atual: registro, acaoCriada, acaoRemovida },
+      };
+    },
+    [acoes, aplicar, gerarId, registrar, relogio, remover],
+  );
+
+  const desfazerMarcacao = useCallback<UseAgenda["desfazerMarcacao"]>(
+    (marcacao) => {
+      const base = atual.current;
+      aplicar({
+        ...base,
+        registros: substituirRegistro(
+          base.registros,
+          marcacao.chave,
+          marcacao.data,
+          marcacao.anterior,
+        ),
+      });
+      if (marcacao.acaoCriada !== null) remover(marcacao.acaoCriada.id);
+      if (marcacao.acaoRemovida !== null) restaurar(marcacao.acaoRemovida);
+    },
+    [aplicar, remover, restaurar],
+  );
+
   const valor = useMemo<UseAgenda>(
     () => ({
       dados,
@@ -328,9 +428,15 @@ export function AgendaProvider({
       editarAgenda,
       removerAgenda,
       duplicarAgenda,
+      registroDe,
+      marcar,
+      desfazerMarcacao,
       substituir: aplicar,
     }),
     [
+      registroDe,
+      marcar,
+      desfazerMarcacao,
       dados,
       relogio,
       ocorrenciasDe,

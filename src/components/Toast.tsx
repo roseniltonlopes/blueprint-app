@@ -46,7 +46,7 @@ export default function Toast({
       </Text>
       <Pressable
         accessibilityRole="button"
-        accessibilityHint="Remove a ação que acabou de ser registrada"
+        accessibilityHint="Desfaz o que acabou de ser registrado"
         onPress={aoDesfazer}
         style={styles.desfazer}
       >

@@ -69,7 +69,7 @@ A branch `main` recebe o código quando cada etapa estiver concluída. Na visual
 
 - [x] **Base (etapas 0 a 6 anteriores):** projeto Expo com TypeScript, fundação visual, Home, anel e animações, navegação, Calendário, Perfil e persistência local.
 - [x] **1. Agenda semanal:** compromissos com início e fim, agendas por período, espaço livre, editar e duplicar para o mês seguinte.
-- [ ] **2. Registro:** "Feito" e "Não fui" com Desfazer, e a Home com os compromissos de hoje.
+- [x] **2. Registro:** "Feito" e "Não fui" com Desfazer, e a Home com os compromissos de hoje.
 - [ ] **3. Alertas:** despertar, antecedência por compromisso, botão "Feito" na notificação, permissões do Android e economia de bateria.
 - [ ] **4. Painel de histórico:** contagem por atividade e por mês, comparação entre meses, detalhe dos dias.
 - [ ] **5. Supabase:** login, acesso por usuário (RLS), sincronização que funciona sem internet, subida dos dados locais. O SQL é revisado e aplicado pelo dono em um projeto de desenvolvimento.

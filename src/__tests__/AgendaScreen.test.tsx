@@ -68,7 +68,7 @@ function agenda(id: string, nome: string, inicio: string, fim: string): Agenda {
 }
 
 function dados(agendas: Agenda[], avulsos: Avulso[] = []): DadosAgenda {
-  return { atividades: [academia, culto, aula], agendas, avulsos };
+  return { atividades: [academia, culto, aula], agendas, avulsos, registros: [] };
 }
 
 function parametros(): unknown {

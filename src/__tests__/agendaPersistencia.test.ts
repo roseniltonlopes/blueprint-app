@@ -37,6 +37,7 @@ const dados: DadosAgenda = {
     },
   ],
   avulsos: [{ id: "v1", atividadeId: "academia", data: "2026-11-21", inicio: "09:00", fim: null }],
+  registros: [],
 };
 
 function criar(inicial: Record<string, string> = {}) {
@@ -64,7 +65,7 @@ describe("AgendaRepository", () => {
     await repositorio.salvar(dados);
     expect(await repositorio.carregar()).toEqual(dados);
     const gravado = JSON.parse(armazenamento.dados.get(CHAVE_AGENDA) ?? "{}") as { versao: number };
-    expect(gravado.versao).toBe(1);
+    expect(gravado.versao).toBe(2);
   });
 
   it("guarda à parte o conteúdo ilegível e abre vazio", async () => {
@@ -77,7 +78,7 @@ describe("AgendaRepository", () => {
   });
 
   it("trata versão desconhecida e array solto como não reconhecidos, sem apagar", async () => {
-    for (const texto of [JSON.stringify({ versao: 2, agendas: [] }), JSON.stringify([1, 2])]) {
+    for (const texto of [JSON.stringify({ versao: 99, agendas: [] }), JSON.stringify([1, 2])]) {
       const { repositorio, armazenamento } = criar({ [CHAVE_AGENDA]: texto });
       expect((await repositorio.ler()).corrompido).toBe(true);
       expect(armazenamento.dados.get(`${CHAVE_AGENDA}:corrompido:1000`)).toBe(texto);
