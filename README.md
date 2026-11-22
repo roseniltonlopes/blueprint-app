@@ -15,14 +15,14 @@ Quem tem a semana cheia esquece compromissos e perde a noção do que de fato cu
 flowchart LR
     A["Planejar<br/>agenda semanal do mês"] --> B["Ser lembrado<br/>alerta na hora certa"]
     B --> C["Registrar<br/>Feito ou Não fui, com 1 toque"]
-    C --> D["Acompanhar<br/>histórico e conquistas"]
+    C --> D["Acompanhar<br/>histórico por mês"]
     D -->|"muda o mês"| A
 ```
 
 1. **Planejar:** a agenda tem compromissos com início e fim que se repetem por dia da semana (academia às 5h, aula, trabalho, culto). Cada agenda vale para um período, por exemplo novembro. Em dezembro, duplique e ajuste só o que mudou. Cada dia tem um espaço livre para encaixar outra atividade.
 2. **Ser lembrado:** alertas locais com o app fechado, com antecedência por compromisso e o despertar do dia.
 3. **Registrar:** toque em "Feito" na agenda ou direto na notificação. Também há "Não fui" e Desfazer. O histórico só conta o que foi marcado.
-4. **Acompanhar:** painel por atividade e por mês ("quantas vezes fui à academia em janeiro"), com comparação entre meses. Depois entram sequência, "dia perfeito" e conquistas.
+4. **Acompanhar:** painel por atividade e por mês ("quantas vezes fui à academia em janeiro"), com comparação entre meses.
 
 O passado nunca é reescrito: editar a agenda de dezembro não muda a contagem de novembro.
 
@@ -78,7 +78,7 @@ A branch `main` recebe o código quando cada etapa estiver concluída. Na visual
   - [ ] Aplicar a migração 002 (tabela `registros` e exclusão de ações sem janela de 5 minutos).
   - [ ] Conferir no aparelho: entrar em dois aparelhos e ver o mesmo histórico.
   - [ ] Foto do perfil na nuvem (bucket `avatares`), login com Google e Apple.
-- [ ] **6. Gamificação e ganhos visuais:** sequência, "dia perfeito", conquistas e animações.
+- ~~**6. Gamificação e ganhos visuais**~~: retirada do plano pelo dono em 2026-11-21.
 - [ ] **7. APK de release:** checklist de segurança e build.
 
 As etapas 1 a 4 funcionam só no aparelho. O Supabase só é necessário a partir da etapa 5.

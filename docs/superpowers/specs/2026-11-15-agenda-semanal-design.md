@@ -12,7 +12,7 @@ A pessoa tem uma semana de horários fixos e diferentes a cada dia (academia às
 1. montar essa semana no celular e **editar quando mudar** (a agenda vale para novembro e pode mudar em dezembro);
 2. receber **alertas** para não esquecer compromissos, incluindo o despertar às 4:30;
 3. consultar o **histórico** de qualquer mês passado, por exemplo "quantas vezes fui à academia em janeiro", mesmo estando em dezembro;
-4. ter o app **instalado por APK**, com os dados na nuvem (Supabase), e uma camada de **gamificação** que dê vontade de cumprir a agenda.
+4. ter o app **instalado por APK**, com os dados na nuvem (Supabase). (A camada de gamificação prevista aqui foi retirada pelo dono em 2026-11-21.)
 
 O asterisco (`*`) do caderno marca um espaço livre onde se pode encaixar outra atividade. Não é prioridade nem alerta reforçado.
 
@@ -121,7 +121,7 @@ type DadosAgenda = {
 | 3 | **Alertas locais**: despertar às 4:30, antecedência por compromisso, botão Feito na notificação, permissões Android (notificações, alarme exato, economia de bateria) | Receber o alerta com o app fechado, em APK ou development build |
 | 4 | **Painel de histórico**: contagem por atividade e por mês, comparação entre meses, detalhe dos dias | "Quantas vezes fui à academia em novembro" |
 | 5 | **Supabase**: login, migração com acesso por usuário (RLS), sincronização offline-first, subida dos dados locais | Entrar em outro aparelho e ver o mesmo histórico |
-| 6 | **Gamificação e ganhos visuais**: sequência de dias cumpridos, "dia perfeito", conquistas, animações | Comemorações e progresso visual |
+| 6 | ~~Gamificação e ganhos visuais~~ | Retirada do plano pelo dono em 2026-11-21 |
 | 7 | **APK de release**: checklist de segurança e build | Instalar o `.apk` final |
 
 As etapas 1 a 4 funcionam só no aparelho. **O Supabase só é necessário na etapa 5**, e o assistente avisa antes de começar.
@@ -209,7 +209,7 @@ Reaproveita `theme.ts`, `Card`, `Text`, `Screen`, `SegmentedControl`, `Icon` e a
 
 - A **agenda** passa a ser o núcleo do planejamento. As telas "Monte seu dia", "Seu dia" e "Meu plano" da Parte 1 **não serão implementadas** como estão.
 - Os **hábitos de 1 toque** da Home (hidratação, exercício etc.) continuam como hoje.
-- Lembretes (Parte 2) e conquistas (Parte 3) da especificação anterior são absorvidos pelas etapas 3 e 6 deste documento.
+- Lembretes (Parte 2) da especificação anterior são absorvidos pela etapa 3 deste documento. As conquistas (Parte 3) foram retiradas junto com a etapa 6.
 - A especificação antiga recebe uma nota de substituição no topo.
 - **A categoria agrupa, a atividade detalha** (decidido pelo dono): "Exercício" é uma categoria dos hábitos, e "Academia", "Corrida", "Futebol" e "Caminhada" são atividades dentro dela. Cada atividade escolhe uma categoria (ou nenhuma). Sugestões iniciais: Academia, Corrida, Futebol, Caminhada em Exercício; Aula e Estudar em Estudo; Trabalho, Uber, Culto e outras ficam sem categoria até a pessoa escolher.
 - **Efeito na etapa 2 (decisão minha, a confirmar):** marcar "Feito" em um compromisso de atividade **com categoria** também grava uma ação daquela categoria (com o rótulo da atividade), então Home, Calendário e Histórico de hábitos continuam coerentes sem toque duplo. "Desfazer" remove as duas. Atividades sem categoria só aparecem na agenda e no painel de compromissos.
