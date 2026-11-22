@@ -22,7 +22,7 @@ Checklist para gerar o `.apk` de release do Blueprint com o EAS Build. A primeir
 ## 2. Antes do build (dono do projeto)
 
 1. **Aplicar a migração 002** (`supabase/migrations/002_registros_e_exclusao.sql`) depois de revisar, de preferência testando antes num projeto de desenvolvimento. Passo a passo em `docs/02`, seção 2.1. Sem ela o app mostra "O banco precisa da migração 002" e não sincroniza os registros.
-2. **Supabase > Authentication:**
+2. **Supabase > Authentication:** (feito em 2026-11-22: senha mínima 8 com "Letras e dígitos", igual à validação do app; a proteção contra senhas vazadas só existe no plano Pro)
    - ligar a proteção contra senhas vazadas (Password security > Leaked password protection; o painel de segurança do Supabase acusa que está desligada);
    - conferir a confirmação de e-mail e o remetente (o SMTP padrão do Supabase tem limite baixo de envios por hora);
    - definir a Site URL usada no e-mail de "Esqueci a senha" (o app não tem deep link).

@@ -1,4 +1,4 @@
-/** Regras puras da conta na nuvem: formato do e-mail, tamanho da senha e mensagens de erro. */
+/** Regras puras da conta na nuvem: formato do e-mail, regras da senha e mensagens de erro. */
 
 export const SENHA_MIN = 8;
 /** Limite do Supabase Auth para a senha (bcrypt usa só os primeiros 72 bytes). */
@@ -11,6 +11,11 @@ const PADRAO_EMAIL = /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)*\.[^\s@.]{2,}$/;
 export const ERRO_EMAIL = "Digite um e-mail válido, como nome@exemplo.com";
 export const ERRO_SENHA_CURTA = `A senha precisa ter pelo menos ${SENHA_MIN} caracteres`;
 export const ERRO_SENHA_LONGA = `A senha pode ter no máximo ${SENHA_MAX} caracteres`;
+export const ERRO_SENHA_SEM_LETRA_E_NUMERO = "A senha precisa ter letras e números";
+
+// Mesma regra do Supabase Auth ("Letras e dígitos"): ele só conta letras sem acento de A a Z.
+const TEM_LETRA = /[A-Za-z]/;
+const TEM_DIGITO = /[0-9]/;
 
 export type ModoDoFormulario = "entrar" | "criar" | "recuperar";
 
@@ -28,6 +33,7 @@ export function validarEmail(texto: string): string | null {
 export function validarSenha(senha: string): string | null {
   if (senha.length < SENHA_MIN) return ERRO_SENHA_CURTA;
   if (senha.length > SENHA_MAX) return ERRO_SENHA_LONGA;
+  if (!TEM_LETRA.test(senha) || !TEM_DIGITO.test(senha)) return ERRO_SENHA_SEM_LETRA_E_NUMERO;
   return null;
 }
 
@@ -72,7 +78,7 @@ export const MENSAGENS_DA_CONTA: Record<CodigoDeErroDaConta, string> = {
   emailNaoConfirmado: "Confirme o seu e-mail pelo link que enviamos e depois entre.",
   emailJaCadastrado: "Este e-mail já tem conta. Use Entrar.",
   emailInvalido: "O servidor recusou este e-mail. Confira se está certo.",
-  senhaFraca: "Senha fraca ou já vazada. Use uma senha mais longa, com letras e números.",
+  senhaFraca: "Senha fraca. Use pelo menos 8 caracteres, com letras e números.",
   muitasTentativas: "Muitas tentativas seguidas. Espere alguns minutos e tente de novo.",
   cadastroDesativado: "Novos cadastros estão desativados no momento.",
   rede: "Sem internet. Verifique a conexão e tente de novo.",

@@ -31,7 +31,7 @@ Lista das funções do **Blueprint**, com a situação real de cada uma e o crit
 | F15 | Lista cronológica de ações por dia (`FlatList`) | Histórico | 🎨 Desenhado | 3 |
 | F16 | Histórico em visão mensal (seletor "Mês") | Histórico | 🎨 Controle desenhado, conteúdo da visão mensal ainda não especificado | 3 |
 | F17 | Mapa de calor das últimas 12 semanas | Perfil | 🧪 Desenhado | 3 |
-| F18 | Cadastro com E-mail e Senha (mínimo 8 caracteres); o nome vem do Perfil | Conta | 🟡 Parcial: entrar, criar conta, sair e "Esqueci a senha" por e-mail (etapa 5); a tela desenhada com Nome ainda não | 4 |
+| F18 | Cadastro com E-mail e Senha (mínimo 8 caracteres, com letras e números, igual ao Supabase Auth); o nome vem do Perfil | Conta | 🟡 Parcial: entrar, criar conta, sair e "Esqueci a senha" por e-mail (etapa 5); a tela desenhada com Nome ainda não | 4 |
 | F19 | Login com Google e Apple | Cadastro | 🎨 Desenhado | 4 |
 | F20 | Fuso horário detectado e editável | Cadastro e Perfil | 🎨 Desenhado | 4 |
 | F21 | Editar perfil, cor de destaque (Gradiente, Laranja, Índigo) | Perfil | 🧪 Desenhado | 4 |

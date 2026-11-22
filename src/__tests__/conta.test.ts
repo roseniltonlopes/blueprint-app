@@ -2,6 +2,7 @@ import {
   ERRO_EMAIL,
   ERRO_SENHA_CURTA,
   ERRO_SENHA_LONGA,
+  ERRO_SENHA_SEM_LETRA_E_NUMERO,
   formularioValido,
   normalizarEmail,
   validarEmail,
@@ -22,9 +23,14 @@ describe("validação da conta", () => {
     }
   });
 
-  it("senha com no mínimo 8 e no máximo 72 caracteres", () => {
-    expect(validarSenha("1234567")).toBe(ERRO_SENHA_CURTA);
-    expect(validarSenha("12345678")).toBeNull();
+  it("senha com 8 a 72 caracteres, letras e números (regra do Supabase Auth)", () => {
+    expect(validarSenha("abc1234")).toBe(ERRO_SENHA_CURTA);
+    expect(validarSenha("abcd1234")).toBeNull();
+    expect(validarSenha("Senha forte 9")).toBeNull();
+    expect(validarSenha("12345678")).toBe(ERRO_SENHA_SEM_LETRA_E_NUMERO);
+    expect(validarSenha("abcdefgh")).toBe(ERRO_SENHA_SEM_LETRA_E_NUMERO);
+    // Letra acentuada não conta como letra para o Supabase.
+    expect(validarSenha("çãéíóú12")).toBe(ERRO_SENHA_SEM_LETRA_E_NUMERO);
     expect(validarSenha("x".repeat(73))).toBe(ERRO_SENHA_LONGA);
   });
 
