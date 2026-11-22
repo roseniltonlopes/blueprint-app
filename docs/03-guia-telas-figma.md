@@ -101,6 +101,23 @@ Os arquivos `docs/assets/blueprint_mvp_screens.jpg` e `docs/figma/blueprint_ui_k
 - Por agenda: **Duplicar para o próximo mês**, **Editar período** e **Remover**.
 - **Nova agenda** abre o formulário com o mês atual preenchido.
 
+### 📱 Home: seção "Hoje na agenda" (etapa 2, sem prancha no canvas)
+- Fica entre o cartão de progresso e "O que você fez agora?".
+- **Cabeçalho:** "Hoje na agenda" (ou "Ontem na agenda") e, à direita, "Feitos: 2 de 5". Logo abaixo, o seletor **Hoje | Ontem** (etapa 4).
+- **Cartão por compromisso de hoje:** ícone da atividade, nome, horário ("05:00 a 06:00" ou só "20:00") e detalhe. Embaixo, dois botões de largura igual: **Feito** (marcado: fundo laranja, texto preto e selo de confirmação) e **Não fiz** (marcado: fundo `ink`, texto `onInk`). Desmarcados usam `sunk`.
+- **Toast:** o mesmo da Home, com "Feito: Academia", "Não fiz: Academia" ou "Registro removido: Academia" e **Desfazer**.
+- **Sem agenda para hoje:** cartão "Sem agenda para hoje", texto de apoio e **Montar agenda** (abre a aba Agenda). **Com agenda e nada hoje:** "Nada marcado para hoje.".
+
+### 📱 Histórico > Mês: "Compromissos da agenda" (etapa 4, sem prancha no canvas)
+- Depois de "Por categoria" (hábitos). Faixa de números: **feitos**, **não fiz**, **sem registro**, e a frase "Cumpriu 78% do que estava na agenda.".
+- Um cartão por categoria com o total ("Exercício · 22 vezes") e uma linha por atividade com o total e a comparação com o mês anterior. Tocar abre os dias de cada situação.
+- Mês sem nada: "Nenhum compromisso da agenda neste mês.".
+
+### 📱 Perfil: seção "Alertas" (etapa 3, sem prancha no canvas)
+- Fica entre "Aparência" e "Sobre". Cartão "Alertas da agenda" com o estado da permissão em texto de apoio.
+- **Desligados:** botão de texto **Permitir alertas**. **Bloqueados:** **Abrir configurações**. **Ligados (Android):** dica de bateria e **Abrir configurações do app**.
+- **Notificação:** título "Academia às 05:00", corpo "Começa em 15 min." ou "Está na hora." mais o detalhe, e o botão **Feito**. Canal Android "Compromissos da agenda", importância alta, com som e vibração.
+
 ---
 
 ## 3. Como exportar imagens das telas para este repositório

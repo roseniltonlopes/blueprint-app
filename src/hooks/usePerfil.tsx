@@ -26,6 +26,8 @@ export type UsePerfil = {
   salvarNome: (nome: string) => Resultado<void>;
   /** null remove a foto e volta para as iniciais */
   definirFoto: (foto: string | null) => Resultado<void>;
+  /** Troca o perfil inteiro (sincronização com a nuvem e "Sair e apagar os dados") */
+  substituir: (perfil: Perfil) => void;
 };
 
 const PerfilContext = createContext<UsePerfil | null>(null);
@@ -74,9 +76,16 @@ export function PerfilProvider({
     return SUCESSO;
   }, []);
 
+  const substituir = useCallback<UsePerfil["substituir"]>((novo) => {
+    setPerfil({
+      nome: normalizarNome(novo.nome),
+      foto: novo.foto !== null && fotoValida(novo.foto) ? novo.foto : null,
+    });
+  }, []);
+
   const valor = useMemo<UsePerfil>(
-    () => ({ perfil, nomeExibido: nomeParaExibir(perfil), salvarNome, definirFoto }),
-    [perfil, salvarNome, definirFoto],
+    () => ({ perfil, nomeExibido: nomeParaExibir(perfil), salvarNome, definirFoto, substituir }),
+    [perfil, salvarNome, definirFoto, substituir],
   );
 
   return <PerfilContext.Provider value={valor}>{children}</PerfilContext.Provider>;

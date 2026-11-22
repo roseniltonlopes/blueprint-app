@@ -1,6 +1,6 @@
 # Parte 1: Plano diário (design)
 
-> **Substituída em 2026-11-15** por `2026-11-15-agenda-semanal-design.md`. A agenda semanal passa a ser o núcleo do planejamento, e lembretes e conquistas foram absorvidos pelas etapas 3 e 6 do novo documento. Mantida apenas como registro.
+> **Substituída em 2026-11-15** por `2026-11-15-agenda-semanal-design.md`. A agenda semanal passa a ser o núcleo do planejamento, e os lembretes foram absorvidos pela etapa 3 do novo documento (as conquistas foram retiradas do plano em 2026-11-21). Mantida apenas como registro.
 
 **Data:** 2026-10-18
 **Situação:** aprovado em conversa; aguarda revisão desta especificação

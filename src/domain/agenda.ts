@@ -1,5 +1,6 @@
 import { CATEGORIAS, type CategoriaId } from "./categorias";
 import { MESES, chaveDoDia, somarDias } from "./datas";
+import type { RegistroCompromisso } from "./registros";
 
 /** 0 = domingo, como em `Date.getDay()`. */
 export type DiaDaSemana = 0 | 1 | 2 | 3 | 4 | 5 | 6;
@@ -53,17 +54,26 @@ export type Avulso = {
   inicio: string;
   fim: string | null;
   detalhe?: string;
+  /** Minutos de aviso antes do início (0 avisa na hora); ausente: sem aviso */
+  antecedenciaMin?: number;
 };
 
 export type DadosAgenda = {
   atividades: Atividade[];
   agendas: Agenda[];
   avulsos: Avulso[];
+  /** "Feito" e "Não fiz" de cada compromisso por dia (src/domain/registros.ts) */
+  registros: RegistroCompromisso[];
 };
 
 export type Resultado<T> = { ok: true; valor: T } | { ok: false; erro: string };
 
-export const DADOS_AGENDA_VAZIOS: DadosAgenda = { atividades: [], agendas: [], avulsos: [] };
+export const DADOS_AGENDA_VAZIOS: DadosAgenda = {
+  atividades: [],
+  agendas: [],
+  avulsos: [],
+  registros: [],
+};
 
 export const NOME_ATIVIDADE_MAX = 40;
 export const DETALHE_MAX = 60;
@@ -73,11 +83,20 @@ export const ERRO_HORARIO = "Informe um horário no formato HH:MM";
 export const ERRO_TERMINO = "O término deve ser depois do início";
 export const ERRO_PERIODO_OCUPADO = "Já existe agenda neste período";
 
+/** Primeiro acesso: o app não traz compromissos prontos. */
+export const AGENDA_COMECA_VAZIA =
+  "Sua agenda começa vazia. Monte a semana com os seus compromissos: o app não preenche nada por você.";
+
 const PADRAO_HORA = /^([01]\d|2[0-3]):([0-5]\d)$/;
 const PADRAO_DATA = /^(\d{4})-(\d{2})-(\d{2})$/;
 
 export function horaValida(hora: string): boolean {
   return PADRAO_HORA.test(hora);
+}
+
+/** "05:00 a 06:00", ou só "20:00" para evento sem término. */
+export function rotuloDoHorario(horario: { inicio: string; fim: string | null }): string {
+  return horario.fim === null ? horario.inicio : `${horario.inicio} a ${horario.fim}`;
 }
 
 /** Minutos desde a meia-noite de uma hora já validada. */
@@ -137,6 +156,14 @@ export function validarAtividade(
   return repetida ? "Já existe uma atividade com este nome" : null;
 }
 
+/** "Avisar antes": ausente (sem aviso) ou um inteiro de 0 a 120 minutos. */
+export function validarAntecedencia(minutos: number | undefined): string | null {
+  if (minutos === undefined) return null;
+  return Number.isInteger(minutos) && minutos >= 0 && minutos <= ANTECEDENCIA_MAX
+    ? null
+    : `A antecedência deve ficar entre 0 e ${ANTECEDENCIA_MAX} minutos`;
+}
+
 function validarDetalhe(detalhe: string | undefined): string | null {
   return detalhe !== undefined && detalhe.length > DETALHE_MAX
     ? `O detalhe pode ter até ${DETALHE_MAX} caracteres`
@@ -155,26 +182,18 @@ export function validarCompromisso(c: Omit<Compromisso, "id">): string | null {
   if (erroHorario !== null) {
     return erroHorario;
   }
-  const erroDetalhe = validarDetalhe(c.detalhe);
-  if (erroDetalhe !== null) {
-    return erroDetalhe;
-  }
-  if (
-    c.antecedenciaMin !== undefined &&
-    (!Number.isInteger(c.antecedenciaMin) ||
-      c.antecedenciaMin < 0 ||
-      c.antecedenciaMin > ANTECEDENCIA_MAX)
-  ) {
-    return `A antecedência deve ficar entre 0 e ${ANTECEDENCIA_MAX} minutos`;
-  }
-  return null;
+  return validarDetalhe(c.detalhe) ?? validarAntecedencia(c.antecedenciaMin);
 }
 
 export function validarAvulso(a: Omit<Avulso, "id">): string | null {
   if (!dataValida(a.data)) {
     return "Informe uma data válida";
   }
-  return validarHorarios(a.inicio, a.fim) ?? validarDetalhe(a.detalhe);
+  return (
+    validarHorarios(a.inicio, a.fim) ??
+    validarDetalhe(a.detalhe) ??
+    validarAntecedencia(a.antecedenciaMin)
+  );
 }
 
 type Periodo = { inicio: string; fim: string };
@@ -269,6 +288,7 @@ export function ocorrenciasDoDia(dados: DadosAgenda, data: Date): Ocorrencia[] {
         inicio: v.inicio,
         fim: v.fim,
         ...(v.detalhe !== undefined ? { detalhe: v.detalhe } : {}),
+        ...(v.antecedenciaMin !== undefined ? { antecedenciaMin: v.antecedenciaMin } : {}),
       });
     }
   }

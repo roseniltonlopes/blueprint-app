@@ -1,8 +1,14 @@
+import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import type { CompositeScreenProps } from "@react-navigation/native";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useMemo, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
 import AvatarDoPerfil from "../components/AvatarDoPerfil";
 import BotaoTexto from "../components/BotaoTexto";
+import CartaoDeAlertas from "../components/CartaoDeAlertas";
+import CartaoDeConta from "../components/CartaoDeConta";
+import CartaoDePrivacidade from "../components/CartaoDePrivacidade";
 import Campo from "../components/Campo";
 import MapaDeCalor from "../components/MapaDeCalor";
 import { NOME_MAX } from "../domain/perfil";
@@ -10,7 +16,10 @@ import { contarPorDia, mapaDeCalor, sequenciaAtual, totalGeral } from "../domain
 import { fusoDoAparelho, nomeDoFuso } from "../domain/fuso";
 import { plural } from "../domain/texto";
 import { useAcoes } from "../hooks/useAcoes";
+import { useConta } from "../hooks/useConta";
 import { usePerfil } from "../hooks/usePerfil";
+import type { AbasParamList } from "../navigation/Abas";
+import type { RaizParamList } from "../navigation/Raiz";
 import { escolherFoto } from "../services/escolherFoto";
 import { aplicarDestaque, useTheme, type Destaque, type ThemeMode } from "../theme/ThemeProvider";
 import { BRAND, RADIUS, SIZES, SPACING, THEMES } from "../styles/theme";
@@ -82,9 +91,15 @@ function SeletorDeDestaque() {
   );
 }
 
-/** Perfil (docs/03 tela 8; docs/05 F14, F17 e F21): identidade, números e aparência. */
-export default function PerfilScreen() {
+type Props = CompositeScreenProps<
+  BottomTabScreenProps<AbasParamList, "Perfil">,
+  NativeStackScreenProps<RaizParamList>
+>;
+
+/** Perfil (docs/03 tela 8; docs/05 F14, F17, F21 e F22): identidade, números, aparência e conta. */
+export default function PerfilScreen({ navigation }: Partial<Props>) {
   const { acoes, relogio } = useAcoes();
+  const { estado: conta } = useConta();
   const { colors, mode, setMode } = useTheme();
   const { perfil, nomeExibido, salvarNome, definirFoto } = usePerfil();
   const [editando, setEditando] = useState(false);
@@ -193,7 +208,9 @@ export default function PerfilScreen() {
                 </Text>
               </PressableEscala>
               <Text variant="caption" color="mute">
-                Dados salvos neste aparelho
+                {conta.situacao === "conectado"
+                  ? "Dados salvos neste aparelho e na nuvem"
+                  : "Dados salvos neste aparelho"}
               </Text>
             </View>
           )}
@@ -260,6 +277,30 @@ export default function PerfilScreen() {
         </Card>
       </Animated.View>
 
+      <Animated.View entering={entrada(230)} style={styles.secao}>
+        <Text variant="section" accessibilityRole="header">
+          Alertas
+        </Text>
+        <CartaoDeAlertas />
+      </Animated.View>
+
+      <Animated.View entering={entrada(245)} style={styles.secao}>
+        <Text variant="section" accessibilityRole="header">
+          Conta
+        </Text>
+        <CartaoDeConta aoAbrirConta={() => navigation?.navigate("Conta")} />
+      </Animated.View>
+
+      <Animated.View entering={entrada(255)} style={styles.secao}>
+        <Text variant="section" accessibilityRole="header">
+          Privacidade
+        </Text>
+        <CartaoDePrivacidade
+          aoAbrirTermos={() => navigation?.navigate("Termos")}
+          aoAbrirPrivacidade={() => navigation?.navigate("Privacidade")}
+        />
+      </Animated.View>
+
       <Animated.View entering={entrada(260)} style={styles.secao}>
         <Text variant="section" accessibilityRole="header">
           Sobre
@@ -269,12 +310,6 @@ export default function PerfilScreen() {
             <Text variant="body">Fuso horário</Text>
             <Text variant="support" color="mute" style={styles.valorInfo}>
               {fuso}
-            </Text>
-          </View>
-          <View style={[styles.linhaInfo, { borderTopWidth: 1, borderTopColor: colors.hair }]}>
-            <Text variant="body">Conta</Text>
-            <Text variant="support" color="mute" style={styles.valorInfo}>
-              Sem conta
             </Text>
           </View>
         </Card>

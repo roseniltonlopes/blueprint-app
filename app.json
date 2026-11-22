@@ -12,13 +12,18 @@
     },
     "android": {
       "package": "com.roseniltonlopes.blueprint",
+      "allowBackup": false,
       "adaptiveIcon": {
         "backgroundColor": "#FFFDF2",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.USE_EXACT_ALARM"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -30,9 +35,18 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "O Blueprint usa as suas fotos só para você escolher a foto do seu perfil."
+          "photosPermission": "O Blueprint usa as suas fotos só para você escolher a foto do seu perfil.",
+          "cameraPermission": false,
+          "microphonePermission": false
         }
-      ]
-    ]
+      ],
+      "expo-notifications"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "ce936785-2b61-476e-ad51-51a02a625776"
+      }
+    },
+    "owner": "roseniltonlopes"
   }
 }

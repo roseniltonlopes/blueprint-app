@@ -11,6 +11,12 @@ import {
   type IconeAtividade,
 } from "../domain/agenda";
 import type { CategoriaId } from "../domain/categorias";
+import {
+  chaveDaOrigem,
+  validarRegistro,
+  type RegistroCompromisso,
+  type StatusDoRegistro,
+} from "../domain/registros";
 import { criarFilaDeGravacao, lerJson, type ArmazenamentoChaveValor } from "./armazenamento";
 
 /** Porta de persistência da agenda. A implementação remota (Supabase) entra na etapa 5. */
@@ -20,7 +26,9 @@ export interface AgendaRepository {
 }
 
 export const CHAVE_AGENDA = "blueprint:agenda";
-export const VERSAO_AGENDA = 1;
+/** 1: atividades, agendas e avulsos. 2: mais os registros de "Feito" e "Não fiz". */
+export const VERSAO_AGENDA = 2;
+const VERSOES_LIDAS: readonly unknown[] = [1, VERSAO_AGENDA];
 export const CHAVE_DESCARTADOS = `${CHAVE_AGENDA}:descartados`;
 
 type Registro = Record<string, unknown>;
@@ -34,7 +42,7 @@ export type ResultadoDaLeituraAgenda = {
 };
 
 function vazios(): DadosAgenda {
-  return { atividades: [], agendas: [], avulsos: [] };
+  return { atividades: [], agendas: [], avulsos: [], registros: [] };
 }
 
 function registro(valor: unknown): Registro | null {
@@ -108,18 +116,87 @@ function lerAvulso(bruto: unknown): Avulso | null {
   const inicio = r && texto(r.inicio);
   const fim = r && textoOuNulo(r.fim);
   if (!r || !id || !atividadeId || !data || !inicio || fim === undefined) return null;
-  const avulso: Avulso = { id, atividadeId, data, inicio, fim, ...opcionais(r) };
+  // antecedenciaMin é opcional: avulsos gravados antes de existir o aviso continuam válidos.
+  const antecedenciaMin = typeof r.antecedenciaMin === "number" ? r.antecedenciaMin : undefined;
+  const avulso: Avulso = {
+    id,
+    atividadeId,
+    data,
+    inicio,
+    fim,
+    ...opcionais(r),
+    ...(antecedenciaMin !== undefined ? { antecedenciaMin } : {}),
+  };
   const { id: _id, ...semId } = avulso;
   return validarAvulso(semId) === null ? avulso : null;
+}
+
+function lerRegistro(bruto: unknown): RegistroCompromisso | null {
+  const r = registro(bruto);
+  const id = r && texto(r.id);
+  const origemId = r && texto(r.origemId);
+  const atividadeId = r && texto(r.atividadeId);
+  const nomeAtividade = r && texto(r.nomeAtividade);
+  const data = r && texto(r.data);
+  const inicio = r && texto(r.inicio);
+  const registradoEm = r && texto(r.registradoEm);
+  const fim = r && textoOuNulo(r.fim);
+  const acaoId = r && textoOuNulo(r.acaoId);
+  if (!r || !id || !origemId || !atividadeId || !nomeAtividade || !data || !inicio) return null;
+  if (!registradoEm || fim === undefined || acaoId === undefined) return null;
+  if (r.categoria !== null && typeof r.categoria !== "string") return null;
+  const lido: RegistroCompromisso = {
+    id,
+    origem: r.origem as RegistroCompromisso["origem"],
+    origemId,
+    atividadeId,
+    nomeAtividade,
+    categoria: r.categoria as CategoriaId | null,
+    data,
+    inicio,
+    fim,
+    status: r.status as StatusDoRegistro,
+    acaoId,
+    registradoEm,
+  };
+  const { id: _id, ...semId } = lido;
+  return validarRegistro(semId) === null ? lido : null;
+}
+
+/**
+ * Registros não dependem de a atividade ou o compromisso ainda existirem: são a cópia do que
+ * aconteceu. Só são descartados se inválidos ou repetidos (mesmo id ou mesmo compromisso no dia).
+ */
+function lerRegistros(brutos: unknown[]): {
+  registros: RegistroCompromisso[];
+  descartados: number;
+} {
+  const registros: RegistroCompromisso[] = [];
+  const ids = new Set<string>();
+  const ocorrencias = new Set<string>();
+  let descartados = 0;
+  for (const item of brutos) {
+    const lido = lerRegistro(item);
+    const ocorrencia = lido && `${chaveDaOrigem(lido)}@${lido.data}`;
+    if (lido && ocorrencia && !ids.has(lido.id) && !ocorrencias.has(ocorrencia)) {
+      ids.add(lido.id);
+      ocorrencias.add(ocorrencia);
+      registros.push(lido);
+    } else {
+      descartados += 1;
+    }
+  }
+  return { registros, descartados };
 }
 
 /**
  * Converte o conteúdo salvo para a versão atual. Devolve null quando o formato não é
  * reconhecido. Cada item é validado: o que for inválido, repetido ou órfão é descartado.
+ * A versão 1 não tinha registros e é lida com a lista vazia.
  */
 export function migrarAgenda(bruto: unknown): { dados: DadosAgenda; descartados: number } | null {
   const raiz = registro(bruto);
-  if (!raiz || raiz.versao !== VERSAO_AGENDA) {
+  if (!raiz || !VERSOES_LIDAS.includes(raiz.versao)) {
     return null;
   }
 
@@ -192,6 +269,10 @@ export function migrarAgenda(bruto: unknown): { dados: DadosAgenda; descartados:
       descartados += 1;
     }
   }
+
+  const lidos = lerRegistros(raiz.versao === 1 ? [] : lista(raiz.registros));
+  dados.registros = lidos.registros;
+  descartados += lidos.descartados;
 
   return { dados, descartados };
 }

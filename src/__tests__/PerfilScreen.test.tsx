@@ -16,7 +16,8 @@ async function digitarNome(texto: string) {
 }
 
 afterEach(() => {
-  jest.resetAllMocks();
+  // Só o mock deste arquivo: resetAllMocks também zeraria os mocks do React Native (AppState).
+  escolherFotoMock.mockReset();
 });
 
 describe("PerfilScreen: nome", () => {

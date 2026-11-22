@@ -1,12 +1,10 @@
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useState } from "react";
+import { useState, type ComponentType } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import MontarSemana from "../components/MontarSemana";
-import { gerarAgendaDeExemplo } from "../dev/agendaDeExemplo";
-import { gerarIdLocal } from "../domain/acoes";
 import {
-  DADOS_AGENDA_VAZIOS,
+  AGENDA_COMECA_VAZIA,
   nomeDeAgendaDoMes,
   periodoLivreDoMes,
   type Agenda,
@@ -21,38 +19,13 @@ import { useTheme } from "../theme/ThemeProvider";
 import { Card, Screen, Text } from "../ui";
 import { Icon } from "../ui/Icon";
 
-function FerramentasDeDesenvolvimento() {
-  const { substituir, relogio } = useAgenda();
-  if (!__DEV__) {
-    return null;
-  }
-  return (
-    <View style={styles.dev}>
-      <Text variant="caption" color="mute">
-        DEV
-      </Text>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Carregar agenda de exemplo"
-        onPress={() => substituir(gerarAgendaDeExemplo(() => gerarIdLocal(relogio()), relogio()))}
-        style={styles.devBotao}
-      >
-        <Text variant="caption" color="accentText" weight={600}>
-          Carregar agenda de exemplo
-        </Text>
-      </Pressable>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Limpar agenda"
-        onPress={() => substituir({ ...DADOS_AGENDA_VAZIOS })}
-        style={styles.devBotao}
-      >
-        <Text variant="caption" color="accentText" weight={600}>
-          Limpar agenda
-        </Text>
-      </Pressable>
-    </View>
-  );
+// Ferramentas de desenvolvimento: o require só existe dentro do if (__DEV__). No build de produção
+// o Metro troca __DEV__ por false, descarta o bloco e o módulo de exemplo nem entra no APK.
+let FerramentasDeDesenvolvimento: ComponentType | null = null;
+if (__DEV__) {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const modulo = require("../dev/FerramentasDaAgenda") as { default: ComponentType };
+  FerramentasDeDesenvolvimento = modulo.default;
 }
 
 /**
@@ -157,6 +130,11 @@ export default function AgendaScreen() {
         />
       ) : (
         <Card style={styles.convite}>
+          {dados.agendas.length === 0 ? (
+            <Text variant="support" color="mute" testID="agenda-comeca-vazia">
+              {AGENDA_COMECA_VAZIA}
+            </Text>
+          ) : null}
           <Pressable
             accessibilityRole="button"
             onPress={() =>
@@ -178,7 +156,7 @@ export default function AgendaScreen() {
           ) : null}
         </Card>
       )}
-      <FerramentasDeDesenvolvimento />
+      {FerramentasDeDesenvolvimento ? <FerramentasDeDesenvolvimento /> : null}
     </Screen>
   );
 }
@@ -202,6 +180,4 @@ const styles = StyleSheet.create({
   },
   convite: { gap: SPACING.sm },
   alvo: { minHeight: SIZES.touchMin, justifyContent: "center" },
-  dev: { flexDirection: "row", alignItems: "center", gap: SPACING.lg, flexWrap: "wrap" },
-  devBotao: { minHeight: SIZES.touchMin, justifyContent: "center" },
 });

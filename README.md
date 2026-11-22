@@ -12,15 +12,15 @@ Quem tem a semana cheia esquece compromissos e perde a noção do que de fato cu
 ```mermaid
 flowchart LR
     A["Planejar<br/>agenda semanal do mês"] --> B["Ser lembrado<br/>alerta na hora certa"]
-    B --> C["Registrar<br/>Feito ou Não fui, com 1 toque"]
-    C --> D["Acompanhar<br/>histórico e conquistas"]
+    B --> C["Registrar<br/>Feito ou Não fiz, com 1 toque"]
+    C --> D["Acompanhar<br/>histórico por mês"]
     D -->|"muda o mês"| A
 ```
 
 1. **Planejar:** a agenda tem compromissos com início e fim que se repetem por dia da semana (academia às 5h, aula, trabalho, culto). Cada agenda vale para um período, por exemplo novembro. Em dezembro, duplique e ajuste só o que mudou. Cada dia tem um espaço livre para encaixar outra atividade.
 2. **Ser lembrado:** alertas locais com o app fechado, com antecedência por compromisso e o despertar do dia.
-3. **Registrar:** toque em "Feito" na agenda ou direto na notificação. Também há "Não fui" e Desfazer. O histórico só conta o que foi marcado.
-4. **Acompanhar:** painel por atividade e por mês ("quantas vezes fui à academia em janeiro"), com comparação entre meses. Depois entram sequência, "dia perfeito" e conquistas.
+3. **Registrar:** toque em "Feito" na agenda ou direto na notificação. Também há "Não fiz" e Desfazer. O histórico só conta o que foi marcado.
+4. **Acompanhar:** painel por atividade e por mês ("quantas vezes fui à academia em janeiro"), com comparação entre meses.
 
 O passado nunca é reescrito: editar a agenda de dezembro não muda a contagem de novembro.
 
@@ -56,7 +56,8 @@ As telas da agenda não têm prancha no canvas; as capturas acima são do app. A
 | :--- | :--- |
 | **App (branch `main`)** | Expo SDK 57 + TypeScript. Home de hábitos com anel de progresso, "Outro" com nome, toast com Desfazer e animações; **Agenda semanal** (compromissos recorrentes e avulsos, agendas por período); Calendário, Histórico e Perfil; tema claro, escuro e automático; dados salvos no aparelho. |
 | **Agenda semanal (etapa 1)** | Concluída e integrada na `main`, com testes automatizados (261 testes). Especificação em [`docs/superpowers/specs/2026-11-15-agenda-semanal-design.md`](docs/superpowers/specs/2026-11-15-agenda-semanal-design.md). |
-| **Login e nuvem** | Etapa 5 do roteiro. Há trabalho anterior pausado na branch `feat/etapa-7-supabase-login` (login por e-mail, sincronização offline-first, RLS por usuário), que será revisado e reaproveitado. |
+| **Login e nuvem (etapa 5)** | Código integrado na `feat/nilton`: entrar, criar conta, "Esqueci a senha" e sair (e-mail e senha), cartão "Conta" no Perfil e sincronização offline-first por mesclagem de três vias, testada com uma nuvem falsa. Migrações 002 e 003 aplicadas pelo dono em 2026-11-22. Falta conferir no aparelho contra o Supabase real. A foto do perfil ainda fica só no aparelho. |
+| **Privacidade (LGPD) e lembretes** | Aceite dos Termos de Uso e da Política de Privacidade no cadastro, textos no app (Perfil > Privacidade) e na landing, exclusão da conta e dos dados pelo app (migração 003, aplicada). "Avisar antes" por toque, também nos avulsos, com a permissão pedida só ao salvar um aviso. O APK não leva dados de exemplo. Os textos legais ainda precisam de revisão jurídica: [`docs/09`](docs/09-lgpd-pendencias-juridicas.md). |
 | **APK** | `eas.json` pronto (`buildType: apk`). Alertas só podem ser validados em APK ou development build, não no Expo Go. |
 
 A branch `main` recebe o código quando cada etapa estiver concluída. Na visualização web (`npx expo start --web`) as animações de entrada ficam desligadas, para a tela se ajustar ao redimensionar a janela; no celular elas continuam.
@@ -67,12 +68,17 @@ A branch `main` recebe o código quando cada etapa estiver concluída. Na visual
 
 - [x] **Base (etapas 0 a 6 anteriores):** projeto Expo com TypeScript, fundação visual, Home, anel e animações, navegação, Calendário, Perfil e persistência local.
 - [x] **1. Agenda semanal:** compromissos com início e fim, agendas por período, espaço livre, editar e duplicar para o mês seguinte.
-- [ ] **2. Registro:** "Feito" e "Não fui" com Desfazer, e a Home com os compromissos de hoje.
-- [ ] **3. Alertas:** despertar, antecedência por compromisso, botão "Feito" na notificação, permissões do Android e economia de bateria.
-- [ ] **4. Painel de histórico:** contagem por atividade e por mês, comparação entre meses, detalhe dos dias.
+- [x] **2. Registro:** "Feito" e "Não fiz" com Desfazer, e a Home com os compromissos de hoje.
+- [x] **3. Alertas:** despertar, antecedência por compromisso, botão "Feito" na notificação, permissões do Android e economia de bateria.
+- [x] **4. Painel de histórico:** contagem por atividade e por mês, comparação entre meses, detalhe dos dias.
 - [ ] **5. Supabase:** login, acesso por usuário (RLS), sincronização que funciona sem internet, subida dos dados locais. O SQL é revisado e aplicado pelo dono em um projeto de desenvolvimento.
-- [ ] **6. Gamificação e ganhos visuais:** sequência, "dia perfeito", conquistas e animações.
-- [ ] **7. APK de release:** checklist de segurança e build.
+  - [x] Login por e-mail e senha, sair, "Esqueci a senha" e o cartão "Conta" no Perfil.
+  - [x] Sincronização offline-first (mesclagem de três vias, troca de conta, sair mantendo ou apagando), com testes automatizados.
+  - [x] Aplicar as migrações 002 (tabela `registros`) e 003 (aceite dos termos, aviso nos avulsos e exclusão da conta).
+  - [ ] Conferir no aparelho: entrar em dois aparelhos e ver o mesmo histórico.
+  - [ ] Foto do perfil na nuvem (bucket `avatares`), login com Google e Apple.
+- ~~**6. Gamificação e ganhos visuais**~~: retirada do plano pelo dono em 2026-11-21.
+- [ ] **7. APK de release:** checklist de segurança feito e configuração pronta ([`docs/08-release-apk.md`](docs/08-release-apk.md)); migrações aplicadas e variáveis criadas no EAS; falta conferir o APK `preview` no aparelho.
 
 As etapas 1 a 4 funcionam só no aparelho. O Supabase só é necessário a partir da etapa 5.
 
@@ -97,7 +103,7 @@ As etapas 1 a 4 funcionam só no aparelho. O Supabase só é necessário a parti
 
 ```bash
 npm install
-cp .env.example .env        # preencha com os dados do Supabase (opcional até a etapa 5)
+cp .env.example .env        # URL e chave publishable do Supabase (sem elas, o app funciona só no aparelho)
 npx expo start              # leia o QR code com o Expo Go (SDK 57)
 ```
 
@@ -122,15 +128,17 @@ eas build -p android --profile preview
 ```text
 src/
 ├── domain/        # Regras puras e testadas (ações, datas, estatísticas, agenda)
-├── data/          # Repositórios: AsyncStorage hoje, Supabase na etapa 5
-├── hooks/         # Estado compartilhado (useAcoes, useAgenda)
+├── data/          # Repositórios no aparelho (AsyncStorage) e a base da sincronização
+├── sincronizacao/ # Mesclagem de três vias, conversores app <-> banco e portas da nuvem (puros)
+├── hooks/         # Estado compartilhado (useAcoes, useAgenda, useConta, useSincronizacao)
 ├── theme/         # ThemeProvider: claro, escuro, automático e cor de destaque
 ├── styles/        # Tokens de design (theme.ts) e cores
 ├── ui/            # Componentes base (Screen, Card, Text, Icon, SegmentedControl)
 ├── components/    # Componentes do app (anel, cartões, sheet, toast, gráficos, agenda)
 ├── screens/       # Telas
 ├── navigation/    # Abas e pilha
-└── services/      # Supabase e migrações SQL
+└── services/      # Cliente Supabase e adaptadores (autenticação e nuvem)
+supabase/migrations/ # SQL revisado e aplicado pelo dono (001, 002 e 003 aplicadas)
 ```
 
 ---
@@ -143,7 +151,9 @@ src/
 4. [04 Design Tokens, Motion e Acessibilidade](docs/04-design-tokens-e-motion.md)
 5. [05 Funcionalidades, Fluxos e Critérios de Aceite](docs/05-funcionalidades-e-fluxos.md)
 6. [06 Roteiro de Desenvolvimento](docs/06-roteiro-claude-code.md)
-7. [Especificações](docs/superpowers/specs/): a agenda semanal (2026-11-15) é a vigente; a de plano diário (2026-10-18) foi substituída.
+7. [08 Release do APK](docs/08-release-apk.md)
+8. [09 LGPD: pendências para revisão jurídica](docs/09-lgpd-pendencias-juridicas.md)
+9. [Especificações](docs/superpowers/specs/): a agenda semanal (2026-11-15) é a vigente; a de plano diário (2026-10-18) foi substituída.
 
 Os documentos 01 a 06 ainda descrevem o app de hábitos e serão atualizados ao fim de cada etapa.
 

@@ -1,9 +1,10 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useState, type ReactNode } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Alert, Linking, Pressable, StyleSheet, View } from "react-native";
 import BotaoTexto from "../components/BotaoTexto";
 import CabecalhoDeTela from "../components/CabecalhoDeTela";
 import Campo from "../components/Campo";
+import SeletorDeAntecedencia from "../components/SeletorDeAntecedencia";
 import SeletorDeAtividade from "../components/SeletorDeAtividade";
 import SeletorDeDias from "../components/SeletorDeDias";
 import SeletorDeHorario from "../components/SeletorDeHorario";
@@ -17,7 +18,9 @@ import {
   type DiaDaSemana,
   type Resultado,
 } from "../domain/agenda";
+import { ANTECEDENCIA_PADRAO } from "../domain/alertas";
 import { chaveDoDia } from "../domain/datas";
+import { useAlertas } from "../hooks/useAlertas";
 import { useAgenda, type CompromissoRascunho, type EscopoDaEdicao } from "../hooks/useAgenda";
 import type { RaizParamList } from "../navigation/Raiz";
 import { RADIUS, SIZES, SPACING } from "../styles/theme";
@@ -38,6 +41,17 @@ type Painel =
 type Repeticao = "semana" | "avulso";
 
 const AVISO_PERIODO_TODO = "O período todo muda também os dias já passados deste período.";
+
+export const EXPLICACAO_DA_PERMISSAO =
+  "Para te avisar antes dos compromissos, o Blueprint precisa enviar notificações.";
+export const AVISO_DE_PERMISSAO_NEGADA =
+  "O compromisso foi salvo, mas o aviso não vai tocar: as notificações do Blueprint estão bloqueadas no aparelho.";
+
+function abrirConfiguracoes() {
+  Linking.openSettings().catch((erro: unknown) => {
+    console.warn("Não foi possível abrir as configurações do aparelho.", erro);
+  });
+}
 
 export default function CompromissoScreen({ route, navigation }: Props) {
   const { dados } = useAgenda();
@@ -95,6 +109,7 @@ function Formulario({ alvo, data, semDiaInicial, navigation }: FormularioProps) 
     salvarAvulso,
     removerAvulso,
   } = useAgenda();
+  const { permissao, pedirPermissao } = useAlertas();
   const { colors } = useTheme();
 
   const hoje = relogio();
@@ -124,8 +139,11 @@ function Formulario({ alvo, data, semDiaInicial, navigation }: FormularioProps) 
     editando && (existente?.fim ?? avulsoExistente?.fim) === null,
   );
   const [detalhe, setDetalhe] = useState(existente?.detalhe ?? avulsoExistente?.detalhe ?? "");
-  const [antecedencia, setAntecedencia] = useState(
-    existente?.antecedenciaMin !== undefined ? String(existente.antecedenciaMin) : "",
+  // Novo já vem com aviso; existente mantém o que tem, inclusive "Sem aviso".
+  const [antecedencia, setAntecedencia] = useState<number | undefined>(
+    alvo.tipo === "novo"
+      ? ANTECEDENCIA_PADRAO
+      : (existente?.antecedenciaMin ?? avulsoExistente?.antecedenciaMin),
   );
   const [dataTexto, setDataTexto] = useState(avulsoExistente?.data ?? data ?? chaveDoDia(hoje));
   const [erro, setErro] = useState<string | null>(null);
@@ -136,8 +154,29 @@ function Formulario({ alvo, data, semDiaInicial, navigation }: FormularioProps) 
     alvo.tipo === "compromisso" ? dados.agendas.find((a) => a.id === alvo.agendaId) : undefined;
   const emCursoRecorrente = agendaDoAlvo !== undefined && agendaEmCurso(agendaDoAlvo, hoje);
 
+  /**
+   * Depois de salvar com aviso: se o app ainda não pode notificar, explica antes de o sistema
+   * perguntar (só "Permitir" chama a permissão); se está bloqueado, oferece as configurações.
+   * O compromisso já está salvo nos dois casos.
+   */
+  function orientarSobreAlertas() {
+    if (antecedencia === undefined) return;
+    if (permissao === "perguntar") {
+      Alert.alert("Permitir notificações?", EXPLICACAO_DA_PERMISSAO, [
+        { text: "Agora não", style: "cancel" },
+        { text: "Permitir", onPress: () => void pedirPermissao() },
+      ]);
+    } else if (permissao === "negada") {
+      Alert.alert("Notificações bloqueadas", AVISO_DE_PERMISSAO_NEGADA, [
+        { text: "Agora não", style: "cancel" },
+        { text: "Abrir configurações", onPress: abrirConfiguracoes },
+      ]);
+    }
+  }
+
   function concluir(resultado: Resultado<unknown>) {
     if (resultado.ok) {
+      orientarSobreAlertas();
       navigation.goBack();
       return;
     }
@@ -157,6 +196,7 @@ function Formulario({ alvo, data, semDiaInicial, navigation }: FormularioProps) 
       inicio: inicio ?? "",
       fim: semTermino || fim === null || fim === "" ? null : fim,
       ...(detalhe.trim().length > 0 ? { detalhe: detalhe.trim() } : {}),
+      ...(antecedencia !== undefined ? { antecedenciaMin: antecedencia } : {}),
     };
 
     if (repeticao === "avulso") {
@@ -174,7 +214,6 @@ function Formulario({ alvo, data, semDiaInicial, navigation }: FormularioProps) 
       id: existente?.id,
       ...comum,
       dias,
-      ...(antecedencia.trim().length > 0 ? { antecedenciaMin: Number(antecedencia) } : {}),
     };
     const { id: _id, ...conteudo } = rascunho;
     const invalido = validarCompromisso(conteudo);
@@ -344,18 +383,9 @@ function Formulario({ alvo, data, semDiaInicial, navigation }: FormularioProps) 
         valor={detalhe}
         aoMudar={setDetalhe}
         maxLength={60}
-        placeholder="Ex.: Montese, Uber"
+        placeholder="Ex.: local ou transporte"
       />
-      {repeticao === "semana" ? (
-        <Campo
-          rotulo="Avisar antes (minutos)"
-          valor={antecedencia}
-          aoMudar={setAntecedencia}
-          teclado="numeric"
-          maxLength={3}
-          placeholder="Sem aviso"
-        />
-      ) : null}
+      <SeletorDeAntecedencia valor={antecedencia} aoMudar={setAntecedencia} />
     </Screen>
   );
 }

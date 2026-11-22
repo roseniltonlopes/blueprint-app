@@ -1,14 +1,15 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ComponentType } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
 import GraficoSemanal from "../components/GraficoSemanal";
 import ListaDeDias from "../components/ListaDeDias";
+import PainelDeCompromissos from "../components/PainelDeCompromissos";
 import Resumo from "../components/Resumo";
 import ResumoPorCategoria from "../components/ResumoPorCategoria";
-import { gerarDadosDeExemplo } from "../dev/dadosDeExemplo";
 import type { Acao } from "../domain/acoes";
 import {
   DIAS_ABREVIADOS,
+  MESES,
   chaveDoDia,
   formatarIntervalo,
   formatarMesAno,
@@ -23,7 +24,9 @@ import {
   semanaDoGrafico,
   sequenciaAtual,
 } from "../domain/estatisticas";
+import { painelDoMes } from "../domain/painel";
 import { useAcoes } from "../hooks/useAcoes";
+import { useAgenda } from "../hooks/useAgenda";
 import { useTheme } from "../theme/ThemeProvider";
 import { SIZES, SPACING } from "../styles/theme";
 import { Card } from "../ui/Card";
@@ -35,32 +38,13 @@ import { Text } from "../ui/Text";
 
 type Visao = "semana" | "mes";
 
-function FerramentasDeDesenvolvimento() {
-  const { substituir, relogio } = useAcoes();
-  if (!__DEV__) {
-    return null;
-  }
-  return (
-    <View style={styles.dev}>
-      <Text variant="caption" color="mute">
-        DEV
-      </Text>
-      <Pressable
-        accessibilityRole="button"
-        onPress={() => substituir(gerarDadosDeExemplo(relogio()))}
-        style={styles.devBotao}
-      >
-        <Text variant="caption" color="accentText" weight={600}>
-          Gerar dados de exemplo
-        </Text>
-      </Pressable>
-      <Pressable accessibilityRole="button" onPress={() => substituir([])} style={styles.devBotao}>
-        <Text variant="caption" color="accentText" weight={600}>
-          Limpar
-        </Text>
-      </Pressable>
-    </View>
-  );
+// Ferramentas de desenvolvimento: o require só existe dentro do if (__DEV__), para o Metro
+// descartar o módulo de exemplo no build de produção.
+let FerramentasDeDesenvolvimento: ComponentType | null = null;
+if (__DEV__) {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const modulo = require("../dev/FerramentasDoHistorico") as { default: ComponentType };
+  FerramentasDeDesenvolvimento = modulo.default;
 }
 
 type NavegacaoProps = {
@@ -114,6 +98,7 @@ function Navegacao({
  */
 export default function HistoricoScreen() {
   const { acoes, relogio } = useAcoes();
+  const { dados: agenda } = useAgenda();
   const [visao, setVisao] = useState<Visao>("semana");
   const [semanasAtras, setSemanasAtras] = useState(0);
   const [mesesAtras, setMesesAtras] = useState(0);
@@ -144,6 +129,8 @@ export default function HistoricoScreen() {
   const doMes = contagemPorCategoria(acoes, anoDoMes, numeroDoMes);
   const doMesAnterior = contagemPorCategoria(acoes, anoAnterior, numeroAnterior);
   const resumoMes = resumoDoMes(porDia, anoDoMes, numeroDoMes);
+  // Até 31 dias de ocorrências: barato o bastante para calcular a cada render.
+  const painel = painelDoMes(agenda, anoDoMes, numeroDoMes, hoje);
 
   return (
     <Screen scroll contentStyle={styles.conteudo}>
@@ -238,10 +225,14 @@ export default function HistoricoScreen() {
               />
             </>
           )}
+          <Text variant="section" accessibilityRole="header" style={styles.titulo}>
+            Compromissos da agenda
+          </Text>
+          <PainelDeCompromissos painel={painel} nomeDoMes={MESES[numeroDoMes]} />
         </>
       )}
 
-      <FerramentasDeDesenvolvimento />
+      {FerramentasDeDesenvolvimento ? <FerramentasDeDesenvolvimento /> : null}
     </Screen>
   );
 }
@@ -260,6 +251,4 @@ const styles = StyleSheet.create({
   intervalo: { fontSize: 15 },
   titulo: { marginTop: SPACING.sm },
   vazio: { marginTop: SPACING.sm },
-  dev: { flexDirection: "row", alignItems: "center", gap: SPACING.sm },
-  devBotao: { minHeight: SIZES.touchMin, justifyContent: "center", paddingHorizontal: SPACING.sm },
 });

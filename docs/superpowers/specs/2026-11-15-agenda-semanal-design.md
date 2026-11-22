@@ -12,7 +12,7 @@ A pessoa tem uma semana de horários fixos e diferentes a cada dia (academia às
 1. montar essa semana no celular e **editar quando mudar** (a agenda vale para novembro e pode mudar em dezembro);
 2. receber **alertas** para não esquecer compromissos, incluindo o despertar às 4:30;
 3. consultar o **histórico** de qualquer mês passado, por exemplo "quantas vezes fui à academia em janeiro", mesmo estando em dezembro;
-4. ter o app **instalado por APK**, com os dados na nuvem (Supabase), e uma camada de **gamificação** que dê vontade de cumprir a agenda.
+4. ter o app **instalado por APK**, com os dados na nuvem (Supabase). (A camada de gamificação prevista aqui foi retirada pelo dono em 2026-11-21.)
 
 O asterisco (`*`) do caderno marca um espaço livre onde se pode encaixar outra atividade. Não é prioridade nem alerta reforçado.
 
@@ -20,7 +20,7 @@ O asterisco (`*`) do caderno marca um espaço livre onde se pode encaixar outra 
 
 **Objetivos**
 - Agenda semanal com compromissos que têm início e fim, repetem por dia da semana e podem mudar de um mês para outro sem apagar o passado.
-- Registro de cada compromisso com 1 toque ("Feito" ou "Não fui"), para que o histórico seja verdadeiro.
+- Registro de cada compromisso com 1 toque ("Feito" ou "Não fiz"), para que o histórico seja verdadeiro.
 - Alertas locais confiáveis com o app fechado, em um APK Android.
 - Painel de histórico por atividade e por mês.
 - Dados no Supabase por usuário, com o app funcionando sem internet.
@@ -117,11 +117,11 @@ type DadosAgenda = {
 | # | Etapa | Entrega testável |
 | :-: | :--- | :--- |
 | 1 | **Agenda semanal** (este documento, seção 7) | Ver a semana, criar, editar, remover, duplicar para o mês seguinte |
-| 2 | **Registro Feito / Não fui**, Home com os compromissos de hoje, e "Feito" gerando a ação da categoria (seção 8) | Tocar em Feito e ver o dia e o anel da Home andarem; Desfazer |
+| 2 | **Registro Feito / Não fiz**, Home com os compromissos de hoje, e "Feito" gerando a ação da categoria (seção 8) | Tocar em Feito e ver o dia e o anel da Home andarem; Desfazer |
 | 3 | **Alertas locais**: despertar às 4:30, antecedência por compromisso, botão Feito na notificação, permissões Android (notificações, alarme exato, economia de bateria) | Receber o alerta com o app fechado, em APK ou development build |
 | 4 | **Painel de histórico**: contagem por atividade e por mês, comparação entre meses, detalhe dos dias | "Quantas vezes fui à academia em novembro" |
 | 5 | **Supabase**: login, migração com acesso por usuário (RLS), sincronização offline-first, subida dos dados locais | Entrar em outro aparelho e ver o mesmo histórico |
-| 6 | **Gamificação e ganhos visuais**: sequência de dias cumpridos, "dia perfeito", conquistas, animações | Comemorações e progresso visual |
+| 6 | ~~Gamificação e ganhos visuais~~ | Retirada do plano pelo dono em 2026-11-21 |
 | 7 | **APK de release**: checklist de segurança e build | Instalar o `.apk` final |
 
 As etapas 1 a 4 funcionam só no aparelho. **O Supabase só é necessário na etapa 5**, e o assistente avisa antes de começar.
@@ -195,7 +195,7 @@ Reaproveita `theme.ts`, `Card`, `Text`, `Screen`, `SegmentedControl`, `Icon` e a
 - Dia da semana sem compromissos: texto "Nada marcado" e o "+ Adicionar".
 - **Fuso:** até a etapa 5, "hoje", o início da semana e os horários dos alertas e registros seguem o **relógio do aparelho** (regra já vigente em `src/domain/datas.ts`). As funções de `agenda.ts` recebem a data como `Date` e não conhecem fuso. Quando o Supabase entrar, os registros passam a guardar também o fuso IANA do aparelho (`fusoDoAparelho()`), sem mudar a agenda.
 - Troca de horário de verão e virada de dia com o app aberto: usa as funções de data existentes (calendário local).
-- **Dia passado sem registro:** não vira "Não fui" automaticamente. O painel da etapa 4 mostra "feitas" como número principal e, ao lado, "sem registro" para o que estava planejado e não foi marcado. A porcentagem usa as agendas vigentes em cada dia (por isso a divisão "a partir de hoje" existe).
+- **Dia passado sem registro:** não vira "Não fiz" automaticamente. O painel da etapa 4 mostra "feitas" como número principal e, ao lado, "sem registro" para o que estava planejado e não foi marcado. A porcentagem usa as agendas vigentes em cada dia (por isso a divisão "a partir de hoje" existe).
 - Falha ao gravar: aviso no console de desenvolvimento, estado mantido em memória (mesmo padrão das ações).
 
 ### 7.5 Testes
@@ -209,7 +209,7 @@ Reaproveita `theme.ts`, `Card`, `Text`, `Screen`, `SegmentedControl`, `Icon` e a
 
 - A **agenda** passa a ser o núcleo do planejamento. As telas "Monte seu dia", "Seu dia" e "Meu plano" da Parte 1 **não serão implementadas** como estão.
 - Os **hábitos de 1 toque** da Home (hidratação, exercício etc.) continuam como hoje.
-- Lembretes (Parte 2) e conquistas (Parte 3) da especificação anterior são absorvidos pelas etapas 3 e 6 deste documento.
+- Lembretes (Parte 2) da especificação anterior são absorvidos pela etapa 3 deste documento. As conquistas (Parte 3) foram retiradas junto com a etapa 6.
 - A especificação antiga recebe uma nota de substituição no topo.
 - **A categoria agrupa, a atividade detalha** (decidido pelo dono): "Exercício" é uma categoria dos hábitos, e "Academia", "Corrida", "Futebol" e "Caminhada" são atividades dentro dela. Cada atividade escolhe uma categoria (ou nenhuma). Sugestões iniciais: Academia, Corrida, Futebol, Caminhada em Exercício; Aula e Estudar em Estudo; Trabalho, Uber, Culto e outras ficam sem categoria até a pessoa escolher.
 - **Efeito na etapa 2 (decisão minha, a confirmar):** marcar "Feito" em um compromisso de atividade **com categoria** também grava uma ação daquela categoria (com o rótulo da atividade), então Home, Calendário e Histórico de hábitos continuam coerentes sem toque duplo. "Desfazer" remove as duas. Atividades sem categoria só aparecem na agenda e no painel de compromissos.

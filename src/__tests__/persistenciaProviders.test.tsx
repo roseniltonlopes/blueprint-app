@@ -3,11 +3,15 @@ import { criarAcoesRepositoryLocal } from "../data/AcoesRepository";
 import { criarArmazenamentoEmMemoria } from "../data/armazenamento";
 import { criarAcao } from "../domain/acoes";
 import { AcoesProvider } from "../hooks/useAcoes";
+import { AgendaProvider } from "../hooks/useAgenda";
+import { AlertasProvider } from "../hooks/useAlertas";
+import { ContaProvider } from "../hooks/useConta";
 import { PerfilProvider } from "../hooks/usePerfil";
+import { SincronizacaoProvider } from "../hooks/useSincronizacao";
 import HomeScreen from "../screens/HomeScreen";
 import PerfilScreen from "../screens/PerfilScreen";
 import { ThemeProvider } from "../theme/ThemeProvider";
-import { AGORA, relogioFixo, renderComTema } from "./utils";
+import { AGORA, relogioFixo, renderComTema, servicoDeAlertasFalso } from "./utils";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 const METRICAS = {
@@ -26,7 +30,9 @@ describe("AcoesProvider com repositório", () => {
       <SafeAreaProvider initialMetrics={METRICAS}>
         <ThemeProvider initialMode="light">
           <AcoesProvider relogio={relogioFixo()} acoesIniciais={[existente]} repositorio={repo}>
-            <HomeScreen />
+            <AgendaProvider>
+              <HomeScreen />
+            </AgendaProvider>
           </AcoesProvider>
         </ThemeProvider>
       </SafeAreaProvider>,
@@ -47,7 +53,9 @@ describe("AcoesProvider com repositório", () => {
       <SafeAreaProvider initialMetrics={METRICAS}>
         <ThemeProvider initialMode="light">
           <AcoesProvider relogio={relogioFixo()} meta={8}>
-            <HomeScreen />
+            <AgendaProvider>
+              <HomeScreen />
+            </AgendaProvider>
           </AcoesProvider>
         </ThemeProvider>
       </SafeAreaProvider>,
@@ -64,9 +72,17 @@ describe("ThemeProvider com persistência", () => {
       <SafeAreaProvider initialMetrics={METRICAS}>
         <ThemeProvider initialMode="dark" initialDestaque="indigo" aoMudar={aoMudar}>
           <AcoesProvider relogio={relogioFixo()}>
-            <PerfilProvider>
-              <PerfilScreen />
-            </PerfilProvider>
+            <AgendaProvider>
+              <AlertasProvider servico={servicoDeAlertasFalso()}>
+                <PerfilProvider>
+                  <ContaProvider porta={null}>
+                    <SincronizacaoProvider nuvem={null}>
+                      <PerfilScreen />
+                    </SincronizacaoProvider>
+                  </ContaProvider>
+                </PerfilProvider>
+              </AlertasProvider>
+            </AgendaProvider>
           </AcoesProvider>
         </ThemeProvider>
       </SafeAreaProvider>,

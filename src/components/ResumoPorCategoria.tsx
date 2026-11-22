@@ -1,7 +1,7 @@
 import { StyleSheet, View } from "react-native";
 import { nomeDaCategoria } from "../domain/categorias";
 import type { ContagemDeCategoria } from "../domain/estatisticas";
-import { plural } from "../domain/texto";
+import { comparacaoComMesAnterior, plural } from "../domain/texto";
 import { RADIUS, SIZES, SPACING } from "../styles/theme";
 import { useTheme } from "../theme/ThemeProvider";
 import { Card } from "../ui/Card";
@@ -14,14 +14,6 @@ type ResumoPorCategoriaProps = {
   anterior: readonly ContagemDeCategoria[] | null;
 };
 
-function comparacao(total: number, antes: number): string {
-  const diferenca = total - antes;
-  if (diferenca === 0) return "igual ao mês anterior";
-  return diferenca > 0
-    ? `${diferenca} a mais que no mês anterior`
-    : `${-diferenca} a menos que no mês anterior`;
-}
-
 /** "Quantas vezes por categoria no mês": uma barra por categoria, proporcional à maior. */
 export default function ResumoPorCategoria({ atual, anterior }: ResumoPorCategoriaProps) {
   const { colors } = useTheme();
@@ -32,7 +24,8 @@ export default function ResumoPorCategoria({ atual, anterior }: ResumoPorCategor
     <Card radius="category" style={styles.cartao}>
       {atual.map(({ categoria, total }) => {
         const nome = nomeDaCategoria(categoria);
-        const texto = anterior === null ? null : comparacao(total, antes.get(categoria) ?? 0);
+        const texto =
+          anterior === null ? null : comparacaoComMesAnterior(total, antes.get(categoria) ?? 0);
         return (
           <View
             key={categoria}

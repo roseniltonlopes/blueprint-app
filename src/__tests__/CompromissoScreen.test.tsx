@@ -1,13 +1,17 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { fireEvent, screen } from "@testing-library/react-native";
+import { act, fireEvent, screen, waitFor } from "@testing-library/react-native";
 import { useEffect } from "react";
+import { Alert, Linking } from "react-native";
 import type { Agenda, Atividade, Avulso, DadosAgenda } from "../domain/agenda";
 import { useAgenda, type UseAgenda } from "../hooks/useAgenda";
 import type { RaizParamList } from "../navigation/Raiz";
-import CompromissoScreen from "../screens/CompromissoScreen";
+import CompromissoScreen, {
+  AVISO_DE_PERMISSAO_NEGADA,
+  EXPLICACAO_DA_PERMISSAO,
+} from "../screens/CompromissoScreen";
 import { Text } from "../ui/Text";
-import { renderComTema } from "./utils";
+import { renderComTema, servicoDeAlertasFalso } from "./utils";
 
 // O seletor real tem teste próprio (componentesAgenda); aqui um campo de texto simples basta.
 jest.mock("../components/SeletorDeHorario", () => {
@@ -116,6 +120,7 @@ const DADOS: DadosAgenda = {
   atividades: [academia, aula],
   agendas: [outubro, novembro],
   avulsos: [avulso],
+  registros: [],
 };
 
 async function abrir(params?: RaizParamList["Compromisso"], dados: DadosAgenda = DADOS) {
@@ -198,17 +203,6 @@ describe("CompromissoScreen: criar", () => {
     expect(screen.getByRole("alert")).toHaveTextContent("O término deve ser depois do início");
     expect(api.dados.agendas.find((a) => a.id === "nov")?.compromissos).toHaveLength(1);
     expect(screen.queryByText("Voltou")).toBeNull();
-  });
-
-  it("recusa antecedência fora de 0 a 120", async () => {
-    await abrir({ data: "2026-11-06" });
-    await fireEvent.press(screen.getByRole("radio", { name: "Academia" }));
-    await digitar("Início", "05:00");
-    await digitar("Avisar antes (minutos)", "150");
-    await tocar("Salvar");
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      "A antecedência deve ficar entre 0 e 120 minutos",
-    );
   });
 
   it("avisa quando não há agenda para o período e oferece criar uma", async () => {
@@ -406,5 +400,140 @@ describe("CompromissoScreen: vindo da semana modelo", () => {
     expect(
       screen.getByRole("checkbox", { name: "Domingo" }).props.accessibilityState,
     ).toMatchObject({ checked: false });
+  });
+});
+
+describe("CompromissoScreen: avisar antes", () => {
+  function selecionado(nome: string) {
+    return screen.getByRole("radio", { name: nome }).props.accessibilityState;
+  }
+
+  it("compromisso novo já vem com 10 minutos e salva a opção escolhida", async () => {
+    await abrir({ data: "2026-11-06" });
+    expect(selecionado("Avisar 10 min antes")).toMatchObject({ selected: true });
+
+    await fireEvent.press(screen.getByRole("radio", { name: "Academia" }));
+    await digitar("Início", "05:00");
+    await fireEvent.press(screen.getByRole("radio", { name: "Avisar na hora" }));
+    await tocar("Salvar");
+
+    const criados = api.dados.agendas.find((a) => a.id === "nov")?.compromissos ?? [];
+    expect(criados[1]).toMatchObject({ inicio: "05:00", antecedenciaMin: 0 });
+  });
+
+  it("Sem aviso salva o compromisso sem antecedência", async () => {
+    await abrir({ data: "2026-11-06" });
+    await fireEvent.press(screen.getByRole("radio", { name: "Academia" }));
+    await digitar("Início", "05:00");
+    await fireEvent.press(screen.getByRole("radio", { name: "Sem aviso" }));
+    await tocar("Salvar");
+
+    const criados = api.dados.agendas.find((a) => a.id === "nov")?.compromissos ?? [];
+    expect(criados[1]).not.toHaveProperty("antecedenciaMin");
+  });
+
+  it("compromisso existente mantém o que tem, inclusive sem aviso", async () => {
+    await abrir({ compromissoId: "n1", agendaId: "nov" });
+    expect(selecionado("Sem aviso")).toMatchObject({ selected: true });
+  });
+
+  it("valor fora da lista aparece como opção extra marcada e não se perde", async () => {
+    const dados: DadosAgenda = {
+      ...DADOS,
+      agendas: [
+        outubro,
+        { ...novembro, compromissos: [{ ...novembro.compromissos[0], antecedenciaMin: 20 }] },
+      ],
+    };
+    await abrir({ compromissoId: "n1", agendaId: "nov" }, dados);
+    expect(selecionado("Avisar 20 min antes")).toMatchObject({ selected: true });
+
+    await tocar("Salvar");
+    expect(api.dados.agendas.find((a) => a.id === "nov")?.compromissos[0]).toMatchObject({
+      antecedenciaMin: 20,
+    });
+  });
+
+  it("avulso também guarda o aviso", async () => {
+    await abrir({ data: "2026-10-20" });
+    await fireEvent.press(screen.getByRole("radio", { name: "Só neste dia" }));
+    await fireEvent.press(screen.getByRole("radio", { name: "Aula" }));
+    await digitar("Início", "10:00");
+    await fireEvent.press(screen.getByRole("radio", { name: "Avisar 30 min antes" }));
+    await tocar("Salvar");
+
+    expect(api.dados.avulsos[1]).toMatchObject({ inicio: "10:00", antecedenciaMin: 30 });
+  });
+});
+
+describe("CompromissoScreen: permissão de notificações no momento certo", () => {
+  async function salvarComAviso(permissao: "perguntar" | "negada" | "concedida") {
+    const servico = servicoDeAlertasFalso(permissao, "concedida");
+    const pedir = jest.spyOn(servico, "pedirPermissao");
+    const alerta = jest.spyOn(Alert, "alert").mockImplementation(() => {});
+    await renderComTema(<Tela params={{ data: "2026-11-06" }} />, {
+      agenda: DADOS,
+      servicoDeAlertas: servico,
+    });
+    // A permissão é consultada ao abrir; nada é pedido ao sistema nesse momento.
+    await waitFor(() => expect(screen.getByRole("radio", { name: "Academia" })).toBeTruthy());
+    await act(async () => {});
+    expect(pedir).not.toHaveBeenCalled();
+
+    await fireEvent.press(screen.getByRole("radio", { name: "Academia" }));
+    await digitar("Início", "05:00");
+    await tocar("Salvar");
+    return { alerta, pedir };
+  }
+
+  it("perguntar: salva, explica antes e só pede ao sistema em Permitir", async () => {
+    const { alerta, pedir } = await salvarComAviso("perguntar");
+
+    expect(api.dados.agendas.find((a) => a.id === "nov")?.compromissos).toHaveLength(2);
+    expect(alerta).toHaveBeenCalledWith("Permitir notificações?", EXPLICACAO_DA_PERMISSAO, [
+      expect.objectContaining({ text: "Agora não" }),
+      expect.objectContaining({ text: "Permitir" }),
+    ]);
+    expect(pedir).not.toHaveBeenCalled();
+
+    const botoes = alerta.mock.calls[0][2] ?? [];
+    await act(async () => {
+      botoes[1].onPress?.();
+    });
+    expect(pedir).toHaveBeenCalledTimes(1);
+  });
+
+  it("perguntar e Agora não: salva e não pede nada ao sistema", async () => {
+    const { alerta, pedir } = await salvarComAviso("perguntar");
+    const botoes = alerta.mock.calls[0][2] ?? [];
+    await act(async () => {
+      botoes[0].onPress?.();
+    });
+    expect(pedir).not.toHaveBeenCalled();
+    expect(api.dados.agendas.find((a) => a.id === "nov")?.compromissos).toHaveLength(2);
+  });
+
+  it("negada: salva e oferece abrir as configurações", async () => {
+    const abrirConfiguracoes = jest.spyOn(Linking, "openSettings").mockResolvedValue();
+    const { alerta, pedir } = await salvarComAviso("negada");
+
+    expect(api.dados.agendas.find((a) => a.id === "nov")?.compromissos).toHaveLength(2);
+    expect(alerta).toHaveBeenCalledWith("Notificações bloqueadas", AVISO_DE_PERMISSAO_NEGADA, [
+      expect.objectContaining({ text: "Agora não" }),
+      expect.objectContaining({ text: "Abrir configurações" }),
+    ]);
+    const botoes = alerta.mock.calls[0][2] ?? [];
+    await act(async () => {
+      botoes[1].onPress?.();
+    });
+    expect(abrirConfiguracoes).toHaveBeenCalled();
+    expect(pedir).not.toHaveBeenCalled();
+  });
+
+  it("concedida: salva sem mostrar nada", async () => {
+    const { alerta, pedir } = await salvarComAviso("concedida");
+    expect(api.dados.agendas.find((a) => a.id === "nov")?.compromissos).toHaveLength(2);
+    expect(alerta).not.toHaveBeenCalled();
+    expect(pedir).not.toHaveBeenCalled();
   });
 });
