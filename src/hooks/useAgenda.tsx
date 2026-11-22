@@ -94,7 +94,7 @@ export type UseAgenda = {
    */
   marcar: (chaveDaOcorrencia: string, status: StatusDoRegistro, dia?: Date) => Resultado<Marcacao>;
   desfazerMarcacao: (marcacao: Marcacao) => void;
-  /** Só para a ferramenta de desenvolvimento. */
+  /** Troca a agenda inteira: sincronização com a nuvem e a ferramenta de desenvolvimento. */
   substituir: (dados: DadosAgenda) => void;
 };
 

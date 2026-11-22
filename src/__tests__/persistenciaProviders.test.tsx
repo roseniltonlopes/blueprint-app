@@ -5,7 +5,9 @@ import { criarAcao } from "../domain/acoes";
 import { AcoesProvider } from "../hooks/useAcoes";
 import { AgendaProvider } from "../hooks/useAgenda";
 import { AlertasProvider } from "../hooks/useAlertas";
+import { ContaProvider } from "../hooks/useConta";
 import { PerfilProvider } from "../hooks/usePerfil";
+import { SincronizacaoProvider } from "../hooks/useSincronizacao";
 import HomeScreen from "../screens/HomeScreen";
 import PerfilScreen from "../screens/PerfilScreen";
 import { ThemeProvider } from "../theme/ThemeProvider";
@@ -73,7 +75,11 @@ describe("ThemeProvider com persistência", () => {
             <AgendaProvider>
               <AlertasProvider servico={servicoDeAlertasFalso()}>
                 <PerfilProvider>
-                  <PerfilScreen />
+                  <ContaProvider porta={null}>
+                    <SincronizacaoProvider nuvem={null}>
+                      <PerfilScreen />
+                    </SincronizacaoProvider>
+                  </ContaProvider>
                 </PerfilProvider>
               </AlertasProvider>
             </AgendaProvider>

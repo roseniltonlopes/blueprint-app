@@ -12,6 +12,7 @@ type CardProps = {
   /** Inverte as cores (fundo ink), usado no estado selecionado */
   inverted?: boolean;
   style?: StyleProp<ViewStyle>;
+  testID?: string;
 };
 
 export function Card({
@@ -20,11 +21,13 @@ export function Card({
   elevation = "card",
   inverted = false,
   style,
+  testID,
 }: CardProps) {
   const { colors, shadows } = useTheme();
 
   return (
     <View
+      testID={testID}
       style={[
         {
           backgroundColor: inverted ? colors.ink : colors.card,

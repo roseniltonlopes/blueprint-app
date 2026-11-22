@@ -10,6 +10,9 @@ type BotaoTextoProps = {
   aoPressionar: () => void;
   /** "primario" é o botão preto; "secundario" é o tom de superfície; "link" não tem fundo */
   variante?: "primario" | "secundario" | "link";
+  /** Bloqueia o toque (por exemplo, enquanto um envio está em andamento) */
+  desabilitado?: boolean;
+  testID?: string;
 };
 
 export default function BotaoTexto({
@@ -17,6 +20,8 @@ export default function BotaoTexto({
   rotuloAcessivel,
   aoPressionar,
   variante = "secundario",
+  desabilitado = false,
+  testID,
 }: BotaoTextoProps) {
   const { colors } = useTheme();
   const fundo =
@@ -26,8 +31,11 @@ export default function BotaoTexto({
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={rotuloAcessivel ?? rotulo}
+      accessibilityState={desabilitado ? { disabled: true } : undefined}
+      disabled={desabilitado}
       onPress={aoPressionar}
-      style={[styles.botao, { backgroundColor: fundo }]}
+      testID={testID}
+      style={[styles.botao, { backgroundColor: fundo, opacity: desabilitado ? 0.6 : 1 }]}
     >
       <Text
         variant="body"

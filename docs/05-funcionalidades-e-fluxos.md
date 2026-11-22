@@ -31,12 +31,12 @@ Lista das funções do **Blueprint**, com a situação real de cada uma e o crit
 | F15 | Lista cronológica de ações por dia (`FlatList`) | Histórico | 🎨 Desenhado | 3 |
 | F16 | Histórico em visão mensal (seletor "Mês") | Histórico | 🎨 Controle desenhado, conteúdo da visão mensal ainda não especificado | 3 |
 | F17 | Mapa de calor das últimas 12 semanas | Perfil | 🧪 Desenhado | 3 |
-| F18 | Cadastro com Nome, E-mail e Senha (mínimo 8 caracteres) | Cadastro | 🎨 Desenhado | 4 |
+| F18 | Cadastro com E-mail e Senha (mínimo 8 caracteres); o nome vem do Perfil | Conta | 🟡 Parcial: entrar, criar conta, sair e "Esqueci a senha" por e-mail (etapa 5); a tela desenhada com Nome ainda não | 4 |
 | F19 | Login com Google e Apple | Cadastro | 🎨 Desenhado | 4 |
 | F20 | Fuso horário detectado e editável | Cadastro e Perfil | 🎨 Desenhado | 4 |
 | F21 | Editar perfil, cor de destaque (Gradiente, Laranja, Índigo) | Perfil | 🧪 Desenhado | 4 |
-| F22 | Persistir ações no Supabase | Todas | 🟡 Tabela criada, app não integrado | 4 |
-| F23 | Cache offline com sincronização (`AsyncStorage`) | Todas | 🎨 Planejado | 4 |
+| F22 | Persistir ações, agenda, registros e nome do perfil no Supabase | Todas | 🟡 Parcial: código pronto e testado com nuvem falsa (etapa 5); depende da migração 002 aplicada; foto do perfil ainda só no aparelho | 4 |
+| F23 | Offline-first: o app grava no aparelho e sincroniza com a nuvem por mesclagem de três vias | Todas | ✅ Implementado (etapa 5; falta conferir contra o Supabase real) | 4 |
 | F24 | Gerar `.apk` com EAS | n/a | 🟡 `eas.json` pronto, build não executado | 4 |
 | F25 | Ver a agenda da semana, de domingo a sábado, com navegação entre semanas | Agenda | ✅ Implementado (agenda, etapa 1) | A1 |
 | F26 | Criar, editar e remover compromisso recorrente (dias da semana, início, fim opcional, detalhe, aviso antes) | Compromisso | ✅ Implementado (agenda, etapa 1) | A1 |
@@ -62,7 +62,7 @@ Lista das funções do **Blueprint**, com a situação real de cada uma e o crit
 | **Sequência** | Dias consecutivos com pelo menos 1 ação. Se hoje ainda não tem registro, a sequência continua válida até a meia-noite e só zera se ontem também estiver vazio. |
 | **Melhor dia** | Dia da semana (ou data, na visão mensal) com mais ações no período exibido. Em empate, o mais recente. |
 | **Intensidade** | 0, 1 a 2, 3 a 4, 5, 6 ou mais ações, mapeadas para os 4 níveis da rampa de cor. |
-| **Desfazer** | Remove a última ação registrada, disponível por 5 minutos (regra reforçada na policy de exclusão da migração proposta). |
+| **Desfazer** | Remove a última ação registrada pelo toast. Desde a migração 002 o banco deixa apagar qualquer ação própria: quando apagar é regra do app (o toast e o "Feito" que vira "Não fui"). |
 | **Desfazer e contadores** | Ao desfazer, contador, anel, calendário e histórico são recalculados. |
 | **Registro de compromisso** | No máximo um por compromisso por dia, com status "Feito" ou "Não fui". Guarda cópia do nome da atividade, da categoria e do horário: editar ou apagar a agenda depois não muda o passado. |
 | **Sem registro** | Compromisso não marcado continua "sem registro". Nunca vira "Não fui" sozinho. |
@@ -72,6 +72,14 @@ Lista das funções do **Blueprint**, com a situação real de cada uma e o crit
 | **Alerta** | Só para compromisso recorrente com "Avisar antes" preenchido (0 a 120 minutos; 0 avisa na hora). O despertar é um compromisso comum, sem término e com antecedência 0. Não há alerta para o que já foi marcado no dia. |
 | **Janela de alertas** | O app agenda os próximos 14 dias (no máximo 120 alertas) e reagenda ao abrir, ao voltar ao primeiro plano e a cada mudança da agenda. Quem ficar mais de 14 dias sem abrir o app para de receber alertas. |
 | **Feito na notificação** | Abre o app e marca "Feito" só se o alerta for do dia de hoje; se já estava feito, não desmarca. |
+| **Dados no aparelho primeiro** | O app sempre lê e grava no aparelho. A nuvem é uma cópia sincronizada; sem internet nada trava. |
+| **Base da sincronização** | Foto (por tabela, id -> conteúdo) da última sincronização bem-sucedida de cada conta, em `blueprint:sync:<id da conta>`. A conta dona dos dados do aparelho fica em `blueprint:dono`. |
+| **Mesclagem** | Por tabela, comparando aparelho e nuvem com a base: criado só de um lado vai para o outro; apagado de um lado sai do outro; alterado só de um lado vale esse lado; alterado dos dois lados vale o aparelho. Apagado aqui e alterado lá: apaga. Apagado lá e alterado aqui: a edição volta para a nuvem. Sem base (primeira vez): união, conflito vale o aparelho, nada é apagado. Ações não são editadas: no conflito fica a da nuvem. |
+| **Conserto depois da mesclagem** | Atividades com o mesmo nome viram uma só (id da nuvem, conteúdo do aparelho). Atividade apagada aqui e usada por compromisso novo de outro aparelho volta. Agendas sobrepostas: fica a do aparelho. Dois registros do mesmo compromisso no mesmo dia: fica o do aparelho. O resto passa pela mesma validação da leitura do aparelho. |
+| **Quando sincroniza** | Ao entrar, ao abrir o app com sessão, ao voltar ao primeiro plano, 2 segundos depois de cada mudança local e no botão "Sincronizar agora". Uma por vez. Sem internet, tenta de novo em 30 segundos. Falha no meio não grava a base: a próxima recalcula (os envios são idempotentes). |
+| **Outra conta no aparelho** | Se quem entra não é o dono dos dados do aparelho, nada é misturado: o app pede para trocar os dados pelos da conta que entrou ou cancelar (e sair). Dados sem dono (de antes de entrar) sobem para a primeira conta que entrar. |
+| **Sair** | Pergunta se mantém os dados no aparelho. Manter: ficam, e o dono continua o mesmo. Apagar: limpa ações, agenda, perfil e a base deste aparelho (a nuvem fica como está). As preferências de tema continuam. |
+| **Leitura do aparelho falhou** | Se a agenda ou as ações não puderam ser lidas na abertura, a sincronização fica pausada até a próxima abertura (senão a tela vazia apagaria a nuvem). |
 | **Tocar de novo** | Tocar no status já marcado desmarca. O toast permite desfazer qualquer marcação, voltando registro e ação ao estado anterior. |
 
 ---
@@ -114,6 +122,23 @@ Lista das funções do **Blueprint**, com a situação real de cada uma e o crit
 - [ ] E-mail inválido mostra erro junto ao campo.
 - [ ] O fuso horário é detectado automaticamente (por exemplo com `Intl.DateTimeFormat().resolvedOptions().timeZone`; valide no motor Hermes da versão do Expo usada).
 - [ ] Erros de rede mostram mensagem clara e mantêm o que a pessoa digitou.
+
+### F18, F22 e F23: conta e sincronização (etapa 5)
+- [ ] Sem `.env` do Supabase, o Perfil mostra "A conta na nuvem não está disponível nesta versão" e o app funciona só no aparelho.
+- [ ] Sem conta, o cartão "Conta" do Perfil mostra "Entrar ou criar conta", que abre a tela Conta.
+- [ ] Criar conta recusa e-mail inválido e senha com menos de 8 caracteres, com a mensagem junto ao campo, sem chamar o servidor.
+- [ ] Com confirmação de e-mail ligada, criar conta avisa "Enviamos um link para ..." e volta para Entrar.
+- [ ] Entrar com senha errada mostra "E-mail ou senha incorretos."; e-mail não confirmado e falta de internet têm mensagens próprias; o que foi digitado continua nos campos.
+- [ ] "Esqueci a senha" envia o link sem revelar se a conta existe.
+- [ ] Depois de entrar, o cartão mostra o e-mail, "Sincronizando" e depois "Sincronizado às HH:MM".
+- [ ] Os dados que já estavam no aparelho (sem dono) sobem para a conta na primeira sincronização.
+- [ ] Entrar com a mesma conta em outro aparelho traz agenda, registros, ações e nome.
+- [ ] Marcar "Feito" num aparelho aparece no outro depois de sincronizar; apagar num aparelho apaga no outro.
+- [ ] Sem internet, o app continua funcionando; o cartão mostra "Sem internet: tentaremos de novo" e sincroniza quando a conexão volta.
+- [ ] Sem a migração 002 aplicada, o cartão mostra "O banco precisa da migração 002" e o resto do app segue normal.
+- [ ] Entrar com outra conta num aparelho com dados de alguém pede confirmação; "Trocar os dados" deixa só os dados da conta nova; "Cancelar e sair" não mexe em nada.
+- [ ] "Sair" pergunta se mantém os dados; "Apagar e sair" deixa o app vazio, como na primeira abertura.
+- [ ] A foto do perfil continua só no aparelho (pendente: bucket `avatares`).
 
 ### F25 a F31: agenda semanal (etapa 1)
 - [ ] A aba Agenda mostra a semana de hoje, de domingo a sábado, com o dia de hoje destacado e o intervalo (por exemplo "15 a 21 de novembro").
@@ -198,6 +223,7 @@ flowchart LR
 
 | Função | Dado | Origem |
 | :--- | :--- | :--- |
+| Sincronização (etapa 5) | Ações, atividades, agendas, compromissos, avulsos, registros e o nome do perfil | Tabelas `acoes`, `atividades`, `agendas`, `compromissos`, `avulsos`, `registros` e `perfis` (`supabase/migrations/001` e `002`). O app guarda a cópia local e calcula tudo no aparelho. |
 | Contador, anel e contador por categoria | Ações do dia do usuário | `blueprint_actions`, filtradas pelo dia no fuso do perfil |
 | Calendário e mapa de calor | Contagem de ações por dia | Consulta agregada por dia (exemplo abaixo) |
 | Histórico semanal | Contagem por dia da semana | Mesma consulta, intervalo de 7 dias |

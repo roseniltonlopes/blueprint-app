@@ -85,6 +85,49 @@ A migração **não foi aplicada nem testada** no projeto Supabase. Revise e tes
 
 ---
 
+## 2.1 Banco atual e sincronização offline-first (etapa 5)
+
+O esquema em uso está em [`supabase/migrations/`](../supabase/migrations/): a `001_schema_inicial.sql` (aplicada pelo dono) cria `perfis`, `acoes`, `atividades`, `agendas`, `compromissos`, `avulsos` e o bucket `avatares`, todas com RLS por usuário (`auth.uid() = user_id`) e sem nenhum acesso para `anon`. A tabela `blueprint_actions` descrita acima é do protótipo e não existe no projeto atual. A `002_registros_e_exclusao.sql` (escrita, **não aplicada**) cria `registros` ("Feito" e "Não fui") e troca a policy de exclusão de ações de 5 minutos por "qualquer ação própria".
+
+**Princípios**
+- A regra de negócio fica no app; o banco guarda e isola por usuário (RLS).
+- O app lê e grava sempre no aparelho (AsyncStorage). A nuvem é uma cópia.
+- O cliente usa só a chave **publishable** (`EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, no `.env`, fora do Git). Sem `.env`, a conta fica indisponível e o app funciona só local.
+
+**Como uma sincronização funciona** (`src/hooks/useSincronizacao.tsx`, regras puras em `src/sincronizacao/`)
+
+```mermaid
+flowchart LR
+    A["Foto do aparelho"] --> M{"Mesclagem de três vias<br/>por tabela"}
+    B["Base: última sincronização<br/>blueprint:sync:&lt;conta&gt;"] --> M
+    C["Linhas da nuvem<br/>(validadas)"] --> M
+    M --> K["Conserto: nomes repetidos,<br/>órfãos, agendas sobrepostas"]
+    K --> P["Passos na ordem das FKs"]
+    P --> N["Nuvem"]
+    N --> L["Aparelho"]
+    L --> G["Grava a nova base"]
+```
+
+1. Baixa todas as linhas da conta (páginas de 1000). Linha inválida é ignorada com aviso.
+2. Mescla aparelho e nuvem com a base (regras em `docs/05`, seção 2) e conserta o resultado.
+3. Escreve na nuvem nesta ordem: apaga ações, registros, avulsos, compromissos e agendas; apaga atividades que já não são usadas; envia (upsert por `user_id,id`) atividades, agendas, compromissos, avulsos, registros e ações (ações só inserem: `ignoreDuplicates`); apaga as atividades restantes; atualiza o nome em `perfis`.
+4. Grava o resultado no aparelho e só então a nova base. Se algo falhar no meio, a base fica como estava e a próxima sincronização recalcula.
+
+Outra conta no mesmo aparelho nunca é misturada: o app pede confirmação e troca os dados. A foto do perfil ainda não sobe (pendente: bucket `avatares`).
+
+**Como aplicar a migração 002**
+1. Leia o arquivo inteiro e teste antes em um projeto de desenvolvimento (ou num branch do Supabase).
+2. Painel do Supabase > SQL Editor > New query > cole `supabase/migrations/002_registros_e_exclusao.sql` > Run (uma vez só).
+3. Rode as consultas do bloco CONFERÊNCIA no fim do arquivo.
+4. Abra o app, entre e confira no Perfil "Sincronizado às HH:MM". Antes da 002, o Perfil mostra "O banco precisa da migração 002" e nada é enviado.
+
+**Configuração do Auth no painel (dono)**
+- Ligar a proteção contra senhas vazadas (Authentication > Policies/Passwords).
+- Confirmar como ficam a confirmação de e-mail e o remetente (o SMTP padrão do Supabase tem limite baixo de envios por hora).
+- "Esqueci a senha" envia o link padrão do Supabase, que abre a *Site URL* configurada no painel. O app ainda não trata esse link (não há deep link): a troca da senha precisa de uma página na Site URL ou de um deep link numa etapa futura.
+
+---
+
 ## 3. Geração do `.APK` Gratuito para Android
 
 O arquivo [`eas.json`](../eas.json) na raiz do projeto está configurado com `"buildType": "apk"` no perfil `preview`, permitindo gerar um arquivo instalável diretamente nos dispositivos Android sem depender de publicação paga em loja.
@@ -127,10 +170,10 @@ O arquivo [`eas.json`](../eas.json) na raiz do projeto está configurado com `"b
 | Anel de progresso e gráfico semanal | `react-native-svg` | 2 |
 | Tipografia da marca | `expo-font` com Nohemi | 2 |
 | Tema claro, escuro e automático | Contexto de tema alimentado por `THEMES` e `useColorScheme()` | 2 |
-| Autenticação | Supabase Auth (Google, Apple e e-mail) | 4 |
+| Autenticação | Supabase Auth: e-mail e senha prontos (etapa 5); Google e Apple pendentes | 4 |
 | Preferências do usuário (tema, fuso, meta, cor de destaque) | Tabela `perfis` com RLS por usuário (migração proposta) | 4 |
 | Calendário, histórico e mapa de calor | Consulta agregada por dia no fuso do perfil | 3 |
-| Desfazer | Policy de exclusão limitada a ações recentes do próprio usuário | 4 |
+| Desfazer | Policy de exclusão de qualquer ação própria (migração 002); a regra de quando apagar é do app | 4 |
 
 O modelo de dados completo e as regras de negócio estão em [`05-funcionalidades-e-fluxos.md`](05-funcionalidades-e-fluxos.md).
 

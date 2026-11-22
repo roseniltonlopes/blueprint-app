@@ -58,7 +58,7 @@ As telas da agenda não têm prancha no canvas; as capturas acima são do app. A
 | :--- | :--- |
 | **App (branch `main`)** | Expo SDK 57 + TypeScript. Home de hábitos com anel de progresso, "Outro" com nome, toast com Desfazer e animações; **Agenda semanal** (compromissos recorrentes e avulsos, agendas por período); Calendário, Histórico e Perfil; tema claro, escuro e automático; dados salvos no aparelho. |
 | **Agenda semanal (etapa 1)** | Concluída e integrada na `main`, com testes automatizados (261 testes). Especificação em [`docs/superpowers/specs/2026-11-15-agenda-semanal-design.md`](docs/superpowers/specs/2026-11-15-agenda-semanal-design.md). |
-| **Login e nuvem** | Etapa 5 do roteiro. Há trabalho anterior pausado na branch `feat/etapa-7-supabase-login` (login por e-mail, sincronização offline-first, RLS por usuário), que será revisado e reaproveitado. |
+| **Login e nuvem (etapa 5)** | Código pronto na branch `feat/etapa-5-supabase`: entrar, criar conta, "Esqueci a senha" e sair (e-mail e senha), cartão "Conta" no Perfil e sincronização offline-first por mesclagem de três vias, testada com uma nuvem falsa. Falta aplicar a migração `supabase/migrations/002_registros_e_exclusao.sql` e conferir no aparelho contra o Supabase real. A foto do perfil ainda fica só no aparelho. |
 | **APK** | `eas.json` pronto (`buildType: apk`). Alertas só podem ser validados em APK ou development build, não no Expo Go. |
 
 A branch `main` recebe o código quando cada etapa estiver concluída. Na visualização web (`npx expo start --web`) as animações de entrada ficam desligadas, para a tela se ajustar ao redimensionar a janela; no celular elas continuam.
@@ -73,6 +73,11 @@ A branch `main` recebe o código quando cada etapa estiver concluída. Na visual
 - [x] **3. Alertas:** despertar, antecedência por compromisso, botão "Feito" na notificação, permissões do Android e economia de bateria.
 - [x] **4. Painel de histórico:** contagem por atividade e por mês, comparação entre meses, detalhe dos dias.
 - [ ] **5. Supabase:** login, acesso por usuário (RLS), sincronização que funciona sem internet, subida dos dados locais. O SQL é revisado e aplicado pelo dono em um projeto de desenvolvimento.
+  - [x] Login por e-mail e senha, sair, "Esqueci a senha" e o cartão "Conta" no Perfil.
+  - [x] Sincronização offline-first (mesclagem de três vias, troca de conta, sair mantendo ou apagando), com testes automatizados.
+  - [ ] Aplicar a migração 002 (tabela `registros` e exclusão de ações sem janela de 5 minutos).
+  - [ ] Conferir no aparelho: entrar em dois aparelhos e ver o mesmo histórico.
+  - [ ] Foto do perfil na nuvem (bucket `avatares`), login com Google e Apple.
 - [ ] **6. Gamificação e ganhos visuais:** sequência, "dia perfeito", conquistas e animações.
 - [ ] **7. APK de release:** checklist de segurança e build.
 
@@ -99,7 +104,7 @@ As etapas 1 a 4 funcionam só no aparelho. O Supabase só é necessário a parti
 
 ```bash
 npm install
-cp .env.example .env        # preencha com os dados do Supabase (opcional até a etapa 5)
+cp .env.example .env        # URL e chave publishable do Supabase (sem elas, o app funciona só no aparelho)
 npx expo start              # leia o QR code com o Expo Go (SDK 57)
 ```
 
@@ -124,15 +129,17 @@ eas build -p android --profile preview
 ```text
 src/
 ├── domain/        # Regras puras e testadas (ações, datas, estatísticas, agenda)
-├── data/          # Repositórios: AsyncStorage hoje, Supabase na etapa 5
-├── hooks/         # Estado compartilhado (useAcoes, useAgenda)
+├── data/          # Repositórios no aparelho (AsyncStorage) e a base da sincronização
+├── sincronizacao/ # Mesclagem de três vias, conversores app <-> banco e portas da nuvem (puros)
+├── hooks/         # Estado compartilhado (useAcoes, useAgenda, useConta, useSincronizacao)
 ├── theme/         # ThemeProvider: claro, escuro, automático e cor de destaque
 ├── styles/        # Tokens de design (theme.ts) e cores
 ├── ui/            # Componentes base (Screen, Card, Text, Icon, SegmentedControl)
 ├── components/    # Componentes do app (anel, cartões, sheet, toast, gráficos, agenda)
 ├── screens/       # Telas
 ├── navigation/    # Abas e pilha
-└── services/      # Supabase e migrações SQL
+└── services/      # Cliente Supabase e adaptadores (autenticação e nuvem)
+supabase/migrations/ # SQL revisado e aplicado pelo dono (001 aplicada, 002 pendente)
 ```
 
 ---
