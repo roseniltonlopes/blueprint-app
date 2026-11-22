@@ -27,11 +27,15 @@ O app trata o caso "confirme o e-mail" (`contaSupabase.ts`, `signUp` sem sessão
 
 ### 2.2 Site URL e página de retorno
 
+> **Atualização (feat/etapa-7-pendencias):** a página `landing/confirmado.html` foi criada. Ela mostra "E-mail confirmado" ou explica o erro do link (expirado ou já usado) e tira os tokens da barra de endereço. **Falta publicar a landing** e apontar a Site URL para `<endereço da landing>/confirmado.html`.
+
 Os links de confirmação e de "Esqueci a senha" redirecionam para a *Site URL* do projeto (Authentication > URL Configuration). Se ela continuar no padrão (`http://localhost:3000`), a pessoa toca no link no celular e cai numa página de erro do navegador. O e-mail fica confirmado, mas a impressão é de falha.
 
 **O que fazer:** publicar a landing (`landing/`) num endereço fixo, apontar a Site URL para ele e criar uma página simples de "E-mail confirmado, volte ao app".
 
 ### 2.3 "Esqueci a senha" não termina
+
+> **Atualização (feat/etapa-7-pendencias):** feita a saída 1, sem novo APK. `landing/nova-senha.html` recebe o link, pede a nova senha duas vezes com a mesma regra do app e chama `updateUser`. Como o app não envia `redirectTo`, o link cai na Site URL: `confirmado.html` e `index.html` reconhecem `type=recovery` e encaminham para a página de nova senha. **Falta preencher `landing/config.js`** com a URL e a chave publicável do Supabase (as mesmas do `.env`) e publicar. Sem isso a página avisa que não está configurada. Não testado contra o Supabase real.
 
 O app envia o e-mail (`resetPasswordForEmail`), mas não há onde criar a nova senha: o app não tem deep link e não existe página web de redefinição (já registrado em `docs/02`, seção de autenticação). Quem esquece a senha fica sem acesso à conta.
 
@@ -65,11 +69,15 @@ Não impedem a instalação, mas fazem o app parecer quebrado em alguns aparelho
 
 ### 3.1 Economia de bateria
 
+> **Feito (feat/etapa-7-pendencias, exige novo APK):** botão "Liberar bateria" no cartão de alertas, que abre `android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS` com `Linking.sendIntent`. Em aparelho sem essa tela, abre as configurações do app.
+
 Fabricantes como Xiaomi, Samsung e Motorola adiam ou cancelam notificações agendadas de apps com restrição de bateria. Hoje o app só mostra o texto "deixe o Blueprint sem restrição de bateria" no cartão de alertas (`CartaoDeAlertas.tsx`) e um botão para as configurações gerais do app.
 
 **Melhoria sugerida (novo APK):** um botão que abre direto a tela de otimização de bateria do Android (`Linking.sendIntent("android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS")`). Validar na documentação do React Native da versão instalada antes de implementar.
 
 ### 3.2 Alertas cobrem só 14 dias
+
+> **Feito (feat/etapa-7-pendencias, exige novo APK):** com os alertas ligados, o cartão avisa: "Os alertas ficam agendados para os próximos 14 dias. Abra o Blueprint pelo menos uma vez por semana para eles continuarem." Reagendar em segundo plano continua para uma versão futura.
 
 O app agenda no máximo 14 dias à frente e até 120 alertas (`src/domain/alertas.ts`), e reagenda ao abrir ou ao mudar a agenda. Se a pessoa ficar 14 dias sem abrir o app, os alertas param. Com mais de cerca de 8 alertas por dia, a janela fica menor que 14 dias.
 
@@ -95,6 +103,10 @@ O app não tem atualização pelo ar (sem `expo-updates`). Cada correção exige
 
 A foto fica só no aparelho e não vai para a nuvem. Em outro aparelho ou depois de reinstalar, ela não volta.
 
+### 3.7 Ícone, splash e tela de erro
+
+> **Feito (feat/etapa-7-pendencias, exige novo APK):** o ícone e o splash eram os do modelo do Expo. Agora são o anel segmentado da marca sobre o gradiente (ícone, adaptativo do Android com versão monocromática, splash claro e escuro, favicon), com as cores da paleta nova no `app.json`. Uma tela de erro com "Tentar de novo" substitui o app quebrado sem mostrar detalhes técnicos. O novo visual das telas também entrou nesta branch.
+
 ## 4. Pendências fora do código
 
 - **LGPD:** os textos de Termos e Política precisam de revisão jurídica antes da distribuição pública. Lista em `docs/09-lgpd-pendencias-juridicas.md`.
@@ -113,6 +125,8 @@ Texto base para a landing ou para enviar junto com o link:
 7. Abrir o app pelo menos uma vez a cada 14 dias para os alertas continuarem agendados.
 
 ## 6. Ordem sugerida
+
+> **Atualização:** os itens 2.2 e 2.3 já têm as páginas prontas (faltam config e publicação) e os itens 3.1, 3.2 e 3.7 estão no código. Eles só chegam ao celular com um novo APK `preview` gerado a partir da `feat/etapa-7-pendencias`.
 
 1. Configurar SMTP próprio e Site URL no Supabase (2.1 e 2.2).
 2. Publicar a landing com as páginas de "E-mail confirmado" e de nova senha (2.2 e 2.3).
