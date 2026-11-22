@@ -33,7 +33,13 @@ export default function SeletorDeAntecedencia({ valor, aoMudar }: SeletorDeAntec
               accessibilityLabel={rotuloAcessivel(minutos)}
               accessibilityState={{ selected: marcado }}
               onPress={() => aoMudar(minutos)}
-              style={[styles.opcao, { backgroundColor: marcado ? colors.ink : colors.sunk }]}
+              haptica={marcado ? undefined : "selecao"}
+              style={[
+                styles.opcao,
+                marcado
+                  ? { backgroundColor: colors.ink }
+                  : { backgroundColor: colors.card, borderColor: colors.hair, borderWidth: 1 },
+              ]}
             >
               <Text variant="caption" weight={600} color={marcado ? "onInk" : "ink"}>
                 {rotuloDaAntecedencia(minutos)}

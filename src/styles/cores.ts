@@ -28,6 +28,29 @@ export function interpolarCor(inicio: string, fim: string, t: number): string {
     .toUpperCase()}`;
 }
 
+/** Luminância relativa WCAG 2.x de uma cor #RRGGBB. */
+export function luminancia(hex: string): number {
+  const [r, g, b] = canais(hex).map((valor) => {
+    const canal = valor / 255;
+    return canal <= 0.03928 ? canal / 12.92 : ((canal + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+/** Razão de contraste WCAG 2.x entre duas cores #RRGGBB (de 1 a 21). */
+export function contraste(a: string, b: string): number {
+  const [claro, escuro] = [luminancia(a), luminancia(b)].sort((x, y) => y - x);
+  return (claro + 0.05) / (escuro + 0.05);
+}
+
+/**
+ * Entre duas cores de texto, a que tem mais contraste sobre `fundo`. Usado nos dias do calendário,
+ * pintados com a rampa do gradiente: o índigo pede texto claro, o laranja pede texto escuro.
+ */
+export function textoSobre(fundo: string, claro: string, escuro: string): string {
+  return contraste(claro, fundo) >= contraste(escuro, fundo) ? claro : escuro;
+}
+
 /** Cor de cada segmento do anel: gradiente distribuído do primeiro ao último segmento. */
 export function coresDosSegmentos(gradiente: readonly [string, string], total: number): string[] {
   return Array.from({ length: total }, (_, i) =>

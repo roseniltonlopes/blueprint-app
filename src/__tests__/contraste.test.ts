@@ -23,6 +23,7 @@ const PARES: [string, (t: ThemeColors) => string, (t: ThemeColors) => string][] 
   ["texto de destaque no fundo", (t) => t.accentText, (t) => t.bg],
   ["texto de destaque no cartão", (t) => t.accentText, (t) => t.card],
   ["texto do botão primário", (t) => t.onInk, (t) => t.ink],
+  ["texto secundário sobre o cartão Agora", (t) => t.onInkMute, (t) => t.ink],
   ["placeholder no cartão", (t) => t.placeholder, (t) => t.card],
 ];
 

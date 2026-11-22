@@ -10,7 +10,10 @@ import { DarkTheme, DefaultTheme, NavigationContainer, type Theme } from "@react
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { StyleSheet } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { LimiteDeErro } from "./src/components/LimiteDeErro";
 import { repositorios, type Preferencias } from "./src/data";
 import { PREFERENCIAS_PADRAO } from "./src/data/PreferenciasRepository";
 import type { Acao } from "./src/domain/acoes";
@@ -165,33 +168,41 @@ export default function App() {
   const sincronizavel = dados.agendaGravavel && dados.acoesLidas;
 
   return (
-    <SafeAreaProvider>
-      <ContaProvider porta={autenticacao}>
-        <ThemeProvider
-          initialMode={dados.preferencias.modo}
-          initialDestaque={dados.preferencias.destaque}
-          aoMudar={salvarPreferencias}
-        >
-          <AcoesProvider acoesIniciais={dados.acoes} meta={meta} repositorio={repositorios.acoes}>
-            <AgendaProvider
-              agendaInicial={dados.agenda}
-              repositorio={dados.agendaGravavel ? repositorios.agenda : undefined}
-            >
-              <AlertasProvider servico={servicoDeAlertas}>
-                <PerfilProvider perfilInicial={dados.perfil} repositorio={repositorios.perfil}>
-                  <SincronizacaoProvider
-                    nuvem={nuvem}
-                    persistencia={sincronizavel ? PERSISTENCIA_LOCAL : undefined}
-                    pausada={sincronizavel ? null : DADOS_ILEGIVEIS}
-                  >
-                    <Root />
-                  </SincronizacaoProvider>
-                </PerfilProvider>
-              </AlertasProvider>
-            </AgendaProvider>
-          </AcoesProvider>
-        </ThemeProvider>
-      </ContaProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={styles.raiz}>
+      <SafeAreaProvider>
+        <ContaProvider porta={autenticacao}>
+          <ThemeProvider
+            initialMode={dados.preferencias.modo}
+            initialDestaque={dados.preferencias.destaque}
+            aoMudar={salvarPreferencias}
+          >
+            <AcoesProvider acoesIniciais={dados.acoes} meta={meta} repositorio={repositorios.acoes}>
+              <AgendaProvider
+                agendaInicial={dados.agenda}
+                repositorio={dados.agendaGravavel ? repositorios.agenda : undefined}
+              >
+                <AlertasProvider servico={servicoDeAlertas}>
+                  <PerfilProvider perfilInicial={dados.perfil} repositorio={repositorios.perfil}>
+                    <SincronizacaoProvider
+                      nuvem={nuvem}
+                      persistencia={sincronizavel ? PERSISTENCIA_LOCAL : undefined}
+                      pausada={sincronizavel ? null : DADOS_ILEGIVEIS}
+                    >
+                      <LimiteDeErro>
+                        <Root />
+                      </LimiteDeErro>
+                    </SincronizacaoProvider>
+                  </PerfilProvider>
+                </AlertasProvider>
+              </AgendaProvider>
+            </AcoesProvider>
+          </ThemeProvider>
+        </ContaProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  raiz: { flex: 1 },
+});

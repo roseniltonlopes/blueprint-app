@@ -65,6 +65,11 @@ Cada comando usa a cota de builds da conta Expo. Ao terminar, o EAS mostra o lin
 - [ ] Criar conta com a caixa de aceite; Termos e Política abrem sem internet.
 - [ ] Excluir a conta pelo Perfil: some do Supabase (Authentication > Users) e o app fica vazio.
 
+- [ ] Ícone do Blueprint (anel em gradiente) na tela inicial e no gerenciador de apps; splash com o anel no claro e no escuro.
+- [ ] Novo visual: cartão "Agora", linha do dia (tocar na bolinha marca Feito; deslizar para a direita marca Feito e para a esquerda Não fiz), registro rápido com 1 toque e retorno tátil.
+- [ ] Perfil > Alertas: aviso dos 14 dias e botão "Liberar bateria" abrindo a otimização de bateria.
+- [ ] Link de "Esqueci a senha" abre `nova-senha.html` e a nova senha funciona no app (depois de publicar a landing e preencher `landing/config.js`).
+
 Se tudo passar, gerar o perfil `production`, atualizar a página de venda (`landing/`: tirar "Em breve" do que já estiver no APK e preencher `DOWNLOAD_URL` em `landing/script.js`) e marcar a etapa 7 no README.
 
 ## 5. O que mudou nos ajustes de 2026-11-22

@@ -6,6 +6,7 @@ import type { UseAgenda } from "../hooks/useAgenda";
 import { RADIUS, SIZES, SPACING } from "../styles/theme";
 import { useTheme } from "../theme/ThemeProvider";
 import { Icon } from "../ui/Icon";
+import { PressableEscala } from "../ui/PressableEscala";
 import { Text } from "../ui/Text";
 import BotaoTexto from "./BotaoTexto";
 import Campo from "./Campo";
@@ -27,7 +28,7 @@ const ROTULOS_DE_ICONE: Record<IconeAtividade, string> = {
   lua: "Lua",
 };
 
-/** Catálogo de atividades agrupado por categoria, com busca e criação de uma atividade nova. */
+/** Catálogo de atividades em chips (ordenados por categoria), com busca e criação de uma nova. */
 export default function SeletorDeAtividade({
   atividades,
   valor,
@@ -73,35 +74,60 @@ export default function SeletorDeAtividade({
     <View style={styles.bloco}>
       <Text variant="section">Atividade</Text>
       <Campo rotulo="Buscar atividade" valor={busca} aoMudar={setBusca} />
-      {grupos.map((grupo) => (
-        <View key={grupo.titulo} style={styles.grupo}>
-          <Text variant="caption" color="mute">
-            {grupo.titulo}
-          </Text>
-          {grupo.itens.map((atividade) => {
+      <View style={styles.linha}>
+        {grupos
+          .flatMap((grupo) => grupo.itens)
+          .map((atividade) => {
             const marcada = atividade.id === valor;
             return (
-              <Pressable
+              <PressableEscala
                 key={atividade.id}
                 accessibilityRole="radio"
                 accessibilityLabel={atividade.nome}
                 accessibilityState={{ checked: marcada }}
                 onPress={() => aoEscolher(atividade.id)}
-                style={[styles.item, { backgroundColor: marcada ? colors.ink : colors.sunk }]}
+                haptica={marcada ? undefined : "selecao"}
+                style={[
+                  styles.item,
+                  marcada
+                    ? { backgroundColor: colors.ink }
+                    : { backgroundColor: colors.card, borderColor: colors.hair, borderWidth: 1 },
+                ]}
               >
                 <Icon
                   name={atividade.icone}
                   color={marcada ? colors.onInk : colors.ink}
-                  size={20}
+                  size={18}
                 />
-                <Text variant="body" color={marcada ? "onInk" : "ink"}>
+                <Text
+                  variant="support"
+                  weight={marcada ? 600 : 500}
+                  color={marcada ? "onInk" : "ink"}
+                >
                   {atividade.nome}
                 </Text>
-              </Pressable>
+              </PressableEscala>
             );
           })}
-        </View>
-      ))}
+        {criando ? null : (
+          <PressableEscala
+            accessibilityRole="button"
+            accessibilityLabel="Nova atividade"
+            onPress={() => setCriando(true)}
+            style={[styles.item, styles.nova, { borderColor: colors.hair }]}
+          >
+            <Icon name="mais" color={colors.ink} size={18} />
+            <Text variant="support" weight={500}>
+              Nova atividade
+            </Text>
+          </PressableEscala>
+        )}
+      </View>
+      {grupos.length === 0 && termo.length > 0 ? (
+        <Text variant="caption" color="mute">
+          Nenhuma atividade com esse nome. Crie uma nova.
+        </Text>
+      ) : null}
 
       {criando ? (
         <View style={styles.grupo}>
@@ -167,9 +193,7 @@ export default function SeletorDeAtividade({
             />
           </View>
         </View>
-      ) : (
-        <BotaoTexto rotulo="Nova atividade" aoPressionar={() => setCriando(true)} variante="link" />
-      )}
+      ) : null}
     </View>
   );
 }
@@ -180,12 +204,13 @@ const styles = StyleSheet.create({
   linha: { flexDirection: "row", flexWrap: "wrap", gap: SPACING.sm },
   item: {
     minHeight: SIZES.touchMin,
-    borderRadius: RADIUS.button,
-    paddingHorizontal: SPACING.lg,
+    borderRadius: RADIUS.pill,
+    paddingHorizontal: SPACING.md,
     flexDirection: "row",
     alignItems: "center",
-    gap: SPACING.md,
+    gap: SPACING.sm,
   },
+  nova: { borderWidth: 1, borderStyle: "dashed" },
   icone: {
     width: SIZES.touchMin,
     height: SIZES.touchMin,

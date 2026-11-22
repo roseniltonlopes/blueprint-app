@@ -26,6 +26,10 @@ export type ThemeColors = {
   ink: string;
   /** Texto sobre o botão primário */
   onInk: string;
+  /** Texto secundário sobre fundo ink (cartão "Agora" da Home) */
+  onInkMute: string;
+  /** Trilha de progresso sobre fundo ink */
+  onInkTrack: string;
   /** Texto secundário */
   mute: string;
   /** Segmentos vazios e contorno de campos */
@@ -52,6 +56,8 @@ export const THEMES: Record<ColorScheme, ThemeColors> = {
     sunk: "#EDEAE4",
     ink: "#17140F",
     onInk: "#F6F4F0",
+    onInkMute: "#BDB7AD",
+    onInkTrack: "rgba(246,244,240,0.16)",
     mute: "#5F5A52",
     hair: "rgba(23,20,15,0.10)",
     accent: BRAND.orange,
@@ -68,6 +74,8 @@ export const THEMES: Record<ColorScheme, ThemeColors> = {
     sunk: "#26231F",
     ink: "#F1EEE8",
     onInk: "#0F0E0C",
+    onInkMute: "#5F5A52",
+    onInkTrack: "rgba(15,14,12,0.12)",
     mute: "#A39D93",
     hair: "rgba(241,238,232,0.12)",
     accent: BRAND.orange,

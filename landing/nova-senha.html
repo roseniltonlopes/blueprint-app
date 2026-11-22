@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Criar nova senha, Blueprint</title>
+    <meta name="description" content="Criar uma nova senha para a conta do Blueprint." />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#F6F4F0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="conta.css" />
+  </head>
+  <body>
+    <header class="topo" id="topo">
+      <div class="container topo__linha">
+        <a class="marca" href="index.html" aria-label="Blueprint, início"
+          ><span>Blue</span><strong>print</strong></a
+        >
+      </div>
+    </header>
+
+    <main class="container conta">
+      <h1>Criar nova senha</h1>
+
+      <p id="carregando" class="conta__mensagem">Conferindo o link do e-mail…</p>
+
+      <form id="formulario" class="conta__cartao" novalidate hidden>
+        <div class="conta__campo">
+          <label for="senha">Nova senha</label>
+          <input
+            id="senha"
+            name="senha"
+            type="password"
+            autocomplete="new-password"
+            minlength="8"
+            maxlength="72"
+            required
+            aria-describedby="senha-ajuda"
+          />
+          <span id="senha-ajuda" class="conta__ajuda"
+            >Pelo menos 8 caracteres, com letras e números.</span
+          >
+        </div>
+        <div class="conta__campo">
+          <label for="confirmacao">Repita a nova senha</label>
+          <input
+            id="confirmacao"
+            name="confirmacao"
+            type="password"
+            autocomplete="new-password"
+            maxlength="72"
+            required
+          />
+        </div>
+        <p id="erro" class="conta__mensagem conta__mensagem--erro" role="alert" hidden></p>
+        <button id="salvar" class="botao botao--escuro" type="submit">Salvar nova senha</button>
+      </form>
+
+      <section id="pronto" class="conta__cartao" aria-live="polite" hidden>
+        <p><strong>Senha alterada.</strong></p>
+        <p>Volte ao app Blueprint e entre com o seu e-mail e a nova senha.</p>
+      </section>
+
+      <section id="invalido" class="conta__cartao" aria-live="assertive" hidden>
+        <p class="conta__mensagem conta__mensagem--erro" id="invalido-texto">
+          Este link expirou ou já foi usado.
+        </p>
+        <p>No app, toque em "Esqueci a senha" de novo para receber um link novo.</p>
+      </section>
+    </main>
+
+    <script src="config.js"></script>
+    <!-- Cliente oficial do Supabase, versão fixa (a mesma do app). -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.2/dist/umd/supabase.js"></script>
+    <script src="conta.js"></script>
+    <script>
+      BlueprintConta.iniciarNovaSenha();
+    </script>
+  </body>
+</html>

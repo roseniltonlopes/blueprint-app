@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
 import CalendarioMensal from "../components/CalendarioMensal";
+import LegendaDeIntensidade from "../components/LegendaDeIntensidade";
 import Resumo from "../components/Resumo";
 import { acoesDoDia, contarPorCategoria } from "../domain/acoes";
 import { CATEGORIAS } from "../domain/categorias";
@@ -101,6 +102,7 @@ export default function CalendarioScreen() {
         selecionado={selecionado}
         aoSelecionar={selecionar}
       />
+      <LegendaDeIntensidade />
 
       <Animated.View entering={entrada(450)}>
         <Card style={styles.cartaoDia}>

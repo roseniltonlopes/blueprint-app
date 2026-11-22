@@ -11,9 +11,9 @@ function total() {
   return screen.getByTestId("progresso-total").props.children;
 }
 
+/** Registro rápido: 1 toque no chip registra. */
 async function registrar(categoria: RegExp) {
   await fireEvent.press(screen.getByRole("button", { name: categoria }));
-  await fireEvent.press(screen.getByRole("button", { name: /^Registrar / }));
 }
 
 describe("Anel de progresso (F04)", () => {

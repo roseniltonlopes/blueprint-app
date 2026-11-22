@@ -16,15 +16,16 @@ import { Text } from "../ui/Text";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-const TAMANHO = 124;
-const RAIO = 52;
-const TRACO = 12;
-const CENTRO = TAMANHO / 2;
-const CIRCUNFERENCIA = 2 * Math.PI * RAIO;
-/** Espaço entre segmentos, medido no traço (9 no canvas) */
-const VAO = 9;
+type Medidas = { tamanho: number; raio: number; traco: number; vao: number };
+
+/** "grande" é o anel do canvas v2; "compacto" é o do cartão de progresso da Home nova. */
+const MEDIDAS: Record<"grande" | "compacto", Medidas> = {
+  grande: { tamanho: 124, raio: 52, traco: 12, vao: 9 },
+  compacto: { tamanho: 76, raio: 32, traco: 8, vao: 6 },
+};
 
 type SegmentoProps = {
+  medidas: Medidas;
   indice: number;
   comprimento: number;
   rotacao: number;
@@ -33,7 +34,17 @@ type SegmentoProps = {
   preenchido: boolean;
 };
 
-function Segmento({ indice, comprimento, rotacao, cor, corVazia, preenchido }: SegmentoProps) {
+function Segmento({
+  medidas,
+  indice,
+  comprimento,
+  rotacao,
+  cor,
+  corVazia,
+  preenchido,
+}: SegmentoProps) {
+  const centro = medidas.tamanho / 2;
+  const circunferencia = 2 * Math.PI * medidas.raio;
   const atrasoInicial = MOTION.ring.delay + indice * MOTION.ring.stagger;
   const base = useSharedValue(0);
   const cheio = useSharedValue(0);
@@ -55,19 +66,19 @@ function Segmento({ indice, comprimento, rotacao, cor, corVazia, preenchido }: S
   }, [preenchido, atrasoInicial, base, cheio]);
 
   const baseProps = useAnimatedProps(() => ({
-    strokeDasharray: [comprimento * base.value, CIRCUNFERENCIA],
+    strokeDasharray: [comprimento * base.value, circunferencia],
   }));
   const cheioProps = useAnimatedProps(() => ({
-    strokeDasharray: [comprimento * cheio.value, CIRCUNFERENCIA],
+    strokeDasharray: [comprimento * cheio.value, circunferencia],
   }));
 
   const comum = {
-    cx: CENTRO,
-    cy: CENTRO,
-    r: RAIO,
+    cx: centro,
+    cy: centro,
+    r: medidas.raio,
     fill: "none",
-    strokeWidth: TRACO,
-    transform: `rotate(${rotacao} ${CENTRO} ${CENTRO})`,
+    strokeWidth: medidas.traco,
+    transform: `rotate(${rotacao} ${centro} ${centro})`,
   };
 
   return (
@@ -81,32 +92,41 @@ function Segmento({ indice, comprimento, rotacao, cor, corVazia, preenchido }: S
 type AnelProgressoProps = {
   total: number;
   meta: number;
+  tamanho?: "grande" | "compacto";
 };
 
 /**
  * Anel segmentado (docs/04 seções 2 e 6): um segmento por ação da meta, com o
  * gradiente distribuído. Acima da meta o anel fica cheio e o número continua subindo.
  */
-export default function AnelProgresso({ total, meta }: AnelProgressoProps) {
+export default function AnelProgresso({ total, meta, tamanho = "grande" }: AnelProgressoProps) {
   const { colors } = useTheme();
+  const medidas = MEDIDAS[tamanho];
+  const circunferencia = 2 * Math.PI * medidas.raio;
   const segmentos = Math.max(1, meta);
   const cores = coresDosSegmentos(colors.gradient, segmentos);
   const passo = 360 / segmentos;
-  const comprimento = CIRCUNFERENCIA / segmentos - VAO;
-  const inicio = -90 + (VAO / CIRCUNFERENCIA) * 180;
+  const comprimento = circunferencia / segmentos - medidas.vao;
+  const inicio = -90 + (medidas.vao / circunferencia) * 180;
+  const compacto = tamanho === "compacto";
 
   return (
     <View
-      style={styles.caixa}
+      style={{ width: medidas.tamanho, height: medidas.tamanho }}
       accessible
       accessibilityRole="progressbar"
       accessibilityLabel={`${total} de ${meta} ações registradas hoje`}
       accessibilityValue={{ min: 0, max: meta, now: Math.min(total, meta) }}
     >
-      <Svg width={TAMANHO} height={TAMANHO} viewBox={`0 0 ${TAMANHO} ${TAMANHO}`}>
+      <Svg
+        width={medidas.tamanho}
+        height={medidas.tamanho}
+        viewBox={`0 0 ${medidas.tamanho} ${medidas.tamanho}`}
+      >
         {cores.map((cor, i) => (
           <Segmento
             key={`${segmentos}-${i}`}
+            medidas={medidas}
             indice={i}
             comprimento={comprimento}
             rotacao={inicio + i * passo}
@@ -121,19 +141,25 @@ export default function AnelProgresso({ total, meta }: AnelProgressoProps) {
         style={styles.centro}
         pointerEvents="none"
       >
-        <Text variant="ring" testID="progresso-total">
+        <Text
+          variant="ring"
+          testID="progresso-total"
+          style={compacto ? styles.numeroCompacto : undefined}
+        >
           {total}
         </Text>
-        <Text variant="caption" color="mute">
-          de {meta}
-        </Text>
+        {compacto ? null : (
+          <Text variant="caption" color="mute">
+            de {meta}
+          </Text>
+        )}
       </Animated.View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  caixa: { width: TAMANHO, height: TAMANHO },
+  numeroCompacto: { fontSize: 26, lineHeight: 30, letterSpacing: -0.8 },
   centro: {
     position: "absolute",
     top: 0,

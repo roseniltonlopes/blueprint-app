@@ -9,6 +9,8 @@ import {
 } from "../domain/datas";
 import { nivelDeIntensidade } from "../domain/estatisticas";
 import { plural } from "../domain/texto";
+import { textoSobre } from "../styles/cores";
+import { BRAND, RADIUS } from "../styles/theme";
 import { useTheme } from "../theme/ThemeProvider";
 import { entradaDeCelula } from "../ui/motion";
 import { Text } from "../ui/Text";
@@ -22,7 +24,11 @@ type CalendarioMensalProps = {
   aoSelecionar: (dia: Date) => void;
 };
 
-/** Grade mensal com barra de intensidade por dia (docs/03 tela 6; docs/05 F11). */
+/**
+ * Grade mensal (docs/03 tela 6; docs/05 F11). Cada dia com registro é pintado com a rampa do
+ * gradiente pela intensidade; o número troca de cor para manter 4,5:1 sobre o fundo.
+ * Hoje leva um ponto embaixo do número; o dia escolhido ganha um anel.
+ */
 export default function CalendarioMensal({
   ano,
   mes,
@@ -31,7 +37,7 @@ export default function CalendarioMensal({
   selecionado,
   aoSelecionar,
 }: CalendarioMensalProps) {
-  const { colors, shadows } = useTheme();
+  const { colors } = useTheme();
   const chaveHoje = chaveDoDia(hoje);
   const chaveSelecionado = chaveDoDia(selecionado);
   const inicioHoje = inicioDoDia(hoje).getTime();
@@ -54,11 +60,12 @@ export default function CalendarioMensal({
               const chave = chaveDoDia(data);
               const total = porDia.get(chave) ?? 0;
               const ehHoje = chave === chaveHoje;
-              const ehSelecionado = chave === chaveSelecionado && !ehHoje;
+              const ehSelecionado = chave === chaveSelecionado;
               const futuro = data.getTime() > inicioHoje;
               const nivel = nivelDeIntensidade(total);
-              const mostrarBarra = doMes && !futuro && nivel > 0;
-              const corBarra = ehHoje ? colors.accent : colors.ramp[Math.max(0, nivel - 1)];
+              const pintado = doMes && !futuro && nivel > 0;
+              const fundo = pintado ? colors.ramp[nivel - 1] : null;
+              const corDoNumero = fundo ? textoSobre(fundo, BRAND.white, BRAND.black) : null;
 
               return (
                 <Animated.View
@@ -68,33 +75,37 @@ export default function CalendarioMensal({
                 >
                   <Pressable
                     accessibilityRole="button"
-                    accessibilityLabel={
+                    accessibilityLabel={`${ehHoje ? "Hoje, " : ""}${
                       total > 0
                         ? `${formatarDiaMes(data)}, ${plural(total, "ação", "ações")}`
                         : formatarDiaMes(data)
-                    }
-                    accessibilityState={{ selected: chave === chaveSelecionado }}
+                    }`}
+                    accessibilityState={{ selected: ehSelecionado }}
                     onPress={() => aoSelecionar(data)}
                     style={[
                       styles.dia,
-                      ehHoje && { backgroundColor: colors.ink, boxShadow: shadows.glow },
-                      ehSelecionado && { backgroundColor: colors.sunk },
+                      fundo
+                        ? { backgroundColor: fundo }
+                        : doMes && !futuro && { backgroundColor: colors.card },
+                      ehSelecionado && {
+                        borderWidth: 2,
+                        borderColor: colors.ink,
+                      },
                     ]}
                   >
                     <Text
                       variant="body"
-                      weight={ehHoje ? 600 : 500}
-                      color={ehHoje ? "onInk" : doMes ? "ink" : "mute"}
-                      style={styles.numero}
+                      weight={ehHoje || ehSelecionado ? 700 : pintado ? 600 : 500}
+                      color={doMes ? "ink" : "placeholder"}
+                      style={[styles.numero, corDoNumero ? { color: corDoNumero } : null]}
                     >
                       {data.getDate()}
                     </Text>
-                    <View
-                      style={[
-                        styles.barra,
-                        { backgroundColor: mostrarBarra ? corBarra : "transparent" },
-                      ]}
-                    />
+                    {ehHoje ? (
+                      <View
+                        style={[styles.ponto, { backgroundColor: corDoNumero ?? colors.accent }]}
+                      />
+                    ) : null}
                   </Pressable>
                 </Animated.View>
               );
@@ -112,12 +123,17 @@ const styles = StyleSheet.create({
   cabecalho: { flex: 1, textAlign: "center", lineHeight: 20 },
   celula: { flex: 1 },
   dia: {
-    height: 52,
+    height: 48,
     borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
-    gap: 5,
   },
   numero: { fontSize: 15, lineHeight: 20 },
-  barra: { width: 20, height: 4, borderRadius: 2 },
+  ponto: {
+    position: "absolute",
+    bottom: 6,
+    width: 4,
+    height: 4,
+    borderRadius: RADIUS.pill,
+  },
 });

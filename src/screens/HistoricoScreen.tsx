@@ -1,6 +1,8 @@
 import { useMemo, useState, type ComponentType } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
+import DestaqueDoMes from "../components/DestaqueDoMes";
+import GraficoDoMes from "../components/GraficoDoMes";
 import GraficoSemanal from "../components/GraficoSemanal";
 import ListaDeDias from "../components/ListaDeDias";
 import PainelDeCompromissos from "../components/PainelDeCompromissos";
@@ -19,12 +21,14 @@ import {
 import {
   contagemPorCategoria,
   contarPorDia,
+  faixasDoMes,
   indiceDoMelhorDia,
   resumoDoMes,
   semanaDoGrafico,
   sequenciaAtual,
 } from "../domain/estatisticas";
 import { painelDoMes } from "../domain/painel";
+import { comparacaoComMesAnterior } from "../domain/texto";
 import { useAcoes } from "../hooks/useAcoes";
 import { useAgenda } from "../hooks/useAgenda";
 import { useTheme } from "../theme/ThemeProvider";
@@ -129,6 +133,8 @@ export default function HistoricoScreen() {
   const doMes = contagemPorCategoria(acoes, anoDoMes, numeroDoMes);
   const doMesAnterior = contagemPorCategoria(acoes, anoAnterior, numeroAnterior);
   const resumoMes = resumoDoMes(porDia, anoDoMes, numeroDoMes);
+  const resumoAnterior = resumoDoMes(porDia, anoAnterior, numeroAnterior);
+  const faixas = faixasDoMes(porDia, anoDoMes, numeroDoMes, hoje);
   // Até 31 dias de ocorrências: barato o bastante para calcular a cada render.
   const painel = painelDoMes(agenda, anoDoMes, numeroDoMes, hoje);
 
@@ -204,12 +210,22 @@ export default function HistoricoScreen() {
             aoVoltar={() => setMesesAtras((n) => n + 1)}
             aoAvancar={() => setMesesAtras((n) => Math.max(0, n - 1))}
           />
-          <Resumo
+          <DestaqueDoMes
+            total={resumoMes.total}
+            rotulo="ações no mês"
+            comparacao={
+              resumoAnterior.total > 0
+                ? comparacaoComMesAnterior(resumoMes.total, resumoAnterior.total)
+                : null
+            }
             itens={[
-              { valor: String(resumoMes.total), rotulo: "ações no mês" },
               { valor: String(resumoMes.diasComRegistro), rotulo: "dias com registro" },
+              ...(mesesAtras === 0
+                ? [{ valor: String(sequenciaAtual(porDia, hoje)), rotulo: "dias seguidos" }]
+                : []),
             ]}
           />
+          {resumoMes.total > 0 ? <GraficoDoMes faixas={faixas} /> : null}
           {doMes.length === 0 ? (
             <Text variant="support" color="mute" style={styles.vazio}>
               Nenhuma ação registrada neste mês.

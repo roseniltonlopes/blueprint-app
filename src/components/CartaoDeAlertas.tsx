@@ -1,4 +1,5 @@
 import { Linking, Platform, Pressable, StyleSheet } from "react-native";
+import { DIAS_DE_ALERTAS } from "../domain/alertas";
 import { useAlertas } from "../hooks/useAlertas";
 import type { EstadoDaPermissao } from "../services/alertas";
 import { SIZES, SPACING } from "../styles/theme";
@@ -17,6 +18,17 @@ function abrirConfiguracoes() {
   Linking.openSettings().catch((erro: unknown) => {
     console.warn("Não foi possível abrir as configurações do aparelho.", erro);
   });
+}
+
+/** Tela do Android com a lista de otimização de bateria. */
+export const INTENCAO_BATERIA = "android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS";
+
+/**
+ * Abre direto a otimização de bateria do Android. Alguns fabricantes não têm essa tela:
+ * nesse caso abre as configurações do app, onde a bateria também pode ser liberada.
+ */
+function abrirBateria() {
+  Linking.sendIntent(INTENCAO_BATERIA).catch(() => abrirConfiguracoes());
 }
 
 function Acao({ titulo, aoPressionar }: { titulo: string; aoPressionar: () => void }) {
@@ -46,12 +58,19 @@ export default function CartaoDeAlertas() {
       {permissao === "negada" ? (
         <Acao titulo="Abrir configurações" aoPressionar={abrirConfiguracoes} />
       ) : null}
+      {permissao === "concedida" ? (
+        <Text variant="caption" color="mute" testID="aviso-dos-dias">
+          {`Os alertas ficam agendados para os próximos ${DIAS_DE_ALERTAS} dias. Abra o Blueprint pelo menos uma vez por semana para eles continuarem.`}
+        </Text>
+      ) : null}
       {permissao === "concedida" && android ? (
         <>
           <Text variant="caption" color="mute">
-            Se um alerta atrasar ou não tocar, deixe o Blueprint sem restrição de bateria.
+            {
+              'Se um alerta atrasar ou não tocar, escolha "Sem restrição" para o Blueprint na bateria.'
+            }
           </Text>
-          <Acao titulo="Abrir configurações do app" aoPressionar={abrirConfiguracoes} />
+          <Acao titulo="Liberar bateria" aoPressionar={abrirBateria} />
         </>
       ) : null}
     </Card>

@@ -11,6 +11,7 @@ import SeletorDeHorario from "../components/SeletorDeHorario";
 import {
   agendaEmCurso,
   dataDaChave,
+  resumoDoCompromisso,
   validarCompromisso,
   type Agenda,
   type Avulso,
@@ -302,6 +303,16 @@ function Formulario({ alvo, data, semDiaInicial, navigation }: FormularioProps) 
             variante="link"
           />
         ) : null}
+        {repeticao === "semana" ? (
+          <Text variant="caption" color="mute" style={styles.resumo} testID="resumo-do-compromisso">
+            {resumoDoCompromisso({
+              dias,
+              inicio,
+              fim: semTermino ? null : fim,
+              antecedenciaMin: antecedencia ?? null,
+            })}
+          </Text>
+        ) : null}
         <BotaoTexto rotulo="Salvar" aoPressionar={aoSalvar} variante="primario" />
         {editando ? (
           <BotaoTexto rotulo="Remover" aoPressionar={() => setPainel({ tipo: "remover" })} />
@@ -353,29 +364,48 @@ function Formulario({ alvo, data, semDiaInicial, navigation }: FormularioProps) 
 
       <View style={styles.bloco}>
         <Text variant="section">Horário</Text>
-        <Text variant="caption" color="mute">
-          Início
-        </Text>
-        <SeletorDeHorario valor={inicio} aoMudar={setInicio} rotulo="Início" />
+        <View style={styles.horarios}>
+          <View style={styles.coluna}>
+            <Text variant="caption" color="mute">
+              Início
+            </Text>
+            <SeletorDeHorario valor={inicio} aoMudar={setInicio} rotulo="Início" bloco />
+          </View>
+          <View style={styles.coluna}>
+            <Text variant="caption" color="mute">
+              Término
+            </Text>
+            {semTermino ? (
+              <View style={[styles.semTermino, { backgroundColor: colors.sunk }]}>
+                <Text variant="support" color="mute">
+                  Sem término
+                </Text>
+              </View>
+            ) : (
+              <SeletorDeHorario valor={fim} aoMudar={setFim} rotulo="Término" bloco />
+            )}
+          </View>
+        </View>
         <Pressable
           accessibilityRole="checkbox"
           accessibilityLabel="Sem horário de término"
           accessibilityState={{ checked: semTermino }}
           onPress={() => setSemTermino((atual) => !atual)}
-          style={[styles.opcao, { backgroundColor: semTermino ? colors.ink : colors.sunk }]}
+          style={styles.opcao}
         >
-          <Text variant="body" color={semTermino ? "onInk" : "ink"}>
+          <Text variant="body" style={styles.flex}>
             Sem horário de término
           </Text>
+          <View style={[styles.chave, { backgroundColor: semTermino ? colors.ink : colors.sunk }]}>
+            <View
+              style={[
+                styles.botaoDaChave,
+                { backgroundColor: semTermino ? colors.onInk : colors.card },
+                semTermino ? styles.chaveLigada : null,
+              ]}
+            />
+          </View>
         </Pressable>
-        {semTermino ? null : (
-          <>
-            <Text variant="caption" color="mute">
-              Término
-            </Text>
-            <SeletorDeHorario valor={fim} aoMudar={setFim} rotulo="Término" />
-          </>
-        )}
       </View>
 
       <Campo
@@ -393,12 +423,25 @@ function Formulario({ alvo, data, semDiaInicial, navigation }: FormularioProps) 
 const styles = StyleSheet.create({
   conteudo: { gap: SPACING.xl, paddingBottom: SPACING.xxl },
   bloco: { gap: SPACING.sm },
-  opcao: {
-    minHeight: SIZES.touchMin,
-    borderRadius: RADIUS.button,
-    paddingHorizontal: SPACING.lg,
+  horarios: { flexDirection: "row", gap: SPACING.md },
+  coluna: { flex: 1, gap: SPACING.xs },
+  semTermino: {
+    minHeight: 72,
+    borderRadius: RADIUS.category,
+    alignItems: "center",
     justifyContent: "center",
   },
+  opcao: {
+    minHeight: SIZES.field,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: SPACING.md,
+  },
+  flex: { flex: 1 },
+  chave: { width: 52, height: 32, borderRadius: RADIUS.pill, padding: 3 },
+  botaoDaChave: { width: 26, height: 26, borderRadius: 13 },
+  chaveLigada: { marginLeft: 20 },
+  resumo: { textAlign: "center" },
   painel: { gap: SPACING.sm },
   rodape: { gap: SPACING.sm },
 });

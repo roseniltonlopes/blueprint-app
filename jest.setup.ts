@@ -1,3 +1,4 @@
+import "react-native-gesture-handler/jestSetup";
 import { setUpTests } from "react-native-reanimated";
 
 // O módulo nativo do Worklets não existe no Jest; o pacote traz um mock oficial.
