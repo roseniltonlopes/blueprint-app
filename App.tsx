@@ -13,6 +13,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { LimiteDeErro } from "./src/components/LimiteDeErro";
 import { repositorios, type Preferencias } from "./src/data";
 import { PREFERENCIAS_PADRAO } from "./src/data/PreferenciasRepository";
 import type { Acao } from "./src/domain/acoes";
@@ -187,7 +188,9 @@ export default function App() {
                       persistencia={sincronizavel ? PERSISTENCIA_LOCAL : undefined}
                       pausada={sincronizavel ? null : DADOS_ILEGIVEIS}
                     >
-                      <Root />
+                      <LimiteDeErro>
+                        <Root />
+                      </LimiteDeErro>
                     </SincronizacaoProvider>
                   </PerfilProvider>
                 </AlertasProvider>

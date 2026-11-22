@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "backgroundColor": "#FFFDF2",
+    "backgroundColor": "#F6F4F0",
     "ios": {
       "supportsTablet": false
     },
@@ -14,7 +14,7 @@
       "package": "com.roseniltonlopes.blueprint",
       "allowBackup": false,
       "adaptiveIcon": {
-        "backgroundColor": "#FFFDF2",
+        "backgroundColor": "#4607CD",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -30,7 +30,19 @@
     },
     "plugins": [
       "expo-font",
-      "expo-splash-screen",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 160,
+          "resizeMode": "contain",
+          "backgroundColor": "#F6F4F0",
+          "dark": {
+            "image": "./assets/splash-icon-dark.png",
+            "backgroundColor": "#0F0E0C"
+          }
+        }
+      ],
       "@react-native-community/datetimepicker",
       [
         "expo-image-picker",
