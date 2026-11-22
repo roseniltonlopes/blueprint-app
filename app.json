@@ -12,6 +12,7 @@
     },
     "android": {
       "package": "com.roseniltonlopes.blueprint",
+      "allowBackup": false,
       "adaptiveIcon": {
         "backgroundColor": "#FFFDF2",
         "foregroundImage": "./assets/android-icon-foreground.png",

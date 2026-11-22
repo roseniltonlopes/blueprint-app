@@ -79,7 +79,7 @@ A branch `main` recebe o código quando cada etapa estiver concluída. Na visual
   - [ ] Conferir no aparelho: entrar em dois aparelhos e ver o mesmo histórico.
   - [ ] Foto do perfil na nuvem (bucket `avatares`), login com Google e Apple.
 - ~~**6. Gamificação e ganhos visuais**~~: retirada do plano pelo dono em 2026-11-21.
-- [ ] **7. APK de release:** checklist de segurança e build.
+- [ ] **7. APK de release:** checklist de segurança feito e configuração pronta ([`docs/08-release-apk.md`](docs/08-release-apk.md)); falta o dono aplicar a migração 002, criar as variáveis no EAS, gerar o build e conferir no aparelho.
 
 As etapas 1 a 4 funcionam só no aparelho. O Supabase só é necessário a partir da etapa 5.
 
