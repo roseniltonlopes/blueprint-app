@@ -46,7 +46,7 @@ Lista das funções do **Blueprint**, com a situação real de cada uma e o crit
 | F30 | Catálogo de atividades com categoria opcional (Academia, Corrida em Exercício) | Compromisso | ✅ Implementado (agenda, etapa 1) | A1 |
 | F31 | Agenda salva no aparelho, versionada, com dado corrompido guardado à parte | Todas | ✅ Implementado (agenda, etapa 1) | A1 |
 | F32 | Registrar "Feito" e "Não fui" em cada compromisso, com Desfazer; "Feito" gera a ação da categoria | Hoje | ✅ Implementado (agenda, etapa 2; só o dia de hoje) | A2 |
-| F33 | Alertas locais: despertar, antecedência por compromisso, botão "Feito" na notificação | Todas | 🎨 Planejado | A3 |
+| F33 | Alertas locais: despertar, antecedência por compromisso, botão "Feito" na notificação | Todas e Perfil | ✅ Implementado (agenda, etapa 3; falta conferir em aparelho) | A3 |
 | F34 | Painel de histórico por categoria, atividade e mês, com comparação entre meses | Histórico | 🎨 Planejado | A4 |
 
 ---
@@ -68,6 +68,9 @@ Lista das funções do **Blueprint**, com a situação real de cada uma e o crit
 | **Sem registro** | Compromisso não marcado continua "sem registro". Nunca vira "Não fui" sozinho. |
 | **Dia do registro** | Hoje ou dia passado; dia futuro é recusado. Na etapa 2 a tela só marca o dia de hoje. |
 | **Feito e hábitos** | "Feito" de atividade com categoria também cria uma ação dessa categoria (rótulo só no "Outro", com o nome da atividade). Sair de "Feito" remove essa ação. Atividade sem categoria só gera o registro. |
+| **Alerta** | Só para compromisso recorrente com "Avisar antes" preenchido (0 a 120 minutos; 0 avisa na hora). O despertar é um compromisso comum, sem término e com antecedência 0. Não há alerta para o que já foi marcado no dia. |
+| **Janela de alertas** | O app agenda os próximos 14 dias (no máximo 120 alertas) e reagenda ao abrir, ao voltar ao primeiro plano e a cada mudança da agenda. Quem ficar mais de 14 dias sem abrir o app para de receber alertas. |
+| **Feito na notificação** | Abre o app e marca "Feito" só se o alerta for do dia de hoje; se já estava feito, não desmarca. |
 | **Tocar de novo** | Tocar no status já marcado desmarca. O toast permite desfazer qualquer marcação, voltando registro e ação ao estado anterior. |
 
 ---
@@ -138,6 +141,16 @@ Lista das funções do **Blueprint**, com a situação real de cada uma e o crit
 - [ ] Editar a agenda "a partir de hoje" mantém a marcação de hoje.
 - [ ] Sem agenda para hoje, aparece "Sem agenda para hoje" com o botão "Montar agenda", que abre a aba Agenda. Com agenda e nada hoje, aparece "Nada marcado para hoje.".
 - [ ] Fechar e reabrir o app mantém as marcações. A agenda gravada na versão 1 abre sem perda, com a lista de registros vazia.
+
+### F33: alertas locais (etapa 3)
+- [ ] No Perfil, o cartão "Alertas da agenda" mostra se os alertas estão ligados, desligados (com "Permitir alertas") ou bloqueados (com "Abrir configurações").
+- [ ] Com permissão, um compromisso com "Avisar antes" de 15 minutos toca 15 minutos antes, com o app fechado e a tela bloqueada, inclusive às 04:30.
+- [ ] O alerta mostra "{Atividade} às {HH:MM}", "Começa em 15 min." ou "Está na hora." e o detalhe do compromisso.
+- [ ] O botão "Feito" da notificação abre o app com o compromisso marcado como feito e o anel atualizado.
+- [ ] Marcar "Feito" ou "Não fui" no app cancela o alerta daquele compromisso no dia.
+- [ ] Editar ou remover um compromisso reagenda os alertas em menos de 1 segundo.
+- [ ] No Android, o aviso de bateria aparece com o atalho para as configurações do app.
+- [ ] Só pode ser conferido em development build ou APK (`eas.json`, perfis `development` ou `preview`), não no Expo Go.
 
 ---
 

@@ -19,9 +19,13 @@ import type { DadosAgenda } from "./src/domain/agenda";
 import { PERFIL_PADRAO, type Perfil } from "./src/domain/perfil";
 import { AcoesProvider } from "./src/hooks/useAcoes";
 import { AgendaProvider } from "./src/hooks/useAgenda";
+import { AlertasProvider } from "./src/hooks/useAlertas";
 import { PerfilProvider } from "./src/hooks/usePerfil";
 import Raiz from "./src/navigation/Raiz";
+import { criarServicoDeAlertas } from "./src/services/alertas";
 import { ThemeProvider, useTheme, type Destaque, type ThemeMode } from "./src/theme/ThemeProvider";
+
+const servicoDeAlertas = criarServicoDeAlertas();
 
 SplashScreen.preventAutoHideAsync().catch(() => {
   // A splash já pode ter sido escondida (ex.: recarga rápida); não há o que fazer.
@@ -135,9 +139,11 @@ export default function App() {
             agendaInicial={dados.agenda}
             repositorio={dados.agendaGravavel ? repositorios.agenda : undefined}
           >
-            <PerfilProvider perfilInicial={dados.perfil} repositorio={repositorios.perfil}>
-              <Root />
-            </PerfilProvider>
+            <AlertasProvider servico={servicoDeAlertas}>
+              <PerfilProvider perfilInicial={dados.perfil} repositorio={repositorios.perfil}>
+                <Root />
+              </PerfilProvider>
+            </AlertasProvider>
           </AgendaProvider>
         </AcoesProvider>
       </ThemeProvider>

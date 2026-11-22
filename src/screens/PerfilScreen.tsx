@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
 import AvatarDoPerfil from "../components/AvatarDoPerfil";
 import BotaoTexto from "../components/BotaoTexto";
+import CartaoDeAlertas from "../components/CartaoDeAlertas";
 import Campo from "../components/Campo";
 import MapaDeCalor from "../components/MapaDeCalor";
 import { NOME_MAX } from "../domain/perfil";
@@ -258,6 +259,13 @@ export default function PerfilScreen() {
             <SeletorDeDestaque />
           </View>
         </Card>
+      </Animated.View>
+
+      <Animated.View entering={entrada(230)} style={styles.secao}>
+        <Text variant="section" accessibilityRole="header">
+          Alertas
+        </Text>
+        <CartaoDeAlertas />
       </Animated.View>
 
       <Animated.View entering={entrada(260)} style={styles.secao}>

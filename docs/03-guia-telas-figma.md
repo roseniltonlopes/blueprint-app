@@ -108,6 +108,11 @@ Os arquivos `docs/assets/blueprint_mvp_screens.jpg` e `docs/figma/blueprint_ui_k
 - **Toast:** o mesmo da Home, com "Feito: Academia", "Não fui: Academia" ou "Registro removido: Academia" e **Desfazer**.
 - **Sem agenda para hoje:** cartão "Sem agenda para hoje", texto de apoio e **Montar agenda** (abre a aba Agenda). **Com agenda e nada hoje:** "Nada marcado para hoje.".
 
+### 📱 Perfil: seção "Alertas" (etapa 3, sem prancha no canvas)
+- Fica entre "Aparência" e "Sobre". Cartão "Alertas da agenda" com o estado da permissão em texto de apoio.
+- **Desligados:** botão de texto **Permitir alertas**. **Bloqueados:** **Abrir configurações**. **Ligados (Android):** dica de bateria e **Abrir configurações do app**.
+- **Notificação:** título "Academia às 05:00", corpo "Começa em 15 min." ou "Está na hora." mais o detalhe, e o botão **Feito**. Canal Android "Compromissos da agenda", importância alta, com som e vibração.
+
 ---
 
 ## 3. Como exportar imagens das telas para este repositório

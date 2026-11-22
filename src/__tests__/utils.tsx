@@ -8,7 +8,10 @@ import type { DadosAgenda } from "../domain/agenda";
 import type { Perfil } from "../domain/perfil";
 import { AcoesProvider, type Relogio } from "../hooks/useAcoes";
 import { AgendaProvider } from "../hooks/useAgenda";
+import { AlertasProvider } from "../hooks/useAlertas";
 import { PerfilProvider } from "../hooks/usePerfil";
+import type { AlertaPlanejado } from "../domain/alertas";
+import type { EstadoDaPermissao, RespostaDeAlerta, ServicoDeAlertas } from "../services/alertas";
 import { ThemeProvider, type ThemeMode } from "../theme/ThemeProvider";
 
 const METRICAS = {
@@ -23,6 +26,40 @@ export function relogioFixo(data = AGORA): Relogio {
   return () => new Date(data.getTime());
 }
 
+export type ServicoDeAlertasFalso = ServicoDeAlertas & {
+  /** Última lista recebida em reagendar */
+  agendados: AlertaPlanejado[] | null;
+  /** Simula o toque numa notificação */
+  responder: (resposta: RespostaDeAlerta) => void;
+};
+
+/** Serviço de alertas em memória: guarda o que foi agendado e permite simular respostas. */
+export function servicoDeAlertasFalso(
+  inicial: EstadoDaPermissao = "perguntar",
+  aoPedir: EstadoDaPermissao = "concedida",
+): ServicoDeAlertasFalso {
+  let estado = inicial;
+  const ouvintes = new Set<(resposta: RespostaDeAlerta) => void>();
+  const servico: ServicoDeAlertasFalso = {
+    agendados: null,
+    preparar: async () => {},
+    permissao: async () => estado,
+    pedirPermissao: async () => {
+      estado = aoPedir;
+      return estado;
+    },
+    reagendar: async (alertas) => {
+      servico.agendados = [...alertas];
+    },
+    aoResponder: (ouvinte) => {
+      ouvintes.add(ouvinte);
+      return () => ouvintes.delete(ouvinte);
+    },
+    responder: (resposta) => ouvintes.forEach((ouvinte) => ouvinte(resposta)),
+  };
+  return servico;
+}
+
 type Opcoes = {
   modo?: ThemeMode;
   relogio?: Relogio;
@@ -31,6 +68,7 @@ type Opcoes = {
   repositorioAgenda?: AgendaRepository;
   perfil?: Perfil;
   repositorioPerfil?: PerfilRepository;
+  servicoDeAlertas?: ServicoDeAlertas;
 };
 
 export function renderComTema(ui: ReactElement, opcoes: Opcoes = {}) {
@@ -42,15 +80,18 @@ export function renderComTema(ui: ReactElement, opcoes: Opcoes = {}) {
     repositorioAgenda,
     perfil,
     repositorioPerfil,
+    servicoDeAlertas = servicoDeAlertasFalso(),
   } = opcoes;
   return render(
     <SafeAreaProvider initialMetrics={METRICAS}>
       <ThemeProvider initialMode={modo}>
         <AcoesProvider relogio={relogio} acoesIniciais={acoes}>
           <AgendaProvider agendaInicial={agenda} repositorio={repositorioAgenda}>
-            <PerfilProvider perfilInicial={perfil} repositorio={repositorioPerfil}>
-              {ui}
-            </PerfilProvider>
+            <AlertasProvider servico={servicoDeAlertas}>
+              <PerfilProvider perfilInicial={perfil} repositorio={repositorioPerfil}>
+                {ui}
+              </PerfilProvider>
+            </AlertasProvider>
           </AgendaProvider>
         </AcoesProvider>
       </ThemeProvider>

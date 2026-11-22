@@ -4,11 +4,12 @@ import { criarArmazenamentoEmMemoria } from "../data/armazenamento";
 import { criarAcao } from "../domain/acoes";
 import { AcoesProvider } from "../hooks/useAcoes";
 import { AgendaProvider } from "../hooks/useAgenda";
+import { AlertasProvider } from "../hooks/useAlertas";
 import { PerfilProvider } from "../hooks/usePerfil";
 import HomeScreen from "../screens/HomeScreen";
 import PerfilScreen from "../screens/PerfilScreen";
 import { ThemeProvider } from "../theme/ThemeProvider";
-import { AGORA, relogioFixo, renderComTema } from "./utils";
+import { AGORA, relogioFixo, renderComTema, servicoDeAlertasFalso } from "./utils";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 const METRICAS = {
@@ -69,9 +70,13 @@ describe("ThemeProvider com persistência", () => {
       <SafeAreaProvider initialMetrics={METRICAS}>
         <ThemeProvider initialMode="dark" initialDestaque="indigo" aoMudar={aoMudar}>
           <AcoesProvider relogio={relogioFixo()}>
-            <PerfilProvider>
-              <PerfilScreen />
-            </PerfilProvider>
+            <AgendaProvider>
+              <AlertasProvider servico={servicoDeAlertasFalso()}>
+                <PerfilProvider>
+                  <PerfilScreen />
+                </PerfilProvider>
+              </AlertasProvider>
+            </AgendaProvider>
           </AcoesProvider>
         </ThemeProvider>
       </SafeAreaProvider>,
