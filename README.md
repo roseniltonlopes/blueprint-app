@@ -2,8 +2,6 @@
 
 > Monte a agenda semanal com os seus horários, receba alertas no celular na hora certa, marque cada compromisso com 1 toque e consulte o histórico de qualquer mês. App Android instalado por `.apk`, em português, com os dados na nuvem e funcionando sem internet.
 
-**Canvas editável das telas (v2):** https://claude.ai/artifact/Cae8a8KKv5bRKpx234Zh3h
-O link é privado até o dono do canvas compartilhar pelo botão *Share*. O código-fonte das 8 pranchas está em [`docs/design/canvas-source/`](docs/design/canvas-source/).
 
 ---
 
