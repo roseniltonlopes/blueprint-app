@@ -35,7 +35,7 @@ Os links de confirmação e de "Esqueci a senha" redirecionam para a *Site URL* 
 
 ### 2.3 "Esqueci a senha" não termina
 
-> **Atualização (feat/etapa-7-pendencias):** feita a saída 1, sem novo APK. `landing/nova-senha.html` recebe o link, pede a nova senha duas vezes com a mesma regra do app e chama `updateUser`. Como o app não envia `redirectTo`, o link cai na Site URL: `confirmado.html` e `index.html` reconhecem `type=recovery` e encaminham para a página de nova senha. **Falta preencher `landing/config.js`** com a URL e a chave publicável do Supabase (as mesmas do `.env`) e publicar. Sem isso a página avisa que não está configurada. Não testado contra o Supabase real.
+> **Atualização (feat/etapa-7-pendencias):** feita a saída 1, sem novo APK. `landing/nova-senha.html` recebe o link, pede a nova senha duas vezes com a mesma regra do app e chama `updateUser`. Como o app não envia `redirectTo`, o link cai na Site URL: `confirmado.html` e `index.html` reconhecem `type=recovery` e encaminham para a página de nova senha. A configuração fica em `landing/config.js`, **fora do Git** (modelo em `landing/config.example.js`): copie o modelo, preencha com a URL e a chave publicável do `.env` e publique a pasta `landing` na Vercel junto com esse arquivo. Sem isso a página avisa que não está configurada. Não testado contra o Supabase real.
 
 O app envia o e-mail (`resetPasswordForEmail`), mas não há onde criar a nova senha: o app não tem deep link e não existe página web de redefinição (já registrado em `docs/02`, seção de autenticação). Quem esquece a senha fica sem acesso à conta.
 

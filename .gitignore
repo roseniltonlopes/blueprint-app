@@ -40,3 +40,7 @@ blueprint-docs-v2.zip
 
 # Arquivos locais
 *.zip
+
+# Landing: configuração local com a chave publicável do Supabase (modelo em landing/config.example.js)
+landing/config.js
+.vercel

@@ -1,4 +1,5 @@
 /*
+ * MODELO. Copie para config.js (que fica fora do Git) e preencha antes de publicar a landing.
  * Configuração das páginas de conta (e-mail confirmado e nova senha).
  * Preencha com os mesmos valores do .env do app (EXPO_PUBLIC_SUPABASE_URL e
  * EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY). A chave publicável é pública por desenho: a proteção
