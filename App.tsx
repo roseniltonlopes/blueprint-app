@@ -10,6 +10,8 @@ import { DarkTheme, DefaultTheme, NavigationContainer, type Theme } from "@react
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { StyleSheet } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { repositorios, type Preferencias } from "./src/data";
 import { PREFERENCIAS_PADRAO } from "./src/data/PreferenciasRepository";
@@ -128,25 +130,31 @@ export default function App() {
   }
 
   return (
-    <SafeAreaProvider>
-      <ThemeProvider
-        initialMode={dados.preferencias.modo}
-        initialDestaque={dados.preferencias.destaque}
-        aoMudar={salvarPreferencias}
-      >
-        <AcoesProvider acoesIniciais={dados.acoes} meta={meta} repositorio={repositorios.acoes}>
-          <AgendaProvider
-            agendaInicial={dados.agenda}
-            repositorio={dados.agendaGravavel ? repositorios.agenda : undefined}
-          >
-            <AlertasProvider servico={servicoDeAlertas}>
-              <PerfilProvider perfilInicial={dados.perfil} repositorio={repositorios.perfil}>
-                <Root />
-              </PerfilProvider>
-            </AlertasProvider>
-          </AgendaProvider>
-        </AcoesProvider>
-      </ThemeProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={styles.raiz}>
+      <SafeAreaProvider>
+        <ThemeProvider
+          initialMode={dados.preferencias.modo}
+          initialDestaque={dados.preferencias.destaque}
+          aoMudar={salvarPreferencias}
+        >
+          <AcoesProvider acoesIniciais={dados.acoes} meta={meta} repositorio={repositorios.acoes}>
+            <AgendaProvider
+              agendaInicial={dados.agenda}
+              repositorio={dados.agendaGravavel ? repositorios.agenda : undefined}
+            >
+              <AlertasProvider servico={servicoDeAlertas}>
+                <PerfilProvider perfilInicial={dados.perfil} repositorio={repositorios.perfil}>
+                  <Root />
+                </PerfilProvider>
+              </AlertasProvider>
+            </AgendaProvider>
+          </AcoesProvider>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  raiz: { flex: 1 },
+});

@@ -29,7 +29,9 @@ describe("AcoesProvider com repositório", () => {
         <ThemeProvider initialMode="light">
           <AcoesProvider relogio={relogioFixo()} acoesIniciais={[existente]} repositorio={repo}>
             <AgendaProvider>
-              <HomeScreen />
+              <PerfilProvider>
+                <HomeScreen />
+              </PerfilProvider>
             </AgendaProvider>
           </AcoesProvider>
         </ThemeProvider>
@@ -39,7 +41,6 @@ describe("AcoesProvider com repositório", () => {
     expect(screen.getByTestId("progresso-total").props.children).toBe(1);
 
     await fireEvent.press(screen.getByRole("button", { name: /^Estudo/ }));
-    await fireEvent.press(screen.getByText("Registrar Estudo"));
     await waitFor(async () => expect(await repo.carregar()).toHaveLength(2));
 
     await fireEvent.press(screen.getByRole("button", { name: "Desfazer" }));
@@ -52,13 +53,15 @@ describe("AcoesProvider com repositório", () => {
         <ThemeProvider initialMode="light">
           <AcoesProvider relogio={relogioFixo()} meta={8}>
             <AgendaProvider>
-              <HomeScreen />
+              <PerfilProvider>
+                <HomeScreen />
+              </PerfilProvider>
             </AgendaProvider>
           </AcoesProvider>
         </ThemeProvider>
       </SafeAreaProvider>,
     );
-    expect(screen.getByText("de 8")).toBeTruthy();
+    expect(screen.getByText("0 de 8 ações hoje")).toBeTruthy();
     expect(screen.getByRole("progressbar").props.accessibilityValue).toMatchObject({ max: 8 });
   });
 });

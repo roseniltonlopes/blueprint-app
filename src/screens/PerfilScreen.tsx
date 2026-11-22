@@ -4,6 +4,7 @@ import Animated from "react-native-reanimated";
 import AvatarDoPerfil from "../components/AvatarDoPerfil";
 import BotaoTexto from "../components/BotaoTexto";
 import CartaoDeAlertas from "../components/CartaoDeAlertas";
+import CartaoDeConquistas from "../components/CartaoDeConquistas";
 import Campo from "../components/Campo";
 import MapaDeCalor from "../components/MapaDeCalor";
 import { NOME_MAX } from "../domain/perfil";
@@ -237,6 +238,10 @@ export default function PerfilScreen() {
           </View>
           <MapaDeCalor colunas={colunas} />
         </Card>
+      </Animated.View>
+
+      <Animated.View entering={entrada(180)}>
+        <CartaoDeConquistas />
       </Animated.View>
 
       <Animated.View entering={entrada(200)} style={styles.secao}>

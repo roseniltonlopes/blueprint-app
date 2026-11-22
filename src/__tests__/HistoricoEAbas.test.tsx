@@ -73,7 +73,6 @@ describe("Abas (F10)", () => {
     });
 
     await fireEvent.press(screen.getByRole("button", { name: /^Estudo/ }));
-    await fireEvent.press(screen.getByText("Registrar Estudo"));
 
     await fireEvent.press(screen.getByRole("tab", { name: "Histórico" }));
     expect(screen.getByLabelText("15:58, Estudo")).toBeTruthy();

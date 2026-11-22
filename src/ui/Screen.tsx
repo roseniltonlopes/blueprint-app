@@ -10,10 +10,12 @@ type ScreenProps = {
   scroll?: boolean;
   /** Conteúdo fixo abaixo da área rolável, como o botão principal */
   footer?: ReactNode;
+  /** Botão flutuante no canto inferior direito, por cima do conteúdo (ex.: Novo compromisso) */
+  flutuante?: ReactNode;
   contentStyle?: StyleProp<ViewStyle>;
 };
 
-export function Screen({ children, scroll = false, footer, contentStyle }: ScreenProps) {
+export function Screen({ children, scroll = false, footer, flutuante, contentStyle }: ScreenProps) {
   const { colors } = useTheme();
 
   return (
@@ -34,6 +36,11 @@ export function Screen({ children, scroll = false, footer, contentStyle }: Scree
         <View style={[styles.content, styles.fill, contentStyle]}>{children}</View>
       )}
       {footer ? <View style={styles.footer}>{footer}</View> : null}
+      {flutuante ? (
+        <View style={styles.flutuante} pointerEvents="box-none">
+          {flutuante}
+        </View>
+      ) : null}
     </SafeAreaView>
   );
 }
@@ -46,6 +53,7 @@ const styles = StyleSheet.create({
     paddingTop: SPACING.xxl,
     paddingBottom: SPACING.lg,
   },
+  flutuante: { position: "absolute", right: SPACING.screen, bottom: SPACING.lg },
   footer: {
     paddingHorizontal: SPACING.screen,
     paddingTop: SPACING.sm,

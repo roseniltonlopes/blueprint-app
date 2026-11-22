@@ -201,15 +201,26 @@ describe("CompromissoScreen: criar", () => {
     expect(screen.queryByText("Voltou")).toBeNull();
   });
 
-  it("recusa antecedência fora de 0 a 120", async () => {
+  it("antecedência fica entre 0 e 120, de 5 em 5, com atalhos", async () => {
     await abrir({ data: "2026-11-06" });
-    await fireEvent.press(screen.getByRole("radio", { name: "Academia" }));
-    await digitar("Início", "05:00");
-    await digitar("Avisar antes (minutos)", "150");
-    await tocar("Salvar");
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      "A antecedência deve ficar entre 0 e 120 minutos",
-    );
+    const valor = () => screen.getByTestId("antecedencia").props.children;
+    expect(valor()).toBe("Sem aviso");
+    expect(
+      screen.getByRole("button", { name: "Diminuir 5 minutos" }).props.accessibilityState,
+    ).toMatchObject({ disabled: true });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Avisar: 30 min" }));
+    expect(valor()).toBe("30 min");
+    for (let i = 0; i < 20; i++) {
+      await fireEvent.press(screen.getByRole("button", { name: "Aumentar 5 minutos" }));
+    }
+    expect(valor()).toBe("120 min");
+    expect(
+      screen.getByRole("button", { name: "Aumentar 5 minutos" }).props.accessibilityState,
+    ).toMatchObject({ disabled: true });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Avisar: Na hora" }));
+    expect(valor()).toBe("Na hora");
   });
 
   it("avisa quando não há agenda para o período e oferece criar uma", async () => {

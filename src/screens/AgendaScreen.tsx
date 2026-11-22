@@ -2,6 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
+import BotaoFlutuante from "../components/BotaoFlutuante";
 import MontarSemana from "../components/MontarSemana";
 import { gerarAgendaDeExemplo } from "../dev/agendaDeExemplo";
 import { gerarIdLocal } from "../domain/acoes";
@@ -105,7 +106,20 @@ export default function AgendaScreen() {
   }
 
   return (
-    <Screen scroll contentStyle={styles.conteudo}>
+    <Screen
+      scroll
+      contentStyle={styles.conteudo}
+      flutuante={
+        agendaAlvo ? (
+          <BotaoFlutuante
+            rotulo="Novo compromisso"
+            aoPressionar={() =>
+              navigation.navigate("Compromisso", { data: agendaAlvo.inicio, modelo: true })
+            }
+          />
+        ) : undefined
+      }
+    >
       <View style={styles.cabecalho}>
         <Text variant="h1" accessibilityRole="header" style={styles.titulo}>
           Agenda
@@ -116,9 +130,7 @@ export default function AgendaScreen() {
           onPress={() => navigation.navigate("Agendas")}
           style={[styles.editar, { backgroundColor: colors.sunk }]}
         >
-          <Text variant="support" weight={600}>
-            Editar
-          </Text>
+          <Icon name="agendas" color={colors.ink} size={20} />
         </Pressable>
       </View>
 
@@ -151,9 +163,7 @@ export default function AgendaScreen() {
           avulsos={avulsosDoMes}
           aoAbrir={(compromisso) => abrirCompromisso(agendaAlvo, compromisso)}
           aoAbrirAvulso={abrirAvulso}
-          aoNovo={() =>
-            navigation.navigate("Compromisso", { data: agendaAlvo.inicio, modelo: true })
-          }
+          diaDeHoje={deslocamento === 0 ? hoje.getDay() : null}
         />
       ) : (
         <Card style={styles.convite}>
@@ -184,13 +194,15 @@ export default function AgendaScreen() {
 }
 
 const styles = StyleSheet.create({
-  conteudo: { gap: SPACING.gap, paddingBottom: SPACING.xxl },
+  /** Folga embaixo para o botão flutuante não cobrir o último compromisso */
+  conteudo: { gap: SPACING.gap, paddingBottom: 96 },
   cabecalho: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   titulo: { flex: 1 },
   editar: {
-    minHeight: SIZES.touchMin,
-    paddingHorizontal: SPACING.xl,
-    borderRadius: RADIUS.button,
+    width: SIZES.touchMin,
+    height: SIZES.touchMin,
+    borderRadius: RADIUS.pill,
+    alignItems: "center",
     justifyContent: "center",
   },
   mes: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
