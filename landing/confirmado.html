@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>E-mail confirmado, Blueprint</title>
+    <meta name="description" content="Confirmação do e-mail da conta do Blueprint." />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#F6F4F0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="conta.css" />
+  </head>
+  <body>
+    <header class="topo" id="topo">
+      <div class="container topo__linha">
+        <a class="marca" href="index.html" aria-label="Blueprint, início"
+          ><span>Blue</span><strong>print</strong></a
+        >
+      </div>
+    </header>
+
+    <main class="container conta">
+      <!-- Destino do link de confirmação do Supabase (Site URL). Não guarda nem envia nada. -->
+      <section id="ok" class="conta__cartao" aria-live="polite">
+        <h1>E-mail confirmado</h1>
+        <p>Pronto. Volte ao app Blueprint e entre com o seu e-mail e a sua senha.</p>
+        <p class="conta__ajuda">Pode fechar esta página.</p>
+      </section>
+
+      <section id="erro" class="conta__cartao" aria-live="assertive" hidden>
+        <h1>Não deu para confirmar</h1>
+        <p class="conta__mensagem conta__mensagem--erro" id="erro-texto">
+          O link expirou ou já foi usado.
+        </p>
+        <p>
+          No app, toque em "Entrar" com o mesmo e-mail: se a conta ainda não estiver confirmada,
+          peça um novo e-mail de confirmação criando a conta de novo.
+        </p>
+      </section>
+    </main>
+
+    <script src="conta.js"></script>
+    <script>
+      BlueprintConta.mostrarResultadoDaConfirmacao();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,68 @@
+/* ---------- Páginas de conta (e-mail confirmado e nova senha) ---------- */
+
+.conta {
+  max-width: 480px;
+  padding-block: clamp(40px, 8vw, 88px);
+  display: grid;
+  gap: 20px;
+}
+
+.conta h1 {
+  font-size: clamp(1.75rem, 6vw, 2.25rem);
+  line-height: 1.15;
+}
+
+.conta__cartao {
+  display: grid;
+  gap: 16px;
+  padding: 24px;
+  background: var(--card);
+  border-radius: 24px;
+}
+
+.conta__campo {
+  display: grid;
+  gap: 6px;
+}
+
+.conta__campo label {
+  font-weight: 600;
+}
+
+.conta__campo input {
+  min-height: 52px;
+  padding: 0 16px;
+  border: 1px solid var(--hair);
+  border-radius: 16px;
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+}
+
+.conta__campo input:focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 2px;
+}
+
+.conta__ajuda {
+  color: var(--mute);
+  font-size: 0.875rem;
+}
+
+.conta__mensagem {
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--sunk);
+}
+
+.conta__mensagem--erro {
+  font-weight: 600;
+}
+
+.conta .botao {
+  width: 100%;
+}
+
+.conta [hidden] {
+  display: none !important;
+}
