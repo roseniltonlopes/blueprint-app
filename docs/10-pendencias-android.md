@@ -13,6 +13,8 @@ Levantamento de 2026-11-22, feito sobre o commit `ee6cf6c` da `feat/nilton`. Com
 | Migrações 001 a 003 | Aplicadas pelo dono em 2026-11-22 (conforme o README). Não conferi no banco: o acesso pelo MCP foi negado. |
 | Conferência no aparelho | Nenhum item da seção 4 do `docs/08` foi marcado. |
 
+> **Versão 1.1:** a conta passou a ser obrigatória. O app abre na tela de entrada (`EntradaScreen`), e a agenda e os registros só existem depois do login. O primeiro acesso precisa de internet; depois, a sessão salva abre o app direto, também offline.
+
 ## 2. Bloqueantes
 
 Sem resolver estes itens, uma pessoa que baixa o `.apk` não consegue usar todas as funções.

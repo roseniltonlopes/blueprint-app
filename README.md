@@ -43,6 +43,7 @@ O passado não é reescrito: mudar a agenda de dezembro não altera o que foi re
 
 | Tela | O que faz |
 | :--- | :--- |
+| **Entrada** | Primeira tela: entrar ou criar a conta (com o aceite dos Termos e da Política) e recuperar a senha. As outras telas só abrem depois do login. |
 | **Hoje** | Mostra o compromisso de agora (ou o próximo) com um botão grande de concluir, a linha do dia (tocar na bolinha marca Feito; deslizar para a direita marca Feito e para a esquerda Não fiz) e o registro rápido de hábitos com 1 toque. |
 | **Agenda** | Semana modelo do mês: quantos compromissos caem em cada dia e os dias de cada compromisso, que ligam e desligam com um toque. Aponta conflitos de horário. |
 | **Calendário** | Mês inteiro com cada dia pintado pela quantidade de registros. Tocar num dia mostra o que foi feito. |
@@ -58,22 +59,24 @@ O app é distribuído como arquivo `.apk`, fora da Play Store.
 1. No celular Android, abra a [página de downloads](https://github.com/roseniltonlopes/blueprint-app/releases/latest) e toque no arquivo `.apk` da versão mais recente.
 2. **Permita a instalação de fontes desconhecidas.** Na primeira vez, o Android pergunta se o navegador (ou o app de arquivos) pode instalar apps. Toque em **Configurações** e ative **Permitir desta fonte**. Isso vale só para o app que você autorizar e pode ser desligado depois em *Configurações > Apps > Acesso especial > Instalar apps desconhecidos*.
 3. **Aviso do Play Protect.** Se aparecer "App não verificado" ou "Bloqueado pelo Play Protect", toque em **Mais detalhes > Instalar mesmo assim**. O aviso aparece porque o app não veio da Play Store, não porque tem algo errado.
-4. Abra o Blueprint. Para os alertas tocarem na hora certa:
+4. Abra o Blueprint e **crie sua conta** (ou entre, se já tiver uma). Confirme o e-mail pelo link que chega na caixa de entrada; se não aparecer, olhe no spam. O primeiro acesso precisa de internet.
+5. Para os alertas tocarem na hora certa:
    - permita as notificações quando o app pedir (ao salvar o primeiro compromisso com aviso);
    - em **Perfil > Alertas**, toque em **Liberar bateria** e escolha **Sem restrição** para o Blueprint;
    - abra o app pelo menos uma vez por semana: os alertas ficam agendados para os próximos 14 dias.
 
-**Atualizar:** instale o `.apk` novo por cima do antigo, sem desinstalar. Desinstalar apaga os dados guardados no celular (quem tem conta recupera ao entrar de novo).
+**Atualizar:** instale o `.apk` novo por cima do antigo, sem desinstalar. Se desinstalar, basta entrar de novo: os dados voltam da nuvem.
 
 ## 4. Com e sem internet
 
 | Situação | O que funciona |
 | :--- | :--- |
-| **Sem Wi-Fi e sem dados móveis** | Tudo do dia a dia: montar a agenda, marcar Feito e Não fiz, alertas, calendário, histórico e perfil. Os dados ficam salvos no celular. |
-| **Com internet (Wi-Fi ou dados móveis)** | Criar conta, entrar, recuperar a senha e sincronizar com a nuvem. |
+| **Primeiro acesso** | Precisa de internet para entrar ou criar a conta. |
+| **Sem Wi-Fi e sem dados móveis (depois do login)** | Tudo do dia a dia: montar a agenda, marcar Feito e Não fiz, alertas, calendário, histórico e perfil. Os dados ficam salvos no celular. |
+| **Com internet (Wi-Fi ou dados móveis)** | Sincronizar com a nuvem, recuperar a senha e entrar em outro aparelho. |
 | **A internet volta** | O app envia o que foi feito offline e traz o que mudou em outro aparelho, sem duplicar registros. |
 
-A conta é opcional. Sem conta, o app funciona só no celular; com conta, os dados ficam também na nuvem e aparecem em outro aparelho. Os alertas são locais (agendados no próprio celular) e tocam sem internet.
+A conta é obrigatória: o app abre na tela de entrada, e a agenda e os registros são criados depois do login. A sessão fica salva no celular, então o app abre direto e funciona sem internet nas vezes seguintes. Os dados ficam no celular e na nuvem e aparecem em outro aparelho. Os alertas são locais (agendados no próprio celular) e tocam sem internet.
 
 ## 5. Arquitetura
 

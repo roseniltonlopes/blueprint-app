@@ -131,7 +131,8 @@ Lista das funções do **Blueprint**, com a situação real de cada uma e o crit
 
 ### F18, F22 e F23: conta e sincronização (etapa 5)
 - [ ] Sem `.env` do Supabase, o Perfil mostra "A conta na nuvem não está disponível nesta versão" e o app funciona só no aparelho.
-- [ ] Sem conta, o cartão "Conta" do Perfil mostra "Entrar ou criar conta", que abre a tela Conta.
+- [x] Com o Supabase configurado, o app abre na tela de entrada (Entrar, Criar conta, Esqueci a senha) e as abas só aparecem depois do login (versão 1.1).
+- [x] Sair da conta volta para a tela de entrada; com a sessão salva, o app abre direto nas abas, também sem internet.
 - [ ] Criar conta recusa e-mail inválido e senha com menos de 8 caracteres, com a mensagem junto ao campo, sem chamar o servidor.
 - [ ] Com confirmação de e-mail ligada, criar conta avisa "Enviamos um link para ..." e volta para Entrar.
 - [ ] Entrar com senha errada mostra "E-mail ou senha incorretos."; e-mail não confirmado e falta de internet têm mensagens próprias; o que foi digitado continua nos campos.
