@@ -21,20 +21,7 @@
     <!-- Ícones usados nas telas do app e nas listas -->
     <svg width="0" height="0" style="position: absolute" aria-hidden="true" focusable="false">
       <defs>
-        <symbol id="i-hoje" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M8 12.5l3 3 5-6" /></symbol>
-        <symbol id="i-agenda" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11" /><circle cx="4.8" cy="6" r="1" /><circle cx="4.8" cy="12" r="1" /><circle cx="4.8" cy="18" r="1" /></symbol>
-        <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3" /><path d="M8 3v4M16 3v4M3 10h18" /></symbol>
-        <symbol id="i-hist" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></symbol>
-        <symbol id="i-perfil" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-6 8-6s8 2 8 6" /></symbol>
-        <symbol id="i-sol" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></symbol>
-        <symbol id="i-hal" viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12" /></symbol>
-        <symbol id="i-livro" viewBox="0 0 24 24"><path d="M12 6c-2-1.5-5-2-8-1.5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-13c-3-.5-6 0-8 1.5zM12 6v13" /></symbol>
-        <symbol id="i-gota" viewBox="0 0 24 24"><path d="M12 3c3 4 6 7 6 11a6 6 0 0 1-12 0c0-4 3-7 6-11z" /></symbol>
-        <symbol id="i-lua" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" /></symbol>
-        <symbol id="i-pontos" viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.2" /><circle cx="12" cy="12" r="1.2" /><circle cx="18" cy="12" r="1.2" /></symbol>
-        <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" /></symbol>
         <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" /></symbol>
-        <symbol id="i-mais" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
       </defs>
     </svg>
 
@@ -73,58 +60,8 @@
         </div>
 
         <div class="hero__tela revelar" style="--i: 2">
-          <div class="phone" role="img" aria-label="Tela Agenda do Blueprint com os compromissos do mês e os dias da semana marcados em cada um">
-            <div class="tela">
-              <div class="ui tema-claro" aria-hidden="true">
-                <div class="ui__corpo">
-                  <div class="ui__cab">
-                    <div class="ui__h1">Agenda</div>
-                    <span class="ui__chip">Editar</span>
-                  </div>
-                  <div class="ui__semana">
-                    <svg class="i"><use href="#i-chev" /></svg>
-                    <span>novembro de 2026</span>
-                    <svg class="i"><use href="#i-chev" /></svg>
-                  </div>
-                  <div class="ui__nota">Toque nos dias para marcar ou desmarcar. Vale para todas as semanas desta agenda.</div>
-                  <div class="ui__cartao">
-                    <div class="ui__linha">
-                      <span class="ui__ic"><svg class="i"><use href="#i-sol" /></svg></span>
-                      <div><b>Acordar</b><small>04:30</small></div>
-                    </div>
-                    <div class="ui__dias"><span class="on">dom</span><span class="on">seg</span><span class="on">ter</span><span class="on">qua</span><span class="on">qui</span><span class="on">sex</span><span class="on">sáb</span></div>
-                  </div>
-                  <div class="ui__cartao">
-                    <div class="ui__linha">
-                      <span class="ui__ic"><svg class="i"><use href="#i-hal" /></svg></span>
-                      <div><b>Academia</b><small>05:00 a 06:00</small></div>
-                    </div>
-                    <div class="ui__dias"><span>dom</span><span class="on">seg</span><span class="on">ter</span><span class="on">qua</span><span class="on">qui</span><span class="on">sex</span><span>sáb</span></div>
-                  </div>
-                  <div class="ui__cartao">
-                    <div class="ui__linha">
-                      <span class="ui__ic"><svg class="i"><use href="#i-livro" /></svg></span>
-                      <div><b>Aula</b><small>07:30</small></div>
-                    </div>
-                    <div class="ui__dias"><span>dom</span><span class="on">seg</span><span class="on">ter</span><span>qua</span><span>qui</span><span>sex</span><span>sáb</span></div>
-                  </div>
-                  <div class="ui__cartao">
-                    <div class="ui__linha">
-                      <span class="ui__ic"><svg class="i"><use href="#i-pontos" /></svg></span>
-                      <div><b>Trabalho</b><small>12:00 a 18:00</small></div>
-                    </div>
-                    <div class="ui__dias"><span>dom</span><span class="on">seg</span><span class="on">ter</span><span>qua</span><span class="on">qui</span><span>sex</span><span>sáb</span></div>
-                  </div>
-                </div>
-                <div class="ui__abas">
-                  <div class="ui__aba"><svg class="i"><use href="#i-hoje" /></svg>Hoje</div>
-                  <div class="ui__aba ativa"><svg class="i"><use href="#i-agenda" /></svg>Agenda</div>
-                  <div class="ui__aba"><svg class="i"><use href="#i-cal" /></svg>Calendário</div>
-                  <div class="ui__aba"><svg class="i"><use href="#i-hist" /></svg>Histórico</div>
-                  <div class="ui__aba"><svg class="i"><use href="#i-perfil" /></svg>Perfil</div>
-                </div>
-              </div>
-            </div>
+          <div class="phone" role="img" aria-label="Tela Agenda do Blueprint no tema escuro, com a carga da semana e os dias de cada compromisso">
+            <div class="tela"><img src="telas/agenda-escuro.jpg" alt="" width="390" height="844" fetchpriority="high" decoding="async" /></div>
           </div>
         </div>
       </section>
@@ -175,8 +112,8 @@
             <p class="etiqueta revelar">Registro</p>
             <h2 class="revelar" style="--i: 1"><span class="leve">Um toque.</span> <strong>Já está feito.</strong></h2>
             <p class="lead revelar" style="--i: 2">
-              Escolheu a categoria, tocou em registrar. O anel mostra quanto falta para fechar o dia, sem você abrir
-              planilha nenhuma.
+              Tocou em Feito na linha do dia, ou num hábito do registro rápido, e pronto. O anel mostra quanto falta
+              para fechar o dia, sem você abrir planilha nenhuma.
             </p>
             <ul class="lista revelar" style="--i: 3">
               <li>
@@ -195,63 +132,8 @@
           </div>
 
           <div class="vitrine__tela revelar" style="--i: 2">
-            <div class="phone" role="img" aria-label="Tela Hoje do Blueprint com a categoria Hidratação selecionada e o botão Registrar Hidratação">
-              <div class="tela">
-                <div class="ui tema-claro" aria-hidden="true">
-                  <div class="ui__corpo">
-                    <div>
-                      <div class="ui__sub">Quinta-feira, 19 de novembro</div>
-                      <div class="ui__h1">Olá!</div>
-                    </div>
-                    <div class="ui__cartao ui__prog">
-                      <div class="ui__anel">
-                        <svg viewBox="0 0 100 100">
-                          <circle cx="50" cy="50" r="36" stroke="#4607cd" stroke-dasharray="40.2 186" transform="rotate(0 50 50)" />
-                          <circle cx="50" cy="50" r="36" stroke="#74189a" stroke-dasharray="40.2 186" transform="rotate(72 50 50)" />
-                          <circle cx="50" cy="50" r="36" stroke="var(--p-sunk)" stroke-dasharray="40.2 186" transform="rotate(144 50 50)" />
-                          <circle cx="50" cy="50" r="36" stroke="var(--p-sunk)" stroke-dasharray="40.2 186" transform="rotate(216 50 50)" />
-                          <circle cx="50" cy="50" r="36" stroke="var(--p-sunk)" stroke-dasharray="40.2 186" transform="rotate(288 50 50)" />
-                        </svg>
-                        <div><strong>2</strong><span>de 5</span></div>
-                      </div>
-                      <div>
-                        <b>ações registradas hoje</b>
-                        <small>Faltam 3 para fechar o dia.</small>
-                      </div>
-                    </div>
-                    <div class="ui__titulo">O que você fez agora?</div>
-                    <div class="ui__grade">
-                      <div class="ui__cat sel">
-                        <div>
-                          <span class="ui__ic"><svg class="i"><use href="#i-gota" /></svg></span>
-                          <span class="ui__selo"><svg class="i"><use href="#i-check" /></svg></span>
-                        </div>
-                        <div><b>Hidratação</b><small>1 hoje</small></div>
-                      </div>
-                      <div class="ui__cat">
-                        <div><span class="ui__ic"><svg class="i"><use href="#i-hal" /></svg></span></div>
-                        <div><b>Exercício</b><small>1 hoje</small></div>
-                      </div>
-                      <div class="ui__cat">
-                        <div><span class="ui__ic"><svg class="i"><use href="#i-lua" /></svg></span></div>
-                        <div><b>Descanso</b><small>0 hoje</small></div>
-                      </div>
-                      <div class="ui__cat">
-                        <div><span class="ui__ic"><svg class="i"><use href="#i-livro" /></svg></span></div>
-                        <div><b>Estudo</b><small>0 hoje</small></div>
-                      </div>
-                    </div>
-                    <div class="ui__cta"><svg class="i"><use href="#i-mais" /></svg>Registrar Hidratação</div>
-                  </div>
-                  <div class="ui__abas">
-                    <div class="ui__aba ativa"><svg class="i"><use href="#i-hoje" /></svg>Hoje</div>
-                    <div class="ui__aba"><svg class="i"><use href="#i-agenda" /></svg>Agenda</div>
-                    <div class="ui__aba"><svg class="i"><use href="#i-cal" /></svg>Calendário</div>
-                    <div class="ui__aba"><svg class="i"><use href="#i-hist" /></svg>Histórico</div>
-                    <div class="ui__aba"><svg class="i"><use href="#i-perfil" /></svg>Perfil</div>
-                  </div>
-                </div>
-              </div>
+            <div class="phone" role="img" aria-label="Tela Hoje do Blueprint com o compromisso de agora, o progresso do dia e a linha do dia">
+              <div class="tela"><img src="telas/hoje-claro.jpg" alt="" width="390" height="844" loading="lazy" decoding="async" /></div>
             </div>
           </div>
         </div>
@@ -284,56 +166,8 @@
           </div>
 
           <div class="vitrine__tela revelar" style="--i: 2">
-            <div class="phone" role="img" aria-label="Tela Histórico do Blueprint no tema escuro com o gráfico da semana e uma linha por dia">
-              <div class="tela">
-                <div class="ui tema-escuro" aria-hidden="true">
-                  <div class="ui__corpo">
-                    <div class="ui__h1">Histórico</div>
-                    <div class="ui__seg"><span class="on">Semana</span><span>Mês</span></div>
-                    <div class="ui__cartao">
-                      <div class="ui__semana">
-                        <svg class="i"><use href="#i-chev" /></svg>
-                        <span>11 a 17 de outubro</span>
-                        <svg class="i"><use href="#i-chev" /></svg>
-                      </div>
-                      <div class="ui__barras">
-                        <div><span class="n">4</span><div class="ui__trilha"><i style="height: 66%"></i></div><span class="d">dom</span></div>
-                        <div><span class="n">5</span><div class="ui__trilha"><i style="height: 83%"></i></div><span class="d">seg</span></div>
-                        <div><span class="n">3</span><div class="ui__trilha"><i style="height: 50%"></i></div><span class="d">ter</span></div>
-                        <div><span class="n">6</span><div class="ui__trilha"><i style="height: 100%"></i></div><span class="d">qua</span></div>
-                        <div><span class="n">2</span><div class="ui__trilha"><i style="height: 33%"></i></div><span class="d">qui</span></div>
-                        <div><span class="n">5</span><div class="ui__trilha"><i style="height: 83%"></i></div><span class="d">sex</span></div>
-                        <div><span class="n">3</span><div class="ui__trilha"><i class="hoje" style="height: 50%"></i></div><span class="d hoje">sáb</span></div>
-                      </div>
-                    </div>
-                    <div class="ui__cartao ui__numeros">
-                      <div><strong>28</strong><span>ações na semana</span></div>
-                      <div><strong>7</strong><span>dias seguidos</span></div>
-                      <div><strong>qua</strong><span>melhor dia</span></div>
-                    </div>
-                    <div class="ui__lista-h">Dia a dia</div>
-                    <div class="ui__cartao ui__resumo-dias">
-                      <div class="ui__rdia">
-                        <div><b>Hoje</b><small>17 de outubro</small></div>
-                        <span class="ui__mini"><svg class="i"><use href="#i-gota" /></svg><svg class="i"><use href="#i-hal" /></svg></span>
-                        <strong>3 ações</strong>
-                      </div>
-                      <div class="ui__rdia">
-                        <div><b>Ontem</b><small>16 de outubro</small></div>
-                        <span class="ui__mini"><svg class="i"><use href="#i-livro" /></svg><svg class="i"><use href="#i-gota" /></svg><svg class="i"><use href="#i-lua" /></svg></span>
-                        <strong>5 ações</strong>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="ui__abas">
-                    <div class="ui__aba"><svg class="i"><use href="#i-hoje" /></svg>Hoje</div>
-                    <div class="ui__aba"><svg class="i"><use href="#i-agenda" /></svg>Agenda</div>
-                    <div class="ui__aba"><svg class="i"><use href="#i-cal" /></svg>Calendário</div>
-                    <div class="ui__aba ativa"><svg class="i"><use href="#i-hist" /></svg>Histórico</div>
-                    <div class="ui__aba"><svg class="i"><use href="#i-perfil" /></svg>Perfil</div>
-                  </div>
-                </div>
-              </div>
+            <div class="phone" role="img" aria-label="Tela Histórico do Blueprint no tema escuro, com o total do mês, a comparação com o mês anterior e as barras por semana">
+              <div class="tela"><img src="telas/historico-escuro.jpg" alt="" width="390" height="844" loading="lazy" decoding="async" /></div>
             </div>
           </div>
         </div>
