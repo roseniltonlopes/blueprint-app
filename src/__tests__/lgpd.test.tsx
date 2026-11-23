@@ -56,6 +56,8 @@ describe("Aceite dos termos no cadastro", () => {
     const botao = screen.getByRole("button", { name: "Criar conta" });
     expect(botao.props.accessibilityState).toMatchObject({ disabled: true });
 
+    await fireEvent.changeText(screen.getByLabelText("Nome"), "Ana");
+    await fireEvent.changeText(screen.getByLabelText("Data de nascimento"), "03/12/1990");
     await fireEvent.changeText(screen.getByLabelText("E-mail"), "ana@exemplo.com");
     await fireEvent.changeText(screen.getByLabelText("Senha"), "senha-forte-1");
     await fireEvent.press(botao);
@@ -68,7 +70,7 @@ describe("Aceite dos termos no cadastro", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Criar conta" }));
     await waitFor(() =>
       expect(autenticacao.chamadas).toEqual([
-        `cadastrar:ana@exemplo.com::termos=${VERSAO_DOS_TERMOS}`,
+        `cadastrar:ana@exemplo.com:Ana:1990-12-03:termos=${VERSAO_DOS_TERMOS}`,
       ]),
     );
   });

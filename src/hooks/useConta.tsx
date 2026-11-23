@@ -22,11 +22,13 @@ export type EstadoDaConta =
 export type UseConta = {
   estado: EstadoDaConta;
   entrar: (email: string, senha: string) => Promise<Resultado<void>>;
-  /** `nome` é o do perfil local: o gatilho do banco cria o perfil na nuvem com ele */
+  /** O gatilho do banco cria o perfil na nuvem com o nome e a data de nascimento */
   criarConta: (dados: {
     email: string;
     senha: string;
     nome: string | null;
+    /** AAAA-MM-DD */
+    nascimento: string | null;
     /** Versão dos termos que a pessoa aceitou na caixa do cadastro */
     termosVersao: string;
   }) => Promise<Resultado<ResultadoDoCadastro>>;
@@ -109,13 +111,14 @@ export function ContaProvider({ children, porta }: ContaProviderProps) {
   );
 
   const criarConta = useCallback<UseConta["criarConta"]>(
-    async ({ email, senha, nome, termosVersao }) => {
+    async ({ email, senha, nome, nascimento, termosVersao }) => {
       if (porta === null) return INDISPONIVEL;
       try {
         const valor = await porta.cadastrar({
           email,
           senha,
           nome,
+          nascimento,
           fuso: fusoDoAparelho() ?? FUSO_PADRAO,
           termosVersao,
         });

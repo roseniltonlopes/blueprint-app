@@ -93,15 +93,21 @@ export function criarAutenticacaoSupabase(cliente: SupabaseClient): PortaDeAuten
       }
     },
 
-    async cadastrar({ email, senha, nome, fuso, termosVersao }) {
+    async cadastrar({ email, senha, nome, nascimento, fuso, termosVersao }) {
       try {
-        // nome, fuso e a versão dos termos aceitos vão no user_metadata: o gatilho do banco cria
-        // o perfil com eles e grava a hora do aceite pelo relógio do servidor (migração 003).
+        // nome, nascimento, fuso e a versão dos termos aceitos vão no user_metadata: o gatilho do
+        // banco cria o perfil com eles e grava a hora do aceite pelo relógio do servidor
+        // (migrações 003 e 004). Sem a 004, a data fica guardada só nos metadados da conta.
         const { data, error } = await cliente.auth.signUp({
           email: normalizarEmail(email),
           password: senha,
           options: {
-            data: { ...(nome !== null ? { nome } : {}), fuso, termos_versao: termosVersao },
+            data: {
+              ...(nome !== null ? { nome } : {}),
+              ...(nascimento !== null ? { data_nascimento: nascimento } : {}),
+              fuso,
+              termos_versao: termosVersao,
+            },
           },
         });
         if (error) throw error;

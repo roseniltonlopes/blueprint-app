@@ -27,7 +27,10 @@ export type IconName =
   | "cadeado"
   | "sino"
   | "menos"
-  | "agendas";
+  | "agendas"
+  | "olho"
+  | "olhoFechado"
+  | "relogio";
 
 type IconProps = {
   name: IconName;
@@ -146,6 +149,27 @@ function desenho(name: IconName, color: string): ReactNode {
       );
     case "sino":
       return <Path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15L6 16zM10 20.5a2 2 0 0 0 4 0" />;
+    case "olho":
+      return (
+        <>
+          <Path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
+          <Circle cx="12" cy="12" r="3" />
+        </>
+      );
+    case "olhoFechado":
+      return (
+        <>
+          <Path d="M4 4l16 16M9.9 5.8A9.6 9.6 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-2.6 3.4M6.4 7.4C3.9 9.1 2.5 12 2.5 12S6 18.5 12 18.5c1.6 0 3-.4 4.2-1" />
+          <Path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" />
+        </>
+      );
+    case "relogio":
+      return (
+        <>
+          <Circle cx="12" cy="12" r="8.5" />
+          <Path d="M12 7.5V12l3 2" />
+        </>
+      );
     case "menos":
       return <Path d="M5 12h14" />;
     case "agendas":

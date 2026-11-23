@@ -21,6 +21,13 @@ function renderizarTela(autenticacao: ReturnType<typeof autenticacaoFalsa> | nul
 const TEXTO_DO_ACEITE = "Li e aceito os Termos de Uso e a Política de Privacidade";
 
 async function preencher(email: string, senha?: string) {
+  // No cadastro, nome e data de nascimento vêm antes do e-mail.
+  if (screen.queryByLabelText("Nome") && screen.getByLabelText("Nome").props.value === "") {
+    await fireEvent.changeText(screen.getByLabelText("Nome"), "Ana Souza");
+  }
+  if (screen.queryByLabelText("Data de nascimento")) {
+    await fireEvent.changeText(screen.getByLabelText("Data de nascimento"), "03121990");
+  }
   await fireEvent.changeText(screen.getByLabelText("E-mail"), email);
   if (senha !== undefined) await fireEvent.changeText(screen.getByLabelText("Senha"), senha);
 }
@@ -93,7 +100,7 @@ describe("ContaScreen: criar conta e recuperar senha", () => {
     expect(autenticacao.chamadas).toEqual([]);
   });
 
-  it("com confirmação de e-mail, avisa e volta para Entrar; o nome do perfil vai junto", async () => {
+  it("com confirmação de e-mail, avisa e volta para Entrar; nome e nascimento vão juntos", async () => {
     const autenticacao = autenticacaoFalsa();
     autenticacao.respostaDoCadastro = "confirmarEmail";
     const { navigation, resultado } = renderizarTela(autenticacao, "Ana Souza");
@@ -110,7 +117,7 @@ describe("ContaScreen: criar conta e recuperar senha", () => {
       ),
     );
     expect(autenticacao.chamadas).toEqual([
-      "cadastrar:ana@exemplo.com:Ana Souza:termos=2026-11-22",
+      "cadastrar:ana@exemplo.com:Ana Souza:1990-12-03:termos=2026-11-23",
     ]);
     expect(screen.getByRole("button", { name: "Entrar" })).toBeTruthy();
     expect(navigation.goBack).not.toHaveBeenCalled();

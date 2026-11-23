@@ -35,3 +35,8 @@ export function fotoValida(foto: unknown): foto is string {
 export function nomeParaExibir(perfil: Pick<Perfil, "nome">): string {
   return perfil.nome.length > 0 ? perfil.nome : NOME_PADRAO;
 }
+
+/** Primeiro nome para a saudação: "Ana Souza" → "Ana". Vazio quando não há nome. */
+export function primeiroNome(perfil: Pick<Perfil, "nome">): string {
+  return normalizarNome(perfil.nome).split(" ")[0] ?? "";
+}

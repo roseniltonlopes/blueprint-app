@@ -56,6 +56,8 @@ describe("Entrada obrigatória", () => {
     await abrirApp(autenticacao);
 
     await fireEvent.press(await screen.findByRole("radio", { name: "Criar conta" }));
+    await fireEvent.changeText(screen.getByLabelText("Nome"), "Bia Lima");
+    await fireEvent.changeText(screen.getByLabelText("Data de nascimento"), "01022000");
     await fireEvent.changeText(screen.getByLabelText("E-mail"), "bia@exemplo.com");
     await fireEvent.changeText(screen.getByLabelText("Senha"), "senha-123");
     await fireEvent.press(screen.getByTestId("aceite-dos-termos"));
@@ -63,6 +65,9 @@ describe("Entrada obrigatória", () => {
 
     expect(await screen.findByTestId("aviso-da-conta")).toHaveTextContent(/Confirme o e-mail/);
     expect(screen.queryByRole("tab", { name: "Hoje" })).toBeNull();
+    expect(autenticacao.chamadas).toEqual([
+      expect.stringMatching(/^cadastrar:bia@exemplo\.com:Bia Lima:2000-02-01:/),
+    ]);
   });
 
   it("sem Supabase configurado (desenvolvimento), abre direto nas abas", async () => {

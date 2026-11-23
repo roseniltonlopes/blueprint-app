@@ -86,6 +86,7 @@ export default function CompromissoScreen({ route, navigation }: Props) {
       alvo={alvo}
       data={params?.data}
       semDiaInicial={params?.modelo === true}
+      soNoDia={params?.avulso === true}
       navigation={navigation}
     />
   );
@@ -96,10 +97,12 @@ type FormularioProps = {
   data: string | undefined;
   /** Novo compromisso sem dia pré-marcado (vem da semana modelo) */
   semDiaInicial: boolean;
+  /** Novo compromisso que já abre como "Só neste dia" */
+  soNoDia: boolean;
   navigation: Props["navigation"];
 };
 
-function Formulario({ alvo, data, semDiaInicial, navigation }: FormularioProps) {
+function Formulario({ alvo, data, semDiaInicial, soNoDia, navigation }: FormularioProps) {
   const {
     dados,
     relogio,
@@ -120,7 +123,7 @@ function Formulario({ alvo, data, semDiaInicial, navigation }: FormularioProps) 
   const dataDaRota = data !== undefined ? dataDaChave(data) : null;
 
   const [repeticao, setRepeticao] = useState<Repeticao>(
-    alvo.tipo === "avulso" ? "avulso" : "semana",
+    alvo.tipo === "avulso" || (alvo.tipo === "novo" && soNoDia) ? "avulso" : "semana",
   );
   const [atividadeId, setAtividadeId] = useState<string | null>(
     existente?.atividadeId ?? avulsoExistente?.atividadeId ?? null,

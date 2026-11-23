@@ -23,6 +23,8 @@ export type RaizParamList = {
     data?: string;
     /** Novo compromisso vindo da semana modelo: abre sem nenhum dia marcado */
     modelo?: boolean;
+    /** Novo compromisso só na `data` (vem do Calendário, "Adicionar neste dia") */
+    avulso?: boolean;
   };
   /** `nova` abre a tela já com o formulário de nova agenda; `data` (AAAA-MM-DD) escolhe o mês e o trecho livre */
   Agendas: { nova?: boolean; data?: string } | undefined;

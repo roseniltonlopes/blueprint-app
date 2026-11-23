@@ -23,35 +23,35 @@ describe("CalendarioScreen (F11, F12)", () => {
     await renderComTema(<CalendarioScreen />, { acoes });
     expect(screen.getByText("outubro de 2026")).toBeTruthy();
     expect(screen.getByText("Hoje, 17 de outubro")).toBeTruthy();
-    expect(screen.getByText("3 ações")).toBeTruthy();
+    expect(screen.getByText("Hábitos: 3 ações")).toBeTruthy();
     expect(screen.getByText("Hidratação 2")).toBeTruthy();
     expect(screen.getByText("Exercício 1")).toBeTruthy();
-    expect(screen.getByLabelText("5 ações em outubro")).toBeTruthy();
-    expect(screen.getByLabelText("3 dias com registro")).toBeTruthy();
+    expect(screen.getByLabelText("5 ações de hábito")).toBeTruthy();
+    // Sem agenda, não há plano para medir.
+    expect(screen.getByLabelText("– do plano cumprido em outubro")).toBeTruthy();
   });
 
   it("tocar em um dia atualiza o resumo do dia", async () => {
     await renderComTema(<CalendarioScreen />, { acoes });
-    await fireEvent.press(screen.getByRole("button", { name: "16 de outubro, 1 ação" }));
+    await fireEvent.press(screen.getByTestId("dia-2026-10-16"));
     expect(screen.getByText("Sexta-feira, 16 de outubro")).toBeTruthy();
     expect(screen.getByText("Estudo 1")).toBeTruthy();
 
-    await fireEvent.press(screen.getByRole("button", { name: "20 de outubro" }));
-    expect(screen.getByText("Este dia ainda não chegou.")).toBeTruthy();
+    await fireEvent.press(screen.getByRole("button", { name: "20 de outubro, sem compromissos" }));
+    expect(screen.getByText("Nada planejado para este dia.")).toBeTruthy();
   });
 
   it("navega entre meses e mostra o resumo do mês visível", async () => {
     await renderComTema(<CalendarioScreen />, { acoes });
     await fireEvent.press(screen.getByRole("button", { name: "Mês anterior" }));
     expect(screen.getByText("setembro de 2026")).toBeTruthy();
-    expect(screen.getByLabelText("1 ações em setembro")).toBeTruthy();
+    expect(screen.getByLabelText("1 ações de hábito")).toBeTruthy();
   });
 
-  it("tocar em dia do mês vizinho troca o mês", async () => {
+  it("os dias de outros meses ficam vazios, sem cartão", async () => {
     await renderComTema(<CalendarioScreen />, { acoes });
-    await fireEvent.press(screen.getByRole("button", { name: "30 de setembro, 1 ação" }));
-    expect(screen.getByText("setembro de 2026")).toBeTruthy();
-    expect(screen.getByText("Quarta-feira, 30 de setembro")).toBeTruthy();
+    expect(screen.queryByTestId("dia-2026-09-30")).toBeNull();
+    expect(screen.getByTestId("dia-2026-10-01")).toBeTruthy();
   });
 });
 
@@ -90,7 +90,7 @@ describe("Totais batem entre Histórico, Calendário e Perfil (docs/05)", () => 
     await historico.unmount();
 
     const calendario = await renderComTema(<CalendarioScreen />, { acoes });
-    expect(screen.getByLabelText("5 ações em outubro")).toBeTruthy();
+    expect(screen.getByLabelText("5 ações de hábito")).toBeTruthy();
     await calendario.unmount();
 
     await renderComTema(<PerfilScreen />, { acoes });

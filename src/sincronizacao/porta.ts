@@ -20,6 +20,8 @@ export interface PortaDeAutenticacao {
     email: string;
     senha: string;
     nome: string | null;
+    /** Data de nascimento no formato do banco (AAAA-MM-DD) */
+    nascimento: string | null;
     fuso: string;
     /** Versão dos termos aceitos na caixa do cadastro (src/legal/versao.ts) */
     termosVersao: string;

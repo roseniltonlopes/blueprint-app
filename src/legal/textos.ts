@@ -6,8 +6,8 @@
  */
 
 /** Versão aceita no cadastro: vai no user_metadata do signUp e o banco grava com a data (003). */
-export const VERSAO_DOS_TERMOS = "2026-11-22";
-export const DATA_DOS_TERMOS = "22 de novembro de 2026";
+export const VERSAO_DOS_TERMOS = "2026-11-23";
+export const DATA_DOS_TERMOS = "23 de novembro de 2026";
 
 export const CONTROLADOR = "Rosenilton Lopes";
 export const CONTATO = "roseniltonlopes1993@gmail.com";
@@ -39,7 +39,8 @@ export const TERMOS_DE_USO: DocumentoLegal = {
     {
       titulo: "Uso pessoal",
       paragrafos: [
-        "O app é para uso pessoal. Você pode usá-lo sem conta; nesse caso, os dados ficam só no aparelho.",
+        "O app é para uso pessoal e precisa de uma conta, criada com nome, data de nascimento, e-mail e senha.",
+        "Para criar a conta, você precisa ter pelo menos 13 anos.",
       ],
     },
     {
@@ -114,7 +115,8 @@ export const POLITICA_DE_PRIVACIDADE: DocumentoLegal = {
       titulo: "Dados guardados com conta",
       paragrafos: [
         "O e-mail e a senha. A senha fica com o provedor de autenticação só em forma cifrada (hash): ninguém consegue lê-la.",
-        "O nome que você escolher no perfil, se escolher.",
+        "O nome informado no cadastro. Você pode trocá-lo no perfil.",
+        "A data de nascimento informada no cadastro, usada só para confirmar que você tem pelo menos 13 anos.",
         'A agenda: atividades, compromissos, períodos e avisos antes de cada compromisso. Os registros de "Feito" e "Não fiz" e as ações de hábito registradas.',
         "O fuso horário do aparelho no momento do cadastro.",
         "A versão destes termos que você aceitou e a data do aceite, gravada pelo servidor.",

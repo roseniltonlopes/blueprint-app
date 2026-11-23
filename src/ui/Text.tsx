@@ -1,6 +1,7 @@
 import { Text as RNText, type TextProps as RNTextProps } from "react-native";
 import { useTheme } from "../theme/ThemeProvider";
 import {
+  ESCALA_MAXIMA_DA_FONTE,
   FONT_FAMILY,
   TYPOGRAPHY,
   type FontWeight,
@@ -26,6 +27,7 @@ export function Text({ variant = "body", color = "ink", weight, style, ...rest }
 
   return (
     <RNText
+      maxFontSizeMultiplier={ESCALA_MAXIMA_DA_FONTE}
       {...rest}
       style={[
         {
