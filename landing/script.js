@@ -1,6 +1,6 @@
-// Link do botão "Baixar". Troque pelo endereço do .apk quando ele existir.
-// Enquanto estiver vazio, os botões levam para a chamada final da página.
-const DOWNLOAD_URL = "";
+// Link do botão "Baixar": a release mais recente no GitHub, com o .apk e o passo a passo.
+// Vazio, os botões levam para a chamada final da página.
+const DOWNLOAD_URL = "https://github.com/roseniltonlopes/blueprint-app/releases/latest";
 
 if (DOWNLOAD_URL) {
   document.querySelectorAll("[data-download]").forEach((link) => {
