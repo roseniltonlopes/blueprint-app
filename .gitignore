@@ -44,3 +44,6 @@ blueprint-docs-v2.zip
 # Landing: configuração local com a chave publicável do Supabase (modelo em landing/config.example.js)
 landing/config.js
 .vercel
+
+# Instruções locais do assistente de IA (ficam só no computador)
+CLAUDE.md

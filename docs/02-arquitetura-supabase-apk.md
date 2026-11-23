@@ -50,44 +50,15 @@ O banco de dados na nuvem do **Blueprint** está configurado na região sul-amer
 - **Região:** `sa-east-1` (América do Sul — São Paulo)
 - **URL da API:** `https://jjnubvilupxybafkasuh.supabase.co`
 
-### Script SQL da Tabela
-O arquivo [`src/services/supabaseSchema.sql`](../src/services/supabaseSchema.sql) contém a estrutura da tabela que armazena os registros do aplicativo:
+### Esquema e segurança
 
-```sql
-create table if not exists public.blueprint_actions (
-  id uuid default gen_random_uuid() primary key,
-  usuario text not null default 'Nilton',
-  categoria text not null,
-  criado_em timestamp with time zone default now()
-);
-
-alter table public.blueprint_actions enable row level security;
-
-create policy "Permitir insercao de acoes no Blueprint"
-  on public.blueprint_actions for insert
-  with check (true);
-
-create policy "Permitir leitura de acoes no Blueprint"
-  on public.blueprint_actions for select
-  using (true);
-```
-
-### Alerta de segurança: policies abertas
-
-As duas policies acima usam `with check (true)` e `using (true)`. Isso significa que **qualquer pessoa com a chave `anon` pode ler todas as ações de todos os usuários e inserir linhas com qualquer valor de `usuario`**. A chave `anon` é pública por desenho (ela vai embutida no `.apk` e pode ser extraída dele), então a proteção real depende das policies, não do sigilo da chave.
-
-Isso é aceitável apenas enquanto o banco guardar dados de teste. **Antes de publicar o `.apk` ou de ativar o login (Fase 4):**
-1. Aplicar a migração proposta em [`src/services/migrations/002_auth_e_rls_PROPOSTA.sql`](../src/services/migrations/002_auth_e_rls_PROPOSTA.sql), que associa cada ação a `auth.uid()` e restringe leitura, inserção e exclusão ao dono;
-2. Decidir o destino das linhas antigas (sem `user_id`, ficam invisíveis após a migração);
-3. Remover o valor padrão `'Nilton'` da coluna `usuario`, que passa a ser redundante.
-
-A migração **não foi aplicada nem testada** no projeto Supabase. Revise e teste em um projeto de desenvolvimento antes.
+O esquema em uso e as policies estão em [`supabase/migrations/`](../supabase/migrations/), descritos na seção 2.1. A chave publicável vai embutida no `.apk` e pode ser extraída dele: ela é pública por desenho. A proteção dos dados vem do RLS, que deixa cada pessoa ler e gravar só as próprias linhas, sem nenhum acesso para `anon`.
 
 ---
 
 ## 2.1 Banco atual e sincronização offline-first (etapa 5)
 
-O esquema em uso está em [`supabase/migrations/`](../supabase/migrations/): a `001_schema_inicial.sql` (aplicada pelo dono) cria `perfis`, `acoes`, `atividades`, `agendas`, `compromissos`, `avulsos` e o bucket `avatares`, todas com RLS por usuário (`auth.uid() = user_id`) e sem nenhum acesso para `anon`. A tabela `blueprint_actions` descrita acima é do protótipo e não existe no projeto atual. A `002_registros_e_exclusao.sql` cria `registros` ("Feito" e "Não fiz") e troca a policy de exclusão de ações de 5 minutos por "qualquer ação própria". A `003_termos_avulsos_e_exclusao.sql` (aplicada pelo dono em 2026-11-22) acrescenta o aceite dos termos em `perfis`, o aviso `antecedencia_min` nos avulsos e a função `public.excluir_minha_conta()` (veja abaixo).
+O esquema em uso está em [`supabase/migrations/`](../supabase/migrations/): a `001_schema_inicial.sql` (aplicada pelo dono) cria `perfis`, `acoes`, `atividades`, `agendas`, `compromissos`, `avulsos` e o bucket `avatares`, todas com RLS por usuário (`auth.uid() = user_id`) e sem nenhum acesso para `anon`. A tabela `blueprint_actions` do protótipo não existe mais no projeto. A `002_registros_e_exclusao.sql` cria `registros` ("Feito" e "Não fiz") e troca a policy de exclusão de ações de 5 minutos por "qualquer ação própria". A `003_termos_avulsos_e_exclusao.sql` (aplicada pelo dono em 2026-11-22) acrescenta o aceite dos termos em `perfis`, o aviso `antecedencia_min` nos avulsos e a função `public.excluir_minha_conta()` (veja abaixo).
 
 **Princípios**
 - A regra de negócio fica no app; o banco guarda e isola por usuário (RLS).
@@ -161,7 +132,7 @@ O arquivo [`eas.json`](../eas.json) na raiz do projeto está configurado com `"b
 | :- | :--- | :--- | :--- |
 | **1** | **Conexão em redes móveis (4G/5G) ou Wi-Fi restrito** | O servidor de desenvolvimento local em modo `LAN` exige mesma sub-rede. | Uso de `npx expo start --tunnel` durante testes e build **`.apk`** em produção conectando direto ao Supabase via HTTPS. |
 | **2** | **Formato de pacote Android (`.aab` vs `.apk`)** | O build padrão gera *Android App Bundle* restrito à Play Store. | Configuração explícita de `"android": { "buildType": "apk" }` no arquivo [`eas.json`](../eas.json). |
-| **3** | **Persistência além da sessão em memória** | O hook `useState` mantém os dados apenas enquanto o ciclo de vida do componente está ativo em memória. | Integração planejada com `AsyncStorage` (offline-first) e sincronização com a tabela `blueprint_actions` no **Supabase**. |
+| **3** | **Persistência além da sessão em memória** | O hook `useState` mantém os dados apenas enquanto o ciclo de vida do componente está ativo em memória. | Implementado: `AsyncStorage` com formato versionado (offline-first) e sincronização com o **Supabase** (seção 2.1). |
 | **4** | **Segurança das chaves de API no repositório** | Chaves expostas em código versionado geram riscos de segurança. | Isolamento das variáveis em `.env` (ignorado via `.gitignore`) e habilitação de *Row Level Security (RLS)* no banco. **Atenção:** o RLS atual está ativo, mas com policies abertas (veja o alerta na seção 2). |
 | **5** | **Fonte Nohemi em produção** | Licença comercial paga e arquivo de fonte fora do Expo por padrão. | Confirmar a licença e carregar a fonte com `expo-font`. Manter `Sora` como fallback. |
 | **6** | **Sombras e animações no Android** | `elevation` não reproduz o desfoque do iOS e o Reanimated exige configuração de plugin. | Validar em aparelho real e seguir [`04-design-tokens-e-motion.md`](04-design-tokens-e-motion.md). |

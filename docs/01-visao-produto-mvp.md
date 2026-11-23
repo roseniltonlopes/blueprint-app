@@ -60,7 +60,7 @@ O **Blueprint** nasce com a proposta oposta: oferecer um **plano de ação claro
 - **Listas e Coleções:** Exibição da lista cronológica de ações registradas no dia usando `FlatList`;
 - **Navegação:** Transição entre a tela de *Check-in Diário* e a tela de *Histórico / Estatísticas*;
 - **Calendário e Perfil:** Calendário mensal com intensidade por dia, mapa de calor e preferências do usuário (tema, fuso, cor de destaque);
-- **Integração Cloud & APK:** Conexão ativa das funções com a tabela `blueprint_actions` no **Supabase**, login (Google, Apple e e-mail) e geração do `.apk` via **Expo EAS**.
+- **Integração Cloud & APK:** Conexão das funções com as tabelas por usuário no **Supabase** (veja `docs/02`, seção 2.1), login (Google, Apple e e-mail) e geração do `.apk` via **Expo EAS**.
 
 ---
 

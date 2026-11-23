@@ -246,17 +246,17 @@ flowchart LR
 | Função | Dado | Origem |
 | :--- | :--- | :--- |
 | Sincronização (etapa 5) | Ações, atividades, agendas, compromissos, avulsos, registros e o nome do perfil | Tabelas `acoes`, `atividades`, `agendas`, `compromissos`, `avulsos`, `registros` e `perfis` (`supabase/migrations/001` e `002`). O app guarda a cópia local e calcula tudo no aparelho. |
-| Contador, anel e contador por categoria | Ações do dia do usuário | `blueprint_actions`, filtradas pelo dia no fuso do perfil |
+| Contador, anel e contador por categoria | Ações do dia do usuário | `acoes`, filtradas pelo dia no fuso do perfil |
 | Calendário e mapa de calor | Contagem de ações por dia | Consulta agregada por dia (exemplo abaixo) |
 | Histórico semanal | Contagem por dia da semana | Mesma consulta, intervalo de 7 dias |
-| Lista do histórico | Ações com horário e categoria | `blueprint_actions` ordenada por `criado_em` |
+| Lista do histórico | Ações com horário e categoria | `acoes` ordenada por `criado_em` |
 | Tema, cor de destaque, meta, fuso | Preferências | `perfis` (tabela proposta) |
 
 Exemplo de consulta para o calendário (proposta, não testada no banco real):
 
 ```sql
 select (a.criado_em at time zone p.fuso)::date as dia, count(*) as acoes
-from public.blueprint_actions a
+from public.acoes a
 join public.perfis p on p.id = a.user_id
 where a.user_id = auth.uid()
   and a.criado_em >= $1
@@ -265,4 +265,4 @@ group by 1
 order by 1;
 ```
 
-A migração que cria `perfis`, adiciona `user_id` e `rotulo` e troca as policies abertas por policies por usuário está em [`src/services/migrations/002_auth_e_rls_PROPOSTA.sql`](../src/services/migrations/002_auth_e_rls_PROPOSTA.sql).
+O esquema atual, com `perfis`, `user_id` em todas as tabelas e RLS por usuário, está em [`supabase/migrations/`](../supabase/migrations/).

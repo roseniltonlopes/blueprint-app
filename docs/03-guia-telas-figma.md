@@ -1,9 +1,10 @@
 # 🎨 03. Guia das 8 Telas da v2 do Blueprint
 
+> Histórico: este guia descreve o canvas da v2. O visual atual do app está nas capturas do README e no [`07-plano-redesign.md`](07-plano-redesign.md).
+
 Este documento descreve as telas da **versão 2** do design, com a paleta da marca (Preto, Off White, Laranja, Roxo índigo e gradiente), tipografia Nohemi, cartões suaves sem bordas escuras e movimento sutil.
 
 - **Canvas editável:** https://claude.ai/artifact/Cae8a8KKv5bRKpx234Zh3h (privado até o dono compartilhar pelo botão *Share*)
-- **Código-fonte das pranchas:** [`docs/design/canvas-source/`](design/canvas-source/)
 - **Tokens, motion e acessibilidade:** [`04-design-tokens-e-motion.md`](04-design-tokens-e-motion.md)
 - **Funções e critérios de aceite:** [`05-funcionalidades-e-fluxos.md`](05-funcionalidades-e-fluxos.md)
 
@@ -24,8 +25,6 @@ Todas as pranchas têm `390 x 844` px. Nomes, datas e números são dados de exe
 | Grid de categorias | "Descanso" aparecia separado do ícone da lua em duas células | 4 cartões completos (ícone, nome, contador) mais a linha "Outro" |
 | Feedback | Texto "Foco atual" | Cartão invertido com selo, toast com Desfazer |
 | Movimento | Nenhum | Entradas em cascata, anel, barras, sheet e toast |
-
-Os arquivos `docs/assets/blueprint_mvp_screens.jpg` e `docs/figma/blueprint_ui_kit.svg` são da **v1** e foram mantidos como histórico. Eles não refletem a v2.
 
 ---
 
