@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
   cartao: { padding: SPACING.xl, gap: SPACING.lg },
   topo: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: 12 },
   principal: { flexShrink: 0 },
-  total: { fontSize: 64, lineHeight: 66, letterSpacing: -2 },
+  total: { fontSize: 52, lineHeight: 56, letterSpacing: -1.6 },
   comparacao: {
     flexShrink: 1,
     maxWidth: 170,

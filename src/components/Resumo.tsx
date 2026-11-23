@@ -31,5 +31,5 @@ export default function Resumo({ itens }: { itens: readonly ItemDoResumo[] }) {
 const styles = StyleSheet.create({
   resumo: { flexDirection: "row", padding: 0, borderRadius: 20 },
   item: { flex: 1, paddingVertical: SPACING.md, paddingHorizontal: 14, gap: 2 },
-  valor: { fontSize: 28, lineHeight: 32, letterSpacing: -0.84 },
+  valor: { fontSize: 24, lineHeight: 28, letterSpacing: -0.72 },
 });

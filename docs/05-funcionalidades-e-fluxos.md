@@ -24,7 +24,7 @@ Lista das funções do **Blueprint**, com a situação real de cada uma e o crit
 | F08 | Tema claro, escuro e automático | Home e Perfil | 🎨 Desenhado (`THEMES` existe em `theme.js`, mas nenhuma tela o consome) | 2 |
 | F09 | Animações suaves e suporte a "reduzir movimento" | Todas | 🎨 Desenhado | 2 |
 | F10 | Navegação por 5 abas (Hoje, Agenda, Calendário, Histórico, Perfil) | Todas | ✅ Implementado (agenda, etapa 1) | 3 |
-| F11 | Calendário mensal com intensidade por dia | Calendário | 🎨 Desenhado | 3 |
+| F11 | Calendário mensal ligado à Agenda: a cor do dia mostra o % do plano cumprido; o detalhe do dia lista os compromissos com Feito e Não fiz, os hábitos e "Adicionar neste dia" | Calendário | ✅ Implementado (ajustes de 2026-11-23) | 3 |
 | F12 | Resumo do dia selecionado e do mês | Calendário | 🎨 Desenhado | 3 |
 | F13 | Histórico semanal em gráfico | Histórico | 🎨 Desenhado | 3 |
 | F14 | Resumo: total, dias seguidos, melhor dia | Histórico e Perfil | 🎨 Desenhado | 3 |
@@ -51,6 +51,9 @@ Lista das funções do **Blueprint**, com a situação real de cada uma e o crit
 | F35 | "Avisar antes" com opções de toque (Sem aviso, Na hora, 5, 10, 15, 30 e 60 min), também nos avulsos; permissão de notificação pedida só ao salvar um aviso | Compromisso | ✅ Implementado (ajustes de 2026-11-22) | A3 |
 | F36 | Aceite dos Termos de Uso e da Política de Privacidade no cadastro; textos no app e na landing | Conta, Termos, Privacidade | ✅ Implementado (ajustes de 2026-11-22; textos pendentes de revisão jurídica, `docs/09`) | 5 |
 | F37 | Excluir a conta e os dados (nuvem e aparelho); sem conta, apagar os dados do aparelho | Perfil | ✅ Implementado (ajustes de 2026-11-22; depende da migração 003, já aplicada) | 5 |
+| F38 | Cadastro com nome e data de nascimento (13 a 120 anos); o nome aparece no Perfil e na saudação da Home; conta antiga sem nome recebe o pedido na Home | Entrada, Conta, Hoje, Perfil | ✅ Implementado (ajustes de 2026-11-23; a coluna `data_nascimento` depende da migração 004, não aplicada) | 5 |
+| F39 | Senha com o botão de olho; formulários sobem com o teclado; telas fora das abas reservam a área dos botões do Android | Todas | ✅ Implementado (ajustes de 2026-11-23) | 5 |
+| F40 | Seletor de horário próprio: painel com as horas de 00 a 23 e os minutos de 5 em 5, no lugar do relógio do sistema | Compromisso | ✅ Implementado (ajustes de 2026-11-23) | A3 |
 
 ---
 
@@ -200,6 +203,18 @@ Lista das funções do **Blueprint**, com a situação real de cada uma e o crit
 - [ ] Com conta, "Excluir minha conta e dados" pede duas confirmações; ao confirmar, a conta some do Supabase, o app sai da conta e fica vazio, com a mensagem de confirmação.
 - [ ] Sem internet, a exclusão mostra o erro e nada é apagado.
 - [ ] Sem conta, "Apagar dados deste aparelho" pede confirmação e deixa o app vazio.
+
+### F11, F38, F39 e F40: ajustes de 2026-11-23
+- [ ] Criar conta pede Nome, Data de nascimento (DD/MM/AAAA, teclado numérico), E-mail e Senha; data inexistente, futura ou fora de 13 a 120 anos mostra o erro no campo.
+- [ ] Depois do cadastro, o Perfil mostra o nome (não "Convidado") e a Home diz "Boa tarde, <primeiro nome>".
+- [ ] Conta criada antes da 1.2.0, sem nome: depois de sincronizar, a Home mostra "Como você quer ser chamado?"; salvar some com o cartão e sobe o nome para a nuvem.
+- [ ] O olho do campo Senha mostra e esconde o texto.
+- [ ] No Android, com o teclado aberto, o campo em foco fica visível; o botão Salvar do compromisso e os links da Entrada não ficam sob os botões do sistema.
+- [ ] Calendário: todos os dias do mês no mesmo cartão; hoje com contorno laranja; a cor (um tom de roxo) cresce com o % cumprido; o ponto marca dia planejado sem nada feito.
+- [ ] Tocar num dia mostra os compromissos dele; em dia passado ou hoje dá para marcar Feito e Não fiz; dia futuro só mostra o plano. "Adicionar neste dia" abre o compromisso em "Só neste dia" com a data.
+- [ ] O resumo do Calendário mostra o % do plano cumprido no mês (só dias até hoje) e as ações de hábito.
+- [ ] Histórico: as barras da semana, do mês e por categoria usam uma cor só.
+- [ ] Início e Término abrem o painel de horário do app; "Definir horário" aplica, "Cancelar" fecha sem mudar.
 
 ### F34: painel de compromissos (etapa 4)
 - [ ] Histórico > Mês mostra "Compromissos da agenda" com feitos, não fiz, sem registro e "Cumpriu X% do que estava na agenda.".

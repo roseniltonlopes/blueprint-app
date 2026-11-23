@@ -1,14 +1,18 @@
-import { useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { useRef, useState } from "react";
+import { Pressable, StyleSheet, View, type TextInput } from "react-native";
 import {
   EMAIL_MAX,
   SENHA_MAX,
   formularioValido,
+  mascararData,
+  nascimentoParaIso,
+  normalizarEmail,
   validarFormularioDeConta,
   type ErrosDoFormulario,
   type ModoDoFormulario,
 } from "../domain/conta";
 import { useConta } from "../hooks/useConta";
+import { NOME_MAX, normalizarNome } from "../domain/perfil";
 import { usePerfil } from "../hooks/usePerfil";
 import { VERSAO_DOS_TERMOS } from "../legal/textos";
 import { RADIUS, SIZES, SPACING } from "../styles/theme";
@@ -46,8 +50,10 @@ export default function FormularioDeConta({
 }: FormularioDeContaProps) {
   const { entrar, criarConta, recuperarSenha } = useConta();
   const { colors } = useTheme();
-  const { perfil } = usePerfil();
+  const { perfil, salvarNome } = usePerfil();
   const [modo, setModo] = useState<ModoDoFormulario>("entrar");
+  const [nome, setNome] = useState(perfil.nome);
+  const [nascimento, setNascimento] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [erros, setErros] = useState<ErrosDoFormulario>({});
@@ -55,6 +61,9 @@ export default function FormularioDeConta({
   const [aviso, setAviso] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [aceitouTermos, setAceitouTermos] = useState(false);
+  const campoNascimento = useRef<TextInput>(null);
+  const campoEmail = useRef<TextInput>(null);
+  const campoSenha = useRef<TextInput>(null);
 
   function trocarModo(novo: ModoDoFormulario) {
     setModo(novo);
@@ -65,7 +74,7 @@ export default function FormularioDeConta({
 
   async function enviar() {
     if (enviando) return;
-    const encontrados = validarFormularioDeConta(modo, { email, senha });
+    const encontrados = validarFormularioDeConta(modo, { email, senha, nome, nascimento });
     setErros(encontrados);
     setErroGeral(null);
     setAviso(null);
@@ -90,18 +99,25 @@ export default function FormularioDeConta({
       const resultado = await criarConta({
         email,
         senha,
-        nome: perfil.nome.length > 0 ? perfil.nome : null,
+        nome: normalizarNome(nome),
+        nascimento: nascimentoParaIso(nascimento),
         termosVersao: VERSAO_DOS_TERMOS,
       });
       setEnviando(false);
       if (!resultado.ok) {
         setErroGeral(resultado.erro);
-      } else if (resultado.valor === "conectado") {
+        return;
+      }
+      // O nome já aparece no Perfil e na tela Hoje, mesmo antes da primeira sincronização.
+      salvarNome(nome);
+      if (resultado.valor === "conectado") {
         aoEntrar();
       } else {
         setModo("entrar");
         setSenha("");
-        setAviso(`Enviamos um link para ${email.trim()}. Confirme o e-mail e depois entre.`);
+        setAviso(
+          `Enviamos um link para ${normalizarEmail(email)}. Confirme o e-mail e depois entre.`,
+        );
       }
       return;
     }
@@ -141,7 +157,41 @@ export default function FormularioDeConta({
         />
       )}
 
+      {modo === "criar" ? (
+        <>
+          <Campo
+            rotulo="Nome"
+            valor={nome}
+            aoMudar={setNome}
+            autoCapitalize="words"
+            autoComplete="name"
+            textContentType="name"
+            maxLength={NOME_MAX}
+            placeholder="Como você quer ser chamado"
+            teclaDeAcao="next"
+            aoConfirmar={() => campoNascimento.current?.focus()}
+            erro={erros.nome}
+            testID="campo-nome"
+          />
+          <Campo
+            ref={campoNascimento}
+            rotulo="Data de nascimento"
+            valor={nascimento}
+            aoMudar={(texto) => setNascimento(mascararData(texto))}
+            teclado="number-pad"
+            autoComplete="birthdate-full"
+            maxLength={10}
+            placeholder="DD/MM/AAAA"
+            teclaDeAcao="next"
+            aoConfirmar={() => campoEmail.current?.focus()}
+            erro={erros.nascimento}
+            testID="campo-nascimento"
+          />
+        </>
+      ) : null}
+
       <Campo
+        ref={campoEmail}
         rotulo="E-mail"
         valor={email}
         aoMudar={setEmail}
@@ -151,10 +201,14 @@ export default function FormularioDeConta({
         textContentType="emailAddress"
         maxLength={EMAIL_MAX}
         placeholder="nome@exemplo.com"
+        teclaDeAcao={modo === "recuperar" ? "send" : "next"}
+        aoConfirmar={modo === "recuperar" ? () => void enviar() : () => campoSenha.current?.focus()}
         erro={erros.email}
+        testID="campo-email"
       />
       {modo !== "recuperar" ? (
         <Campo
+          ref={campoSenha}
           rotulo="Senha"
           valor={senha}
           aoMudar={setSenha}
@@ -163,8 +217,11 @@ export default function FormularioDeConta({
           autoComplete={modo === "criar" ? "new-password" : "current-password"}
           textContentType={modo === "criar" ? "newPassword" : "password"}
           maxLength={SENHA_MAX}
-          placeholder={modo === "criar" ? "Pelo menos 8 caracteres" : undefined}
+          placeholder={modo === "criar" ? "Mínimo 8, letras e números" : undefined}
+          teclaDeAcao={modo === "criar" ? "next" : "go"}
+          aoConfirmar={modo === "entrar" ? () => void enviar() : undefined}
           erro={erros.senha}
+          testID="campo-senha"
         />
       ) : null}
 

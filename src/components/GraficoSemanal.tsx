@@ -7,7 +7,6 @@ import Animated, {
   withDelay,
   withTiming,
 } from "react-native-reanimated";
-import { Gradiente } from "../ui/Gradiente";
 import { DIAS_ABREVIADOS } from "../domain/datas";
 import type { DiaDoGrafico } from "../domain/estatisticas";
 import { useTheme } from "../theme/ThemeProvider";
@@ -63,9 +62,7 @@ function Barra({ dia, maximo, indice }: BarraProps) {
         {dia.futuro ? " " : dia.total}
       </Text>
       <View style={[styles.trilho, { backgroundColor: colors.sunk }]}>
-        <Animated.View style={[styles.barra, { backgroundColor: colors.ink }, estilo]}>
-          {dia.ehHoje ? <Gradiente cores={colors.gradient} /> : null}
-        </Animated.View>
+        <Animated.View style={[styles.barra, { backgroundColor: colors.ramp[0] }, estilo]} />
       </View>
       <Text
         variant="caption"
@@ -83,7 +80,10 @@ type GraficoSemanalProps = {
   dias: readonly DiaDoGrafico[];
 };
 
-/** Gráfico de 7 barras, de domingo a sábado (docs/03 tela 7). Altura relativa ao maior dia. */
+/**
+ * Gráfico de 7 barras, de domingo a sábado (docs/03 tela 7). Altura relativa ao maior dia. Uma
+ * cor só para todas as barras; hoje se destaca pelo texto.
+ */
 export default function GraficoSemanal({ dias }: GraficoSemanalProps) {
   const maximo = Math.max(0, ...dias.map((dia) => dia.total));
   return (

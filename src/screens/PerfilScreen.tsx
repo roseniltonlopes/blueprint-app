@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
   removerFoto: { minHeight: SIZES.touchMin, justifyContent: "center", marginTop: -SPACING.sm },
   estatisticas: { flexDirection: "row", gap: SPACING.gap },
   estatistica: { flex: 1, paddingVertical: 14 },
-  estatisticaValor: { fontSize: 36, lineHeight: 40, letterSpacing: -1.08 },
+  estatisticaValor: { fontSize: 30, lineHeight: 34, letterSpacing: -0.9 },
   mapa: { paddingHorizontal: SPACING.xl, paddingBottom: 14 },
   tituloMapa: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between" },
   secao: { gap: SPACING.md },

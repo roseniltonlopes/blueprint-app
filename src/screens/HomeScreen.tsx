@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
 import AvatarDoPerfil from "../components/AvatarDoPerfil";
 import CartaoAgora from "../components/CartaoAgora";
+import CartaoDoNome from "../components/CartaoDoNome";
 import CartaoProgresso from "../components/CartaoProgresso";
 import HojeNaAgenda from "../components/HojeNaAgenda";
 import OutraAcaoSheet from "../components/OutraAcaoSheet";
@@ -14,10 +15,13 @@ import { nomeDaCategoria, type CategoriaId } from "../domain/categorias";
 import { chaveDoDia, formatarDataCabecalho, formatarHora } from "../domain/datas";
 import { contarPorDia, sequenciaAtual } from "../domain/estatisticas";
 import { destaqueDoDia, saudacao } from "../domain/hoje";
+import { primeiroNome } from "../domain/perfil";
 import { mensagemDaMarcacao, type StatusDoRegistro } from "../domain/registros";
 import { useAcoes } from "../hooks/useAcoes";
 import { useAgenda, type Marcacao } from "../hooks/useAgenda";
+import { useConta } from "../hooks/useConta";
 import { usePerfil } from "../hooks/usePerfil";
+import { useSincronizacao } from "../hooks/useSincronizacao";
 import type { AbasParamList } from "../navigation/Abas";
 import { tocarHaptica } from "../services/haptica";
 import { SIZES, SPACING } from "../styles/theme";
@@ -48,6 +52,8 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   const { acoes, porCategoriaHoje, totalHoje, meta, registrar, remover, relogio } = useAcoes();
   const { dados, ocorrenciasDe, marcar, desfazerMarcacao } = useAgenda();
   const { perfil, nomeExibido } = usePerfil();
+  const { estado: conta } = useConta();
+  const { estado: sincronizacao } = useSincronizacao();
   const [sheetAberto, setSheetAberto] = useState(false);
   const [confirmacao, setConfirmacao] = useState<Confirmacao | null>(null);
   const [erroDoDestaque, setErroDoDestaque] = useState<string | null>(null);
@@ -58,6 +64,12 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   const porDia = useMemo(() => contarPorDia(acoes), [acoes]);
   const sequencia = sequenciaAtual(porDia, hoje);
   const destaque = destaqueDoDia(ocorrenciasDe(hoje), dados.registros, chaveHoje, hoje);
+  const nome = primeiroNome(perfil);
+  // Conta criada antes do cadastro pedir o nome: depois de conferir a nuvem, ainda sem nome.
+  const pedirNome =
+    conta.situacao === "conectado" &&
+    nome.length === 0 &&
+    (sincronizacao.tipo === "sincronizada" || sincronizacao.tipo === "falhou");
 
   function confirmar(mensagem: string, desfazer: () => void) {
     contadorDeConfirmacoes.current += 1;
@@ -126,8 +138,8 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
           <Text variant="support" color="mute">
             {formatarDataCabecalho(hoje)}
           </Text>
-          <Text variant="h1" accessibilityRole="header">
-            {saudacao(hoje)}
+          <Text variant="h1" accessibilityRole="header" numberOfLines={1}>
+            {nome.length > 0 ? `${saudacao(hoje)}, ${nome}` : saudacao(hoje)}
           </Text>
         </View>
         <Pressable
@@ -139,6 +151,12 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
           <AvatarDoPerfil nome={nomeExibido} foto={perfil.foto} tamanho={SIZES.touchMin} />
         </Pressable>
       </Animated.View>
+
+      {pedirNome ? (
+        <Animated.View entering={entrada(40)}>
+          <CartaoDoNome />
+        </Animated.View>
+      ) : null}
 
       {destaque ? (
         <Animated.View entering={entrada(60)}>
@@ -197,7 +215,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
 }
 
 const styles = StyleSheet.create({
-  conteudo: { gap: SPACING.xl, paddingBottom: SPACING.xxl },
+  conteudo: { gap: SPACING.lg, paddingBottom: SPACING.xl },
   cabecalho: {
     flexDirection: "row",
     alignItems: "center",

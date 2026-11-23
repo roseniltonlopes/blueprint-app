@@ -1,6 +1,15 @@
-import type { ReactNode } from "react";
-import { ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { BottomTabBarHeightContext } from "@react-navigation/bottom-tabs";
+import { useContext, type ReactNode } from "react";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
+import { SafeAreaView, type Edge } from "react-native-safe-area-context";
 import { useTheme } from "../theme/ThemeProvider";
 import { SPACING } from "../styles/theme";
 
@@ -15,27 +24,43 @@ type ScreenProps = {
   contentStyle?: StyleProp<ViewStyle>;
 };
 
+const BORDAS_COM_ABAS: Edge[] = ["top", "left", "right"];
+const BORDAS_SEM_ABAS: Edge[] = ["top", "left", "right", "bottom"];
+
+/**
+ * Base de toda tela. Dentro das abas, a borda de baixo fica com a barra de abas, que já aplica a
+ * área segura. Fora delas (cadastro, compromisso, conta), a tela reserva a área dos botões do
+ * Android para que o rodapé não fique por baixo deles. O conteúdo sobe junto com o teclado.
+ */
 export function Screen({ children, scroll = false, footer, flutuante, contentStyle }: ScreenProps) {
   const { colors } = useTheme();
+  const alturaDasAbas = useContext(BottomTabBarHeightContext);
+  const dentroDasAbas = alturaDasAbas !== undefined;
 
   return (
-    // A borda inferior fica com a barra de abas, que já aplica a área segura.
     <SafeAreaView
-      edges={["top", "left", "right"]}
+      edges={dentroDasAbas ? BORDAS_COM_ABAS : BORDAS_SEM_ABAS}
       style={[styles.root, { backgroundColor: colors.bg }]}
     >
-      {scroll ? (
-        <ScrollView
-          style={styles.fill}
-          contentContainerStyle={[styles.content, contentStyle]}
-          showsVerticalScrollIndicator={false}
-        >
-          {children}
-        </ScrollView>
-      ) : (
-        <View style={[styles.content, styles.fill, contentStyle]}>{children}</View>
-      )}
-      {footer ? <View style={styles.footer}>{footer}</View> : null}
+      <KeyboardAvoidingView
+        style={styles.fill}
+        behavior={Platform.OS === "web" ? undefined : "padding"}
+      >
+        {scroll ? (
+          <ScrollView
+            style={styles.fill}
+            contentContainerStyle={[styles.content, contentStyle]}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+          >
+            {children}
+          </ScrollView>
+        ) : (
+          <View style={[styles.content, styles.fill, contentStyle]}>{children}</View>
+        )}
+        {footer ? <View style={styles.footer}>{footer}</View> : null}
+      </KeyboardAvoidingView>
       {flutuante ? (
         <View style={styles.flutuante} pointerEvents="box-none">
           {flutuante}
@@ -50,13 +75,13 @@ const styles = StyleSheet.create({
   fill: { flex: 1 },
   content: {
     paddingHorizontal: SPACING.screen,
-    paddingTop: SPACING.xxl,
+    paddingTop: SPACING.xl,
     paddingBottom: SPACING.lg,
   },
   flutuante: { position: "absolute", right: SPACING.screen, bottom: SPACING.lg },
   footer: {
     paddingHorizontal: SPACING.screen,
     paddingTop: SPACING.sm,
-    paddingBottom: SPACING.lg,
+    paddingBottom: SPACING.md,
   },
 });

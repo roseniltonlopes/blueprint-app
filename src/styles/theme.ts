@@ -125,8 +125,8 @@ export const SPACING = {
   sm: 8,
   md: 12,
   lg: 16,
-  xl: 20,
-  xxl: 24,
+  xl: 18,
+  xxl: 22,
   /** Margem lateral padrão da tela */
   screen: 16,
   /** Margem lateral do cadastro */
@@ -137,8 +137,8 @@ export const SPACING = {
 
 export const SIZES = {
   touchMin: 44,
-  button: 56,
-  field: 52,
+  button: 50,
+  field: 48,
   categoryCard: 108,
   categoryRow: 76,
   iconCircle: 42,
@@ -179,16 +179,22 @@ type TypeSpec = {
 };
 
 export const TYPOGRAPHY: Record<TextVariant, TypeSpec> = {
-  ring: { fontSize: 48, lineHeight: 48, weight: 300, letterSpacingEm: -0.03 },
-  wordmark: { fontSize: 40, lineHeight: 44, weight: 300, letterSpacingEm: -0.04 },
-  h1: { fontSize: 30, lineHeight: 36, weight: 400, letterSpacingEm: -0.02 },
-  sheetTitle: { fontSize: 26, lineHeight: 32, weight: 400, letterSpacingEm: -0.02 },
-  cardTitle: { fontSize: 19, lineHeight: 24, weight: 400, letterSpacingEm: -0.02 },
-  section: { fontSize: 17, lineHeight: 24, weight: 600, letterSpacingEm: 0 },
-  body: { fontSize: 16, lineHeight: 22, weight: 500, letterSpacingEm: 0 },
-  support: { fontSize: 14, lineHeight: 20, weight: 400, letterSpacingEm: 0 },
-  caption: { fontSize: 13, lineHeight: 18, weight: 400, letterSpacingEm: 0 },
+  ring: { fontSize: 42, lineHeight: 42, weight: 300, letterSpacingEm: -0.03 },
+  wordmark: { fontSize: 34, lineHeight: 38, weight: 300, letterSpacingEm: -0.04 },
+  h1: { fontSize: 26, lineHeight: 32, weight: 400, letterSpacingEm: -0.02 },
+  sheetTitle: { fontSize: 22, lineHeight: 28, weight: 400, letterSpacingEm: -0.02 },
+  cardTitle: { fontSize: 17, lineHeight: 22, weight: 400, letterSpacingEm: -0.02 },
+  section: { fontSize: 15, lineHeight: 20, weight: 600, letterSpacingEm: 0 },
+  body: { fontSize: 15, lineHeight: 20, weight: 500, letterSpacingEm: 0 },
+  support: { fontSize: 13, lineHeight: 18, weight: 400, letterSpacingEm: 0 },
+  caption: { fontSize: 12, lineHeight: 16, weight: 400, letterSpacingEm: 0 },
 };
+
+/**
+ * Limite para o tamanho de fonte escolhido no sistema. Acima disso as telas passam a esconder
+ * conteúdo; 1,2 ainda atende quem aumenta a fonte sem quebrar a distribuição.
+ */
+export const ESCALA_MAXIMA_DA_FONTE = 1.2;
 
 export const MOTION = {
   /** cubic-bezier(0.23, 1, 0.32, 1): saída forte, responde rápido e assenta devagar */

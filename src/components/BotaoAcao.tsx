@@ -9,13 +9,20 @@ type BotaoAcaoProps = {
   titulo: string;
   aoPressionar: () => void;
   desabilitado?: boolean;
+  /** Mostra o "+" antes do título (ações de adicionar). Padrão: sim. */
+  comMais?: boolean;
 };
 
 /**
  * Botão principal: laranja da marca com texto preto (contraste 6,3:1 nos dois temas).
  * Desabilitado em tom afundado, com o texto ainda legível.
  */
-export default function BotaoAcao({ titulo, aoPressionar, desabilitado = false }: BotaoAcaoProps) {
+export default function BotaoAcao({
+  titulo,
+  aoPressionar,
+  desabilitado = false,
+  comMais = true,
+}: BotaoAcaoProps) {
   const { colors } = useTheme();
 
   return (
@@ -32,7 +39,7 @@ export default function BotaoAcao({ titulo, aoPressionar, desabilitado = false }
         </Text>
       ) : (
         <>
-          <Icon name="mais" color={BRAND.black} size={20} strokeWidth={2.4} />
+          {comMais ? <Icon name="mais" color={BRAND.black} size={20} strokeWidth={2.4} /> : null}
           <Text variant="body" weight={600} style={{ color: BRAND.black }}>
             {titulo}
           </Text>

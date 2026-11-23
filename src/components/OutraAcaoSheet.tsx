@@ -18,7 +18,14 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ROTULO_MAX, normalizarRotulo } from "../domain/acoes";
 import { useTheme } from "../theme/ThemeProvider";
-import { FONT_FAMILY, MOTION, RADIUS, SIZES, SPACING } from "../styles/theme";
+import {
+  ESCALA_MAXIMA_DA_FONTE,
+  FONT_FAMILY,
+  MOTION,
+  RADIUS,
+  SIZES,
+  SPACING,
+} from "../styles/theme";
 import { CURVA } from "../ui/motion";
 import { Text } from "../ui/Text";
 import BotaoAcao from "./BotaoAcao";
@@ -143,6 +150,7 @@ export default function OutraAcaoSheet({ aoFechar, aoRegistrar }: OutraAcaoSheet
               onSubmitEditing={confirmar}
               placeholder="Ex.: meditação de 10 minutos"
               placeholderTextColor={colors.placeholder}
+              maxFontSizeMultiplier={ESCALA_MAXIMA_DA_FONTE}
               style={[
                 styles.input,
                 { borderColor: colors.hair, backgroundColor: colors.card, color: colors.ink },

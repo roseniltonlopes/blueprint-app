@@ -24,7 +24,7 @@ export default function EntradaScreen({ navigation }: Props) {
   return (
     <Screen scroll contentStyle={styles.conteudo}>
       <Animated.View entering={entrada(0)}>
-        <MarcaBlueprint />
+        <MarcaBlueprint tamanho={48} />
       </Animated.View>
 
       <Animated.View entering={entrada(60)} style={styles.chamada}>
@@ -77,9 +77,9 @@ export default function EntradaScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  conteudo: { gap: SPACING.xl, paddingTop: SPACING.xxl * 1.5, paddingBottom: SPACING.xxl },
+  conteudo: { gap: SPACING.lg, paddingTop: SPACING.xxl, paddingBottom: SPACING.lg },
   chamada: { gap: SPACING.md },
-  titulo: { fontSize: 40, lineHeight: 46 },
+  titulo: { fontSize: 32, lineHeight: 38 },
   faixa: { width: 96, height: 6, borderRadius: 6, overflow: "hidden" },
   aviso: { flexDirection: "row", alignItems: "flex-start", gap: SPACING.sm },
   textoDoAviso: { flex: 1 },

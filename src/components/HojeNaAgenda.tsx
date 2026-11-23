@@ -7,6 +7,7 @@ import ReanimatedSwipeable, {
 import { AGENDA_COMECA_VAZIA, rotuloDoHorario, type Ocorrencia } from "../domain/agenda";
 import { chaveDoDia, somarDias } from "../domain/datas";
 import {
+  podeRegistrarNaData,
   registroDaOcorrencia,
   resumoDoDia,
   textoDoResumo,
@@ -73,9 +74,19 @@ type LinhaProps = {
   primeira: boolean;
   ultima: boolean;
   aoTocar: (status: StatusDoRegistro) => void;
+  /** Dia futuro: mostra o plano, sem Feito e Não fiz */
+  somenteLeitura?: boolean;
 };
 
-function LinhaDoDia({ ocorrencia, status, emCurso, primeira, ultima, aoTocar }: LinhaProps) {
+function LinhaDoDia({
+  ocorrencia,
+  status,
+  emCurso,
+  primeira,
+  ultima,
+  aoTocar,
+  somenteLeitura = false,
+}: LinhaProps) {
   const { colors } = useTheme();
   const gesto = useRef<SwipeableMethods>(null);
   const nome = ocorrencia.atividade.nome;
@@ -89,6 +100,47 @@ function LinhaDoDia({ ocorrencia, status, emCurso, primeira, ultima, aoTocar }: 
   function aoAbrir(direcao: SwipeDirection) {
     aoTocar(direcao === SwipeDirection.RIGHT ? "feito" : "nao_fui");
     gesto.current?.close();
+  }
+
+  const fio = (
+    <View
+      style={[
+        styles.fio,
+        {
+          backgroundColor: colors.sunk,
+          top: primeira ? "50%" : 0,
+          bottom: ultima ? "50%" : 0,
+        },
+      ]}
+    />
+  );
+
+  if (somenteLeitura) {
+    return (
+      <View
+        style={[styles.linha, { backgroundColor: colors.card }]}
+        accessible
+        accessibilityLabel={`Planejado: ${descricao}`}
+      >
+        <Text variant="caption" color="mute" style={styles.hora}>
+          {ocorrencia.inicio}
+        </Text>
+        <View style={styles.colunaDoNo}>
+          {fio}
+          <NoDaLinha status={null} emCurso={false} />
+        </View>
+        <View style={styles.textos}>
+          <Text variant="body" numberOfLines={1}>
+            {nome}
+          </Text>
+          {apoio ? (
+            <Text variant="caption" color="mute" numberOfLines={1}>
+              {apoio}
+            </Text>
+          ) : null}
+        </View>
+      </View>
+    );
   }
 
   return (
@@ -126,16 +178,7 @@ function LinhaDoDia({ ocorrencia, status, emCurso, primeira, ultima, aoTocar }: 
           {ocorrencia.inicio}
         </Text>
         <View style={styles.colunaDoNo}>
-          <View
-            style={[
-              styles.fio,
-              {
-                backgroundColor: colors.sunk,
-                top: primeira ? "50%" : 0,
-                bottom: ultima ? "50%" : 0,
-              },
-            ]}
-          />
+          {fio}
           <PressableEscala
             accessibilityRole="button"
             accessibilityLabel={`Feito: ${descricao}`}
@@ -215,27 +258,24 @@ function AlternarDia({ valor, aoMudar }: { valor: Dia; aoMudar: (dia: Dia) => vo
   );
 }
 
-/**
- * Compromissos do dia na Home como uma linha do tempo (etapas 2 e 4 da agenda semanal).
- * Tocar na bolinha marca Feito; "Não fiz" fica à direita. Deslizar faz o mesmo: para a direita
- * é Feito, para a esquerda é Não fiz. "Ontem" permite marcar o que ficou esquecido.
- */
-export default function HojeNaAgenda({ aoMarcar, aoMontarAgenda, chaveAgora }: HojeNaAgendaProps) {
-  const { dados, relogio, ocorrenciasDe, agendaDe, marcar } = useAgenda();
-  const [erro, setErro] = useState<string | null>(null);
-  const [qual, setQual] = useState<Dia>("hoje");
+type CompromissosDoDiaProps = {
+  /** Dia mostrado. Dia futuro aparece só como plano, sem marcar. */
+  dia: Date;
+  aoMarcar: (marcacao: Marcacao) => void;
+  /** Chave da ocorrência em curso agora, destacada na linha */
+  chaveAgora?: string | null;
+};
 
-  const hoje = relogio();
-  const dia = qual === "hoje" ? hoje : somarDias(hoje, -1);
-  const minusculo = NOMES_DO_DIA[qual].toLowerCase();
+/**
+ * Linha do tempo dos compromissos de um dia, com Feito e Não fiz (toque ou gesto). Usada na Home
+ * (hoje e ontem) e no detalhe do dia do Calendário. Não mostra nada quando o dia não tem plano.
+ */
+export function CompromissosDoDia({ dia, aoMarcar, chaveAgora = null }: CompromissosDoDiaProps) {
+  const { dados, relogio, ocorrenciasDe, marcar } = useAgenda();
+  const [erro, setErro] = useState<string | null>(null);
   const data = chaveDoDia(dia);
   const ocorrencias = ocorrenciasDe(dia);
-  const resumo = resumoDoDia(ocorrencias, dados.registros, data);
-
-  function trocarDia(proximo: Dia) {
-    setErro(null);
-    setQual(proximo);
-  }
+  const somenteLeitura = !podeRegistrarNaData(data, relogio());
 
   function aoTocar(chave: string, status: StatusDoRegistro) {
     const resultado = marcar(chave, status, dia);
@@ -246,6 +286,54 @@ export default function HojeNaAgenda({ aoMarcar, aoMontarAgenda, chaveAgora }: H
       setErro(resultado.erro);
     }
   }
+
+  if (ocorrencias.length === 0) return null;
+
+  return (
+    <View style={styles.secao}>
+      <Card style={styles.lista}>
+        {ocorrencias.map((ocorrencia, indice) => (
+          <LinhaDoDia
+            key={ocorrencia.chave}
+            ocorrencia={ocorrencia}
+            status={registroDaOcorrencia(dados.registros, ocorrencia.chave, data)?.status ?? null}
+            emCurso={ocorrencia.chave === chaveAgora}
+            primeira={indice === 0}
+            ultima={indice === ocorrencias.length - 1}
+            aoTocar={(status) => aoTocar(ocorrencia.chave, status)}
+            somenteLeitura={somenteLeitura}
+          />
+        ))}
+      </Card>
+      {somenteLeitura ? null : (
+        <Text variant="caption" color="mute">
+          Deslize um compromisso: para a direita marca Feito, para a esquerda Não fiz.
+        </Text>
+      )}
+      {erro ? (
+        <Text variant="caption" color="accentText" weight={600} accessibilityRole="alert">
+          {erro}
+        </Text>
+      ) : null}
+    </View>
+  );
+}
+
+/**
+ * Compromissos do dia na Home como uma linha do tempo (etapas 2 e 4 da agenda semanal).
+ * Tocar na bolinha marca Feito; "Não fiz" fica à direita. Deslizar faz o mesmo: para a direita
+ * é Feito, para a esquerda é Não fiz. "Ontem" permite marcar o que ficou esquecido.
+ */
+export default function HojeNaAgenda({ aoMarcar, aoMontarAgenda, chaveAgora }: HojeNaAgendaProps) {
+  const { dados, relogio, ocorrenciasDe, agendaDe } = useAgenda();
+  const [qual, setQual] = useState<Dia>("hoje");
+
+  const hoje = relogio();
+  const dia = qual === "hoje" ? hoje : somarDias(hoje, -1);
+  const minusculo = NOMES_DO_DIA[qual].toLowerCase();
+  const data = chaveDoDia(dia);
+  const ocorrencias = ocorrenciasDe(dia);
+  const resumo = resumoDoDia(ocorrencias, dados.registros, data);
 
   return (
     <View style={styles.secao}>
@@ -260,7 +348,7 @@ export default function HojeNaAgenda({ aoMarcar, aoMontarAgenda, chaveAgora }: H
             </Text>
           ) : null}
         </View>
-        <AlternarDia valor={qual} aoMudar={trocarDia} />
+        <AlternarDia valor={qual} aoMudar={setQual} />
       </View>
 
       {ocorrencias.length === 0 ? (
@@ -288,33 +376,13 @@ export default function HojeNaAgenda({ aoMarcar, aoMontarAgenda, chaveAgora }: H
           )}
         </Card>
       ) : (
-        <>
-          <Card style={styles.lista}>
-            {ocorrencias.map((ocorrencia, indice) => (
-              <LinhaDoDia
-                key={ocorrencia.chave}
-                ocorrencia={ocorrencia}
-                status={
-                  registroDaOcorrencia(dados.registros, ocorrencia.chave, data)?.status ?? null
-                }
-                emCurso={qual === "hoje" && ocorrencia.chave === chaveAgora}
-                primeira={indice === 0}
-                ultima={indice === ocorrencias.length - 1}
-                aoTocar={(status) => aoTocar(ocorrencia.chave, status)}
-              />
-            ))}
-          </Card>
-          <Text variant="caption" color="mute">
-            Deslize um compromisso: para a direita marca Feito, para a esquerda Não fiz.
-          </Text>
-        </>
+        <CompromissosDoDia
+          key={data}
+          dia={dia}
+          aoMarcar={aoMarcar}
+          chaveAgora={qual === "hoje" ? (chaveAgora ?? null) : null}
+        />
       )}
-
-      {erro ? (
-        <Text variant="caption" color="accentText" weight={600} accessibilityRole="alert">
-          {erro}
-        </Text>
-      ) : null}
     </View>
   );
 }

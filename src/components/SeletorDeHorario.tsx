@@ -1,12 +1,19 @@
-import DateTimePicker, { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
-import { useState } from "react";
-import { Platform, Pressable, StyleSheet, TextInput, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Modal, Pressable, StyleSheet, View, useWindowDimensions } from "react-native";
+import Animated, {
+  ReduceMotion,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { horaValida } from "../domain/agenda";
-import { formatarHora } from "../domain/datas";
-import { FONT_FAMILY, RADIUS, SIZES, SPACING, TYPOGRAPHY } from "../styles/theme";
+import { MOTION, RADIUS, SIZES, SPACING } from "../styles/theme";
 import { useTheme } from "../theme/ThemeProvider";
+import { CURVA } from "../ui/motion";
+import { PressableEscala } from "../ui/PressableEscala";
 import { Text } from "../ui/Text";
-import BotaoTexto from "./BotaoTexto";
+import BotaoAcao from "./BotaoAcao";
 
 type SeletorDeHorarioProps = {
   valor: string | null;
@@ -16,94 +23,208 @@ type SeletorDeHorarioProps = {
   bloco?: boolean;
 };
 
+export const HORAS = Array.from({ length: 24 }, (_, i) => i);
+export const MINUTOS = Array.from({ length: 12 }, (_, i) => i * 5);
 const HORA_PADRAO = { horas: 8, minutos: 0 };
-const TAMANHO_DO_BLOCO = 30;
+const COLUNAS = 6;
 
-function dataDaHora(hora: string | null): Date {
-  const [horas, minutos] =
-    hora !== null && horaValida(hora)
-      ? hora.split(":").map(Number)
-      : [HORA_PADRAO.horas, HORA_PADRAO.minutos];
-  return new Date(2000, 0, 1, horas, minutos);
+const doisDigitos = (n: number) => String(n).padStart(2, "0");
+
+/** "07:30" → { horas: 7, minutos: 30 }. Sem hora válida, 08:00. */
+export function partesDaHora(hora: string | null): { horas: number; minutos: number } {
+  if (hora === null || !horaValida(hora)) return HORA_PADRAO;
+  const [horas, minutos] = hora.split(":").map(Number);
+  return { horas, minutos };
 }
 
-/** Campo de texto com máscara HH:MM. Só avisa quando a hora digitada é válida. */
-function CampoWeb({ valor, aoMudar, rotulo, bloco = false }: SeletorDeHorarioProps) {
+export function montarHora(horas: number, minutos: number): string {
+  return `${doisDigitos(horas)}:${doisDigitos(minutos)}`;
+}
+
+type GradeProps = {
+  titulo: string;
+  valores: readonly number[];
+  escolhido: number;
+  aoEscolher: (valor: number) => void;
+  /** "Hora 07" / "Minuto 30" para o leitor de tela */
+  prefixo: string;
+};
+
+/** Grade de botões em 6 colunas, no visual dos chips do app. */
+function Grade({ titulo, valores, escolhido, aoEscolher, prefixo }: GradeProps) {
   const { colors } = useTheme();
-  const [texto, setTexto] = useState(valor ?? "");
-
-  function aoDigitar(entrada: string) {
-    const digitos = entrada.replace(/\D/g, "").slice(0, 4);
-    const mascarado = digitos.length > 2 ? `${digitos.slice(0, 2)}:${digitos.slice(2)}` : digitos;
-    setTexto(mascarado);
-    if (horaValida(mascarado)) {
-      aoMudar(mascarado);
-    }
-  }
-
   return (
-    <TextInput
-      accessibilityLabel={rotulo}
-      value={texto}
-      onChangeText={aoDigitar}
-      placeholder="HH:MM"
-      placeholderTextColor={colors.placeholder}
-      keyboardType="numeric"
-      maxLength={5}
-      style={[
-        styles.campo,
-        bloco && styles.bloco,
-        {
-          borderColor: colors.hair,
-          backgroundColor: bloco ? colors.card : undefined,
-          color: colors.ink,
-          fontFamily: FONT_FAMILY[bloco ? 300 : 500],
-          fontSize: bloco ? TAMANHO_DO_BLOCO : TYPOGRAPHY.body.fontSize,
-        },
-      ]}
-    />
+    <View style={styles.grupo}>
+      <Text variant="caption" color="mute">
+        {titulo}
+      </Text>
+      <View style={styles.grade} accessibilityRole="radiogroup" accessibilityLabel={titulo}>
+        {valores.map((valor) => {
+          const ativo = valor === escolhido;
+          return (
+            <PressableEscala
+              key={valor}
+              accessibilityRole="radio"
+              accessibilityLabel={`${prefixo} ${doisDigitos(valor)}`}
+              accessibilityState={{ selected: ativo }}
+              onPress={() => aoEscolher(valor)}
+              haptica={ativo ? undefined : "selecao"}
+              escala={0.92}
+              style={[styles.opcao, { backgroundColor: ativo ? colors.ink : colors.sunk }]}
+            >
+              <Text variant="body" weight={ativo ? 700 : 500} color={ativo ? "onInk" : "ink"}>
+                {doisDigitos(valor)}
+              </Text>
+            </PressableEscala>
+          );
+        })}
+      </View>
+    </View>
   );
 }
 
-/** Botão que mostra a hora e abre o seletor nativo (diálogo no Android, roda no iOS). */
-function CampoNativo({ valor, aoMudar, rotulo, bloco = false }: SeletorDeHorarioProps) {
+type PainelProps = {
+  rotulo: string;
+  valor: string | null;
+  aoConfirmar: (hora: string) => void;
+  aoFechar: () => void;
+};
+
+/** Painel que sobe de baixo com as horas (00 a 23) e os minutos (de 5 em 5). */
+function PainelDeHorario({ rotulo, valor, aoConfirmar, aoFechar }: PainelProps) {
+  const { colors, shadows } = useTheme();
+  const insets = useSafeAreaInsets();
+  const { height: alturaTela } = useWindowDimensions();
+  const inicial = partesDaHora(valor);
+  const [horas, setHoras] = useState(inicial.horas);
+  const [minutos, setMinutos] = useState(inicial.minutos);
+
+  const deslocamento = useSharedValue(alturaTela);
+  const opacidadeVeu = useSharedValue(0);
+
+  useEffect(() => {
+    const reduzir = ReduceMotion.System;
+    deslocamento.value = withTiming(0, {
+      duration: MOTION.sheet.duration,
+      easing: CURVA,
+      reduceMotion: reduzir,
+    });
+    opacidadeVeu.value = withTiming(1, { duration: 300, reduceMotion: reduzir });
+  }, [deslocamento, opacidadeVeu]);
+
+  const estiloSheet = useAnimatedStyle(() => ({
+    transform: [{ translateY: deslocamento.value }],
+  }));
+  const estiloVeu = useAnimatedStyle(() => ({ opacity: opacidadeVeu.value }));
+
+  return (
+    <Modal
+      visible
+      transparent
+      animationType="none"
+      statusBarTranslucent
+      navigationBarTranslucent
+      onRequestClose={aoFechar}
+    >
+      <View style={styles.raiz}>
+        <Animated.View
+          style={[StyleSheet.absoluteFill, { backgroundColor: colors.overlay }, estiloVeu]}
+        >
+          <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={aoFechar}
+            accessibilityRole="button"
+            accessibilityLabel="Fechar"
+          />
+        </Animated.View>
+
+        <Animated.View
+          accessibilityViewIsModal
+          accessibilityLabel={`Definir horário: ${rotulo}`}
+          style={[
+            styles.sheet,
+            {
+              backgroundColor: colors.card,
+              boxShadow: shadows.sheet,
+              paddingBottom: SPACING.lg + insets.bottom,
+            },
+            estiloSheet,
+          ]}
+        >
+          <View style={[styles.alca, { backgroundColor: colors.hair }]} />
+          <View style={styles.topo}>
+            <Text variant="section" accessibilityRole="header">
+              {rotulo}
+            </Text>
+            <View style={[styles.visor, { backgroundColor: colors.sunk }]}>
+              <Text
+                variant="h1"
+                weight={300}
+                color="accentText"
+                style={styles.numeroDoVisor}
+                accessibilityLiveRegion="polite"
+                testID="visor-do-horario"
+              >
+                {montarHora(horas, minutos)}
+              </Text>
+            </View>
+          </View>
+
+          <Grade
+            titulo="Hora"
+            valores={HORAS}
+            escolhido={horas}
+            aoEscolher={setHoras}
+            prefixo="Hora"
+          />
+          <Grade
+            titulo="Minutos"
+            valores={MINUTOS}
+            escolhido={minutos}
+            aoEscolher={setMinutos}
+            prefixo="Minuto"
+          />
+
+          <BotaoAcao
+            titulo="Definir horário"
+            comMais={false}
+            aoPressionar={() => aoConfirmar(montarHora(horas, minutos))}
+          />
+          <Pressable accessibilityRole="button" onPress={aoFechar} style={styles.cancelar}>
+            <Text variant="support" weight={500} color="mute">
+              Cancelar
+            </Text>
+          </Pressable>
+        </Animated.View>
+      </View>
+    </Modal>
+  );
+}
+
+/**
+ * Campo de horário no visual do app: mostra a hora e, ao tocar, abre o painel com a grade de
+ * horas e minutos. Substitui o relógio nativo do sistema, que não seguia a identidade do app.
+ */
+export default function SeletorDeHorario({
+  valor,
+  aoMudar,
+  rotulo,
+  bloco = false,
+}: SeletorDeHorarioProps) {
   const { colors } = useTheme();
   const [aberto, setAberto] = useState(false);
 
-  function aoEscolher(tipo: string | undefined, data: Date | undefined) {
-    if (tipo === "set" && data) {
-      aoMudar(formatarHora(data));
-    }
-  }
-
-  function aoPressionar() {
-    if (Platform.OS === "android") {
-      DateTimePickerAndroid.open({
-        value: dataDaHora(valor),
-        mode: "time",
-        is24Hour: true,
-        onChange: (evento, data) => aoEscolher(evento.type, data),
-      });
-      return;
-    }
-    // A roda já mostra a hora padrão: sem isto, aceitá-la sem girar deixaria o campo vazio.
-    if (!aberto && valor === null) {
-      aoMudar(formatarHora(dataDaHora(null)));
-    }
-    setAberto((atual) => !atual);
-  }
-
   return (
-    <View>
-      <Pressable
+    <>
+      <PressableEscala
         accessibilityRole="button"
-        accessibilityLabel={rotulo}
-        onPress={aoPressionar}
+        accessibilityLabel={valor === null ? `${rotulo}: escolher horário` : `${rotulo}: ${valor}`}
+        onPress={() => setAberto(true)}
+        escala={0.97}
         style={[
           styles.campo,
-          styles.botao,
           bloco && styles.bloco,
-          { borderColor: colors.hair, backgroundColor: bloco ? colors.card : undefined },
+          { borderColor: colors.hair, backgroundColor: colors.card },
         ]}
       >
         <Text
@@ -114,25 +235,20 @@ function CampoNativo({ valor, aoMudar, rotulo, bloco = false }: SeletorDeHorario
         >
           {valor ?? "--:--"}
         </Text>
-      </Pressable>
-      {aberto && Platform.OS !== "android" ? (
-        <>
-          <DateTimePicker
-            value={dataDaHora(valor)}
-            mode="time"
-            display="spinner"
-            is24Hour
-            onChange={(evento, data) => aoEscolher(evento.type, data)}
-          />
-          <BotaoTexto rotulo="OK" aoPressionar={() => setAberto(false)} />
-        </>
+      </PressableEscala>
+      {aberto ? (
+        <PainelDeHorario
+          rotulo={rotulo}
+          valor={valor}
+          aoFechar={() => setAberto(false)}
+          aoConfirmar={(hora) => {
+            setAberto(false);
+            aoMudar(hora);
+          }}
+        />
       ) : null}
-    </View>
+    </>
   );
-}
-
-export default function SeletorDeHorario(props: SeletorDeHorarioProps) {
-  return Platform.OS === "web" ? <CampoWeb {...props} /> : <CampoNativo {...props} />;
 }
 
 const styles = StyleSheet.create({
@@ -141,8 +257,36 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: RADIUS.field,
     paddingHorizontal: SPACING.lg,
+    justifyContent: "center",
   },
-  botao: { justifyContent: "center" },
-  bloco: { minHeight: 72, borderRadius: RADIUS.category },
-  numeroDoBloco: { fontSize: TAMANHO_DO_BLOCO, lineHeight: 38, fontVariant: ["tabular-nums"] },
+  bloco: { minHeight: 64, borderRadius: RADIUS.category },
+  numeroDoBloco: { fontSize: 28, lineHeight: 34, fontVariant: ["tabular-nums"] },
+  raiz: { flex: 1, justifyContent: "flex-end" },
+  sheet: {
+    paddingTop: SPACING.md,
+    paddingHorizontal: SPACING.screenAuth,
+    borderTopLeftRadius: RADIUS.progress,
+    borderTopRightRadius: RADIUS.progress,
+    gap: SPACING.md,
+  },
+  alca: { alignSelf: "center", width: 44, height: 5, borderRadius: 3 },
+  topo: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  visor: {
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.xs,
+    borderRadius: RADIUS.field,
+  },
+  numeroDoVisor: { fontVariant: ["tabular-nums"] },
+  grupo: { gap: SPACING.xs },
+  grade: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
+  opcao: {
+    // 6 colunas com 5 vãos de 6 pt: cada botão ocupa 1/6 da linha menos a sua parte dos vãos.
+    flexBasis: `${100 / COLUNAS - 2}%`,
+    flexGrow: 1,
+    minHeight: SIZES.touchMin,
+    borderRadius: RADIUS.field,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cancelar: { height: SIZES.touchMin, alignItems: "center", justifyContent: "center" },
 });

@@ -3,12 +3,14 @@ import type { FaixaDoMes } from "../domain/estatisticas";
 import { SPACING } from "../styles/theme";
 import { useTheme } from "../theme/ThemeProvider";
 import { Card } from "../ui/Card";
-import { Gradiente } from "../ui/Gradiente";
 import { Text } from "../ui/Text";
 
 const ALTURA_MAXIMA = 110;
 
-/** "Por semana": uma barra por faixa de 7 dias do mês, com o total escrito acima. */
+/**
+ * "Por semana": uma barra por faixa de 7 dias do mês, com o total escrito acima. Todas as barras
+ * têm a mesma cor; a semana atual se destaca só pelo texto em negrito.
+ */
 export default function GraficoDoMes({ faixas }: { faixas: readonly FaixaDoMes[] }) {
   const { colors } = useTheme();
   const maximo = Math.max(1, ...faixas.map((faixa) => faixa.total));
@@ -48,9 +50,7 @@ export default function GraficoDoMes({ faixas }: { faixas: readonly FaixaDoMes[]
                       faixa.futura || faixa.total === 0 ? colors.sunk : colors.ramp[0],
                   },
                 ]}
-              >
-                {faixa.atual && faixa.total > 0 ? <Gradiente cores={colors.gradient} /> : null}
-              </View>
+              />
               <Text
                 variant="caption"
                 weight={faixa.atual ? 700 : 400}

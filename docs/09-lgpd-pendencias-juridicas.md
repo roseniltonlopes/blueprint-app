@@ -1,6 +1,6 @@
 # 09. LGPD: pendências para revisão jurídica
 
-Os Termos de Uso e a Política de Privacidade (`src/legal/textos.ts`, versão `2026-11-22`) foram escritos em linguagem simples, a partir do que o app faz de fato. **Não foram revisados por advogado.** Antes de divulgar o app para além de uso pessoal ou acadêmico, um profissional precisa olhar os pontos abaixo.
+Os Termos de Uso e a Política de Privacidade (`src/legal/textos.ts`, versão `2026-11-23`) foram escritos em linguagem simples, a partir do que o app faz de fato. **Não foram revisados por advogado.** Antes de divulgar o app para além de uso pessoal ou acadêmico, um profissional precisa olhar os pontos abaixo.
 
 Controlador: Rosenilton Lopes (pessoa física). Contato público: roseniltonlopes1993@gmail.com.
 
@@ -25,7 +25,8 @@ Controlador: Rosenilton Lopes (pessoa física). Contato público: roseniltonlope
 | Dado | Onde | Necessário? |
 | :--- | :--- | :--- |
 | E-mail e senha | Supabase Auth | Sim (login e recuperação de senha). |
-| Nome | `perfis.nome` e `user_metadata.nome` | Opcional. A cópia no `user_metadata` (feita no cadastro) fica no Auth mesmo depois de a pessoa mudar o nome no app. Dá para deixar de enviar o nome no cadastro: a sincronização já sobe o nome para `perfis`. |
+| Nome | `perfis.nome` e `user_metadata.nome` | Sim desde a 1.2.0: o cadastro pede o nome para mostrar no Perfil e na saudação. A cópia no `user_metadata` fica no Auth mesmo depois de a pessoa mudar o nome no app. |
+| Data de nascimento | `user_metadata.data_nascimento` e, depois da migração 004, `perfis.data_nascimento` | Usada só para confirmar a idade mínima de 13 anos. **Revisão jurídica:** a LGPD (art. 14) exige consentimento dos pais para menores de 12 anos e trata adolescentes com regra própria; confirmar se 13 anos é o corte certo e se guardar a data inteira é necessário (bastaria guardar "maior de 13: sim"). |
 | Fuso horário | `perfis.fuso` e `user_metadata.fuso` | **Hoje não é usado**: o app calcula os dias pelo relógio do aparelho e não lê `perfis.fuso`. Candidato a deixar de enviar no cadastro até ser usado. |
 | Versão dos termos | `perfis.termos_versao` e `user_metadata.termos_versao` | Sim em `perfis` (prova do aceite). A cópia no `user_metadata` é o caminho que o gatilho usa e fica guardada no Auth. |
 | Tema, destaque e meta diária | `perfis.tema`, `perfis.destaque`, `perfis.meta_diaria` | O app não envia; o banco guarda os valores padrão. Não são dados da pessoa hoje. |

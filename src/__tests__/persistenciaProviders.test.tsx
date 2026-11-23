@@ -32,7 +32,11 @@ describe("AcoesProvider com repositório", () => {
           <AcoesProvider relogio={relogioFixo()} acoesIniciais={[existente]} repositorio={repo}>
             <AgendaProvider>
               <PerfilProvider>
-                <HomeScreen />
+                <ContaProvider porta={null}>
+                  <SincronizacaoProvider nuvem={null}>
+                    <HomeScreen />
+                  </SincronizacaoProvider>
+                </ContaProvider>
               </PerfilProvider>
             </AgendaProvider>
           </AcoesProvider>
@@ -56,7 +60,11 @@ describe("AcoesProvider com repositório", () => {
           <AcoesProvider relogio={relogioFixo()} meta={8}>
             <AgendaProvider>
               <PerfilProvider>
-                <HomeScreen />
+                <ContaProvider porta={null}>
+                  <SincronizacaoProvider nuvem={null}>
+                    <HomeScreen />
+                  </SincronizacaoProvider>
+                </ContaProvider>
               </PerfilProvider>
             </AgendaProvider>
           </AcoesProvider>

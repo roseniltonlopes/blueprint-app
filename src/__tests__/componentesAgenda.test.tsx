@@ -1,8 +1,11 @@
-import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import { fireEvent, screen } from "@testing-library/react-native";
-import { Platform } from "react-native";
 import SeletorDeDias from "../components/SeletorDeDias";
-import SeletorDeHorario from "../components/SeletorDeHorario";
+import SeletorDeHorario, {
+  HORAS,
+  MINUTOS,
+  montarHora,
+  partesDaHora,
+} from "../components/SeletorDeHorario";
 import type { DiaDaSemana } from "../domain/agenda";
 import { renderComTema } from "./utils";
 
@@ -35,68 +38,50 @@ describe("SeletorDeDias", () => {
 });
 
 describe("SeletorDeHorario", () => {
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
-  it("no iOS abre o seletor nativo e devolve a hora escolhida", async () => {
+  it("abre o painel com a hora atual e devolve a hora escolhida na grade", async () => {
     const aoMudar = jest.fn();
     await renderComTema(<SeletorDeHorario valor="05:00" aoMudar={aoMudar} rotulo="Início" />);
     expect(screen.getByText("05:00")).toBeTruthy();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Início" }));
-    const seletor = screen.getByTestId("datetimepicker");
-    await fireEvent(seletor, "change", { type: "set" }, new Date(2026, 10, 1, 5, 30));
-    expect(aoMudar).toHaveBeenCalledWith("05:30");
-  });
+    await fireEvent.press(screen.getByRole("button", { name: "Início: 05:00" }));
+    expect(screen.getByTestId("visor-do-horario").props.children).toBe("05:00");
+    expect(screen.getByRole("radio", { name: "Hora 05" }).props.accessibilityState).toMatchObject({
+      selected: true,
+    });
 
-  it("no iOS, abrir sem valor já propõe 08:00 e o botão OK fecha a roda", async () => {
-    const aoMudar = jest.fn();
-    await renderComTema(<SeletorDeHorario valor={null} aoMudar={aoMudar} rotulo="Início" />);
-
-    await fireEvent.press(screen.getByRole("button", { name: "Início" }));
-    expect(aoMudar).toHaveBeenCalledWith("08:00");
-    expect(screen.getByTestId("datetimepicker")).toBeTruthy();
-
-    await fireEvent.press(screen.getByRole("button", { name: "OK" }));
-    expect(screen.queryByTestId("datetimepicker")).toBeNull();
-  });
-
-  it("no iOS, abrir com valor não troca a hora até a pessoa girar a roda", async () => {
-    const aoMudar = jest.fn();
-    await renderComTema(<SeletorDeHorario valor="05:00" aoMudar={aoMudar} rotulo="Início" />);
-    await fireEvent.press(screen.getByRole("button", { name: "Início" }));
+    await fireEvent.press(screen.getByRole("radio", { name: "Hora 07" }));
+    await fireEvent.press(screen.getByRole("radio", { name: "Minuto 30" }));
+    expect(screen.getByTestId("visor-do-horario").props.children).toBe("07:30");
     expect(aoMudar).not.toHaveBeenCalled();
+
+    await fireEvent.press(screen.getByRole("button", { name: "Definir horário" }));
+    expect(aoMudar).toHaveBeenCalledWith("07:30");
+    expect(screen.queryByTestId("visor-do-horario")).toBeNull();
   });
 
-  it("no Android abre o diálogo nativo", async () => {
-    jest.replaceProperty(Platform, "OS", "android");
-    const aoMudar = jest.fn();
-    await renderComTema(<SeletorDeHorario valor={null} aoMudar={aoMudar} rotulo="Início" />);
-
-    await fireEvent.press(screen.getByRole("button", { name: "Início" }));
-    expect(DateTimePickerAndroid.open).toHaveBeenCalledWith(
-      expect.objectContaining({ mode: "time", is24Hour: true }),
-    );
-    const { onChange } = jest.mocked(DateTimePickerAndroid.open).mock.calls[0][0];
-    onChange?.({ type: "set" } as never, new Date(2026, 10, 1, 7, 5));
-    expect(aoMudar).toHaveBeenCalledWith("07:05");
+  it("sem valor, o painel começa em 08:00", async () => {
+    await renderComTema(<SeletorDeHorario valor={null} aoMudar={() => {}} rotulo="Término" />);
+    expect(screen.getByText("--:--")).toBeTruthy();
+    await fireEvent.press(screen.getByRole("button", { name: "Término: escolher horário" }));
+    expect(screen.getByTestId("visor-do-horario").props.children).toBe("08:00");
   });
 
-  it("na web aplica a máscara HH:MM e só avisa quando a hora é válida", async () => {
-    jest.replaceProperty(Platform, "OS", "web");
+  it("Cancelar fecha sem mudar a hora", async () => {
     const aoMudar = jest.fn();
-    await renderComTema(<SeletorDeHorario valor={null} aoMudar={aoMudar} rotulo="Início" />);
-
-    const campo = screen.getByLabelText("Início");
-    await fireEvent.changeText(campo, "053");
+    await renderComTema(<SeletorDeHorario valor="09:15" aoMudar={aoMudar} rotulo="Início" />);
+    await fireEvent.press(screen.getByRole("button", { name: "Início: 09:15" }));
+    await fireEvent.press(screen.getByRole("radio", { name: "Hora 10" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Cancelar" }));
     expect(aoMudar).not.toHaveBeenCalled();
-    await fireEvent.changeText(campo, "0530");
-    expect(aoMudar).toHaveBeenCalledWith("05:30");
-    expect(screen.getByDisplayValue("05:30")).toBeTruthy();
+    expect(screen.queryByTestId("visor-do-horario")).toBeNull();
+  });
 
-    await fireEvent.changeText(campo, "2599");
-    expect(aoMudar).toHaveBeenCalledTimes(1);
+  it("oferece as 24 horas e os minutos de 5 em 5", async () => {
+    expect(HORAS).toHaveLength(24);
+    expect(MINUTOS).toEqual([0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]);
+    expect(partesDaHora("23:45")).toEqual({ horas: 23, minutos: 45 });
+    expect(partesDaHora("25:00")).toEqual({ horas: 8, minutos: 0 });
+    expect(montarHora(7, 5)).toBe("07:05");
   });
 });
 
